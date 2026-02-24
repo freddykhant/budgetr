@@ -12,6 +12,7 @@ export const appRouter = createTRPCRouter({
   entry: entryRouter,
   goal: goalRouter,
   creditCard: creditCardRouter,
+  
   onboarding: onboardingRouter,
 });
 
