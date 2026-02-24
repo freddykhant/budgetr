@@ -50,75 +50,75 @@ export const onboardingRouter = createTRPCRouter({
         throw new Error("Allocation percentages must add up to 100%");
       }
 
-      const result = await ctx.db.transaction(async (tx) => {
-        // Upsert user settings
-        const existingSettings = await tx.query.userSettings.findFirst({
-          where: eq(userSettings.userId, userId),
-        });
+      // NOTE: neon-http driver doesn't support transactional APIs the same
+      // way as some other drivers, so we perform these operations
+      // sequentially instead of using `db.transaction`.
 
-        if (existingSettings) {
-          await tx
-            .update(userSettings)
-            .set({
-              monthlyIncome: input.income.toString(),
-              onboardingCompleted: true,
-            })
-            .where(eq(userSettings.id, existingSettings.id));
-        } else {
-          await tx.insert(userSettings).values({
-            userId,
-            monthlyIncome: input.income.toString(),
-            onboardingCompleted: true,
-          });
-        }
-
-        // Create categories
-        const createdCategories = await tx
-          .insert(categories)
-          .values(
-            input.categories.map((c, index) => ({
-              userId,
-              name: c.name,
-              emoji: c.emoji,
-              color: c.color,
-              type: c.type,
-              sortOrder: index,
-            })),
-          )
-          .returning();
-
-        // Create first budget
-        const budgetArr = await tx
-          .insert(budgets)
-          .values({
-            userId,
-            month: input.month,
-            year: input.year,
-            income: input.income.toString(),
-          })
-          .returning();
-        const budget = budgetArr[0];
-
-        if (!budget) {
-          throw new Error("Failed to create budget");
-        }
-
-        // Link allocations
-        await tx.insert(budgetAllocations).values(
-          createdCategories.map((cat, index) => ({
-            budgetId: budget.id,
-            categoryId: cat.id,
-            allocationPct: input.categories[index]!.allocationPct,
-          })),
-        );
-
-        return {
-          budget,
-          categories: createdCategories,
-        };
+      // Upsert user settings
+      const existingSettings = await ctx.db.query.userSettings.findFirst({
+        where: eq(userSettings.userId, userId),
       });
 
-      return result;
+      if (existingSettings) {
+        await ctx.db
+          .update(userSettings)
+          .set({
+            monthlyIncome: input.income.toString(),
+            onboardingCompleted: true,
+          })
+          .where(eq(userSettings.id, existingSettings.id));
+      } else {
+        await ctx.db.insert(userSettings).values({
+          userId,
+          monthlyIncome: input.income.toString(),
+          onboardingCompleted: true,
+        });
+      }
+
+      // Create categories
+      const createdCategories = await ctx.db
+        .insert(categories)
+        .values(
+          input.categories.map((c, index) => ({
+            userId,
+            name: c.name,
+            emoji: c.emoji,
+            color: c.color,
+            type: c.type,
+            sortOrder: index,
+          })),
+        )
+        .returning();
+
+      // Create first budget
+      const budgetArr = await ctx.db
+        .insert(budgets)
+        .values({
+          userId,
+          month: input.month,
+          year: input.year,
+          income: input.income.toString(),
+        })
+        .returning();
+      const budget = budgetArr[0];
+
+      if (!budget) {
+        throw new Error("Failed to create budget");
+      }
+
+      // Link allocations
+      await ctx.db.insert(budgetAllocations).values(
+        createdCategories.map((cat, index) => ({
+          budgetId: budget.id,
+          categoryId: cat.id,
+          allocationPct: input.categories[index]!.allocationPct,
+        })),
+      );
+
+      return {
+        budget,
+        categories: createdCategories,
+      };
     }),
 });
 
