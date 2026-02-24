@@ -1,14 +1,20 @@
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
+import { budgetRouter } from "./routers/budget";
+import { creditCardRouter } from "./routers/creditCard";
+import { investmentRouter } from "./routers/investment";
+import { savingsRouter } from "./routers/savings";
+import { transactionRouter } from "./routers/transaction";
+import { travelFundRouter } from "./routers/travelFund";
 
-export const appRouter = createTRPCRouter({});
+export const appRouter = createTRPCRouter({
+  budget: budgetRouter,
+  transaction: transactionRouter,
+  savings: savingsRouter,
+  investment: investmentRouter,
+  travelFund: travelFundRouter,
+  creditCard: creditCardRouter,
+});
 
 export type AppRouter = typeof appRouter;
 
-/**
- * Create a server-side caller for the tRPC API.
- * @example
- * const trpc = createCaller(createContext);
- * const res = await trpc.post.all();
- *       ^? Post[]
- */
 export const createCaller = createCallerFactory(appRouter);
