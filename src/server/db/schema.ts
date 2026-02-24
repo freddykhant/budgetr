@@ -1,10 +1,16 @@
 import { relations } from "drizzle-orm";
 import {
+  boolean,
+  date,
   index,
+  integer,
+  numeric,
   pgEnum,
   pgTableCreator,
   primaryKey,
   unique,
+  varchar,
+  timestamp,
 } from "drizzle-orm/pg-core";
 import { type AdapterAccount } from "next-auth/adapters";
 
@@ -12,14 +18,12 @@ export const createTable = pgTableCreator((name) => `budgetr_${name}`);
 
 // ─── Enums ────────────────────────────────────────────────────────────────────
 
-export const transactionCategoryEnum = pgEnum("transaction_category", [
-  "food_dining",
-  "transport",
-  "subscriptions",
-  "personal_care",
-  "entertainment",
-  "shopping",
-  "other",
+export const categoryTypeEnum = pgEnum("category_type", [
+  "spending",
+  "saving",
+  "investment",
+  "credit_card",
+  "custom",
 ]);
 
 // ─── Auth tables (NextAuth) ───────────────────────────────────────────────────
@@ -85,8 +89,46 @@ export const verificationTokens = createTable(
   (t) => [primaryKey({ columns: [t.identifier, t.token] })],
 );
 
-// ─── Budget ───────────────────────────────────────────────────────────────────
-// One row per user per calendar month — defines income and the 4-way split.
+// ─── Budget & Settings ────────────────────────────────────────────────────────
+
+export const userSettings = createTable(
+  "user_settings",
+  (d) => ({
+    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
+    userId: d
+      .varchar({ length: 255 })
+      .notNull()
+      .references(() => users.id),
+    monthlyIncome: d.numeric({ precision: 10, scale: 2 }).notNull(),
+    onboardingCompleted: d.boolean().notNull().default(false),
+    createdAt: d.timestamp({ withTimezone: true }).defaultNow().notNull(),
+  }),
+  (t) => [
+    unique("user_settings_user_id_uniq").on(t.userId),
+    index("user_settings_user_id_idx").on(t.userId),
+  ],
+);
+
+export const categories = createTable(
+  "category",
+  (d) => ({
+    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
+    userId: d
+      .varchar({ length: 255 })
+      .notNull()
+      .references(() => users.id),
+    name: d.varchar({ length: 255 }).notNull(),
+    emoji: d.varchar({ length: 16 }),
+    color: d.varchar({ length: 32 }),
+    type: categoryTypeEnum().notNull().default("spending"),
+    sortOrder: d.integer().notNull().default(0),
+    createdAt: d.timestamp({ withTimezone: true }).defaultNow().notNull(),
+  }),
+  (t) => [
+    index("category_user_id_idx").on(t.userId),
+    unique("category_user_name_uniq").on(t.userId, t.name),
+  ],
+);
 
 export const budgets = createTable(
   "budget",
@@ -98,15 +140,8 @@ export const budgets = createTable(
       .references(() => users.id),
     month: d.integer().notNull(), // 1–12
     year: d.integer().notNull(),
-    income: d.numeric({ precision: 10, scale: 2 }).notNull().default("4100"),
-    spendingPct: d.integer().notNull().default(30),
-    savingsPct: d.integer().notNull().default(40),
-    investPct: d.integer().notNull().default(20),
-    travelPct: d.integer().notNull().default(10),
+    income: d.numeric({ precision: 10, scale: 2 }).notNull(),
     createdAt: d.timestamp({ withTimezone: true }).defaultNow().notNull(),
-    updatedAt: d
-      .timestamp({ withTimezone: true })
-      .$onUpdate(() => new Date()),
   }),
   (t) => [
     index("budget_user_id_idx").on(t.userId),
@@ -114,189 +149,126 @@ export const budgets = createTable(
   ],
 );
 
-// ─── Transactions ─────────────────────────────────────────────────────────────
-// Individual spending entries that count against the monthly spending budget.
+export const budgetAllocations = createTable(
+  "budget_allocation",
+  (d) => ({
+    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
+    budgetId: d
+      .integer()
+      .notNull()
+      .references(() => budgets.id, { onDelete: "cascade" }),
+    categoryId: d
+      .integer()
+      .notNull()
+      .references(() => categories.id, { onDelete: "cascade" }),
+    allocationPct: d.integer().notNull(),
+    createdAt: d.timestamp({ withTimezone: true }).defaultNow().notNull(),
+  }),
+  (t) => [
+    index("budget_allocation_budget_id_idx").on(t.budgetId),
+    unique("budget_allocation_budget_category_uniq").on(
+      t.budgetId,
+      t.categoryId,
+    ),
+  ],
+);
 
-export const transactions = createTable(
-  "transaction",
+// ─── Entries & Goals ──────────────────────────────────────────────────────────
+
+export const entries = createTable(
+  "entry",
   (d) => ({
     id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
     userId: d
       .varchar({ length: 255 })
       .notNull()
       .references(() => users.id),
+    categoryId: d
+      .integer()
+      .notNull()
+      .references(() => categories.id, { onDelete: "cascade" }),
     amount: d.numeric({ precision: 10, scale: 2 }).notNull(),
-    category: transactionCategoryEnum().notNull(),
     description: d.varchar({ length: 255 }),
+    // Redundant month/year to make queries efficient and avoid extracting from date
     date: d.date().notNull(),
+    month: d.integer().notNull(),
+    year: d.integer().notNull(),
     createdAt: d.timestamp({ withTimezone: true }).defaultNow().notNull(),
     updatedAt: d
       .timestamp({ withTimezone: true })
       .$onUpdate(() => new Date()),
   }),
   (t) => [
-    index("transaction_user_id_idx").on(t.userId),
-    index("transaction_date_idx").on(t.date),
+    index("entry_user_id_idx").on(t.userId),
+    index("entry_category_id_idx").on(t.categoryId),
+    index("entry_month_year_idx").on(t.year, t.month),
   ],
 );
 
-// ─── Savings ──────────────────────────────────────────────────────────────────
-// A savings goal (e.g. Emergency Fund) with per-month contribution logs.
-
-export const savingsGoals = createTable(
-  "savings_goal",
+export const categoryGoals = createTable(
+  "category_goal",
   (d) => ({
     id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
     userId: d
       .varchar({ length: 255 })
       .notNull()
       .references(() => users.id),
+    categoryId: d
+      .integer()
+      .notNull()
+      .references(() => categories.id, { onDelete: "cascade" }),
     name: d.varchar({ length: 255 }).notNull(),
     targetAmount: d.numeric({ precision: 10, scale: 2 }).notNull(),
     createdAt: d.timestamp({ withTimezone: true }).defaultNow().notNull(),
   }),
-  (t) => [index("savings_goal_user_id_idx").on(t.userId)],
+  (t) => [
+    index("category_goal_user_id_idx").on(t.userId),
+    unique("category_goal_category_id_uniq").on(t.categoryId),
+  ],
 );
 
-export const savingsContributions = createTable(
-  "savings_contribution",
+// ─── Credit Card Trackers ─────────────────────────────────────────────────────
+
+export const creditCardTrackers = createTable(
+  "credit_card_tracker",
   (d) => ({
     id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
-    goalId: d
+    userId: d
+      .varchar({ length: 255 })
+      .notNull()
+      .references(() => users.id),
+    categoryId: d
       .integer()
       .notNull()
-      .references(() => savingsGoals.id, { onDelete: "cascade" }),
-    userId: d
-      .varchar({ length: 255 })
-      .notNull()
-      .references(() => users.id),
-    amount: d.numeric({ precision: 10, scale: 2 }).notNull(),
-    month: d.integer().notNull(),
-    year: d.integer().notNull(),
-    grewByHundred: d.boolean().notNull().default(false), // ANZ bonus qualifier
-    createdAt: d.timestamp({ withTimezone: true }).defaultNow().notNull(),
-  }),
-  (t) => [
-    index("savings_contribution_goal_id_idx").on(t.goalId),
-    unique("savings_contribution_goal_month_year_uniq").on(
-      t.goalId,
-      t.month,
-      t.year,
-    ),
-  ],
-);
-
-// ─── Investments ──────────────────────────────────────────────────────────────
-// Monthly ETF contribution entries + a snapshot of total portfolio value.
-
-export const investments = createTable(
-  "investment",
-  (d) => ({
-    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
-    userId: d
-      .varchar({ length: 255 })
-      .notNull()
-      .references(() => users.id),
-    amount: d.numeric({ precision: 10, scale: 2 }).notNull(),
-    portfolioValue: d.numeric({ precision: 10, scale: 2 }),
-    month: d.integer().notNull(),
-    year: d.integer().notNull(),
-    note: d.varchar({ length: 255 }),
-    createdAt: d.timestamp({ withTimezone: true }).defaultNow().notNull(),
-  }),
-  (t) => [
-    index("investment_user_id_idx").on(t.userId),
-    unique("investment_user_month_year_uniq").on(t.userId, t.month, t.year),
-  ],
-);
-
-// ─── Travel Funds ─────────────────────────────────────────────────────────────
-// A named travel goal with per-month contribution logs.
-
-export const travelFunds = createTable(
-  "travel_fund",
-  (d) => ({
-    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
-    userId: d
-      .varchar({ length: 255 })
-      .notNull()
-      .references(() => users.id),
-    name: d.varchar({ length: 255 }).notNull(), // e.g. "Japan Trip"
-    targetAmount: d.numeric({ precision: 10, scale: 2 }).notNull(),
-    createdAt: d.timestamp({ withTimezone: true }).defaultNow().notNull(),
-  }),
-  (t) => [index("travel_fund_user_id_idx").on(t.userId)],
-);
-
-export const travelContributions = createTable(
-  "travel_contribution",
-  (d) => ({
-    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
-    fundId: d
-      .integer()
-      .notNull()
-      .references(() => travelFunds.id, { onDelete: "cascade" }),
-    userId: d
-      .varchar({ length: 255 })
-      .notNull()
-      .references(() => users.id),
-    amount: d.numeric({ precision: 10, scale: 2 }).notNull(),
-    month: d.integer().notNull(),
-    year: d.integer().notNull(),
-    note: d.varchar({ length: 255 }),
-    createdAt: d.timestamp({ withTimezone: true }).defaultNow().notNull(),
-  }),
-  (t) => [
-    index("travel_contribution_fund_id_idx").on(t.fundId),
-    unique("travel_contribution_fund_month_year_uniq").on(
-      t.fundId,
-      t.month,
-      t.year,
-    ),
-  ],
-);
-
-// ─── Credit Card Goals ────────────────────────────────────────────────────────
-// Tracks spend-to-bonus progress for a credit card sign-up bonus.
-
-export const creditCardGoals = createTable(
-  "credit_card_goal",
-  (d) => ({
-    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
-    userId: d
-      .varchar({ length: 255 })
-      .notNull()
-      .references(() => users.id),
+      .references(() => categories.id, { onDelete: "cascade" }),
     cardName: d.varchar({ length: 255 }).notNull(),
     spendTarget: d.numeric({ precision: 10, scale: 2 }).notNull(),
-    currentSpend: d
-      .numeric({ precision: 10, scale: 2 })
-      .notNull()
-      .default("0"),
     bonusPoints: d.integer().notNull().default(0),
     startDate: d.date().notNull(),
-    endDate: d.date().notNull(), // startDate + 90 days
+    endDate: d.date().notNull(),
     paidInFull: d.boolean().notNull().default(false),
     createdAt: d.timestamp({ withTimezone: true }).defaultNow().notNull(),
-    updatedAt: d
-      .timestamp({ withTimezone: true })
-      .$onUpdate(() => new Date()),
   }),
-  (t) => [index("credit_card_goal_user_id_idx").on(t.userId)],
+  (t) => [
+    index("credit_card_tracker_user_id_idx").on(t.userId),
+    unique("credit_card_tracker_category_id_uniq").on(t.categoryId),
+  ],
 );
 
 // ─── Relations ────────────────────────────────────────────────────────────────
 
-export const usersRelations = relations(users, ({ many }) => ({
+export const usersRelations = relations(users, ({ many, one }) => ({
   accounts: many(accounts),
+  sessions: many(sessions),
+  settings: one(userSettings, {
+    fields: [users.id],
+    references: [userSettings.userId],
+  }),
   budgets: many(budgets),
-  transactions: many(transactions),
-  savingsGoals: many(savingsGoals),
-  savingsContributions: many(savingsContributions),
-  investments: many(investments),
-  travelFunds: many(travelFunds),
-  travelContributions: many(travelContributions),
-  creditCardGoals: many(creditCardGoals),
+  categories: many(categories),
+  entries: many(entries),
+  goals: many(categoryGoals),
+  creditCardTrackers: many(creditCardTrackers),
 }));
 
 export const accountsRelations = relations(accounts, ({ one }) => ({
@@ -307,65 +279,66 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
   user: one(users, { fields: [sessions.userId], references: [users.id] }),
 }));
 
-export const budgetsRelations = relations(budgets, ({ one }) => ({
+export const userSettingsRelations = relations(userSettings, ({ one }) => ({
+  user: one(users, { fields: [userSettings.userId], references: [users.id] }),
+}));
+
+export const categoriesRelations = relations(categories, ({ one, many }) => ({
+  user: one(users, { fields: [categories.userId], references: [users.id] }),
+  entries: many(entries),
+  allocations: many(budgetAllocations),
+  goals: many(categoryGoals),
+  creditCardTracker: many(creditCardTrackers),
+}));
+
+export const budgetsRelations = relations(budgets, ({ one, many }) => ({
   user: one(users, { fields: [budgets.userId], references: [users.id] }),
+  allocations: many(budgetAllocations),
 }));
 
-export const transactionsRelations = relations(transactions, ({ one }) => ({
-  user: one(users, { fields: [transactions.userId], references: [users.id] }),
-}));
-
-export const savingsGoalsRelations = relations(
-  savingsGoals,
-  ({ one, many }) => ({
-    user: one(users, { fields: [savingsGoals.userId], references: [users.id] }),
-    contributions: many(savingsContributions),
-  }),
-);
-
-export const savingsContributionsRelations = relations(
-  savingsContributions,
+export const budgetAllocationsRelations = relations(
+  budgetAllocations,
   ({ one }) => ({
-    goal: one(savingsGoals, {
-      fields: [savingsContributions.goalId],
-      references: [savingsGoals.id],
+    budget: one(budgets, {
+      fields: [budgetAllocations.budgetId],
+      references: [budgets.id],
     }),
-    user: one(users, {
-      fields: [savingsContributions.userId],
-      references: [users.id],
+    category: one(categories, {
+      fields: [budgetAllocations.categoryId],
+      references: [categories.id],
     }),
   }),
 );
 
-export const investmentsRelations = relations(investments, ({ one }) => ({
-  user: one(users, { fields: [investments.userId], references: [users.id] }),
+export const entriesRelations = relations(entries, ({ one }) => ({
+  user: one(users, { fields: [entries.userId], references: [users.id] }),
+  category: one(categories, {
+    fields: [entries.categoryId],
+    references: [categories.id],
+  }),
 }));
 
-export const travelFundsRelations = relations(travelFunds, ({ one, many }) => ({
-  user: one(users, { fields: [travelFunds.userId], references: [users.id] }),
-  contributions: many(travelContributions),
-}));
-
-export const travelContributionsRelations = relations(
-  travelContributions,
+export const categoryGoalsRelations = relations(
+  categoryGoals,
   ({ one }) => ({
-    fund: one(travelFunds, {
-      fields: [travelContributions.fundId],
-      references: [travelFunds.id],
-    }),
-    user: one(users, {
-      fields: [travelContributions.userId],
-      references: [users.id],
+    user: one(users, { fields: [categoryGoals.userId], references: [users.id] }),
+    category: one(categories, {
+      fields: [categoryGoals.categoryId],
+      references: [categories.id],
     }),
   }),
 );
 
-export const creditCardGoalsRelations = relations(
-  creditCardGoals,
+export const creditCardTrackersRelations = relations(
+  creditCardTrackers,
   ({ one }) => ({
     user: one(users, {
-      fields: [creditCardGoals.userId],
+      fields: [creditCardTrackers.userId],
       references: [users.id],
+    }),
+    category: one(categories, {
+      fields: [creditCardTrackers.categoryId],
+      references: [categories.id],
     }),
   }),
 );
