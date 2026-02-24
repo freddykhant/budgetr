@@ -8,7 +8,7 @@ import { TRPCReactProvider } from "~/trpc/react";
 export const metadata: Metadata = {
   title: "budgetr",
   description: "stupidly simple monthly budget planning",
-  icons: [{ rel: "icon", url: "/favicon.ico" }],
+  icons: [{ rel: "icon", url: "/budgetr.svg" }],
 };
 
 const geist = Geist({
