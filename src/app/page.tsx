@@ -1,4 +1,4 @@
-export default async function Home() {
+export default async function HeroPage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-neutral-950 text-white">
       <div className="flex flex-col items-center gap-4">
