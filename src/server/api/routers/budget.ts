@@ -57,7 +57,7 @@ export const budgetRouter = createTRPCRouter({
         settings?.monthlyIncome ??
         "0";
 
-      const [createdBudget] = await ctx.db
+      const createdArr = await ctx.db
         .insert(budgets)
         .values({
           userId,
@@ -66,6 +66,11 @@ export const budgetRouter = createTRPCRouter({
           income,
         })
         .returning();
+      const createdBudget = createdArr[0];
+
+      if (!createdBudget) {
+        throw new Error("Failed to create budget");
+      }
 
       // If there was a previous budget, copy its allocations
       if (previous) {
@@ -132,7 +137,7 @@ export const budgetRouter = createTRPCRouter({
         throw new Error("Budget not found");
       }
 
-      const [updatedBudget] = await ctx.db
+      const updatedArr = await ctx.db
         .update(budgets)
         .set({
           ...(input.income !== undefined && {
@@ -141,6 +146,11 @@ export const budgetRouter = createTRPCRouter({
         })
         .where(eq(budgets.id, existing.id))
         .returning();
+      const updatedBudget = updatedArr[0];
+
+      if (!updatedBudget) {
+        throw new Error("Failed to update budget");
+      }
 
       if (input.allocations) {
         // Ensure categories belong to user

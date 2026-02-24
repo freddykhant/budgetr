@@ -88,7 +88,7 @@ export const onboardingRouter = createTRPCRouter({
           .returning();
 
         // Create first budget
-        const [budget] = await tx
+        const budgetArr = await tx
           .insert(budgets)
           .values({
             userId,
@@ -97,6 +97,11 @@ export const onboardingRouter = createTRPCRouter({
             income: input.income.toString(),
           })
           .returning();
+        const budget = budgetArr[0];
+
+        if (!budget) {
+          throw new Error("Failed to create budget");
+        }
 
         // Link allocations
         await tx.insert(budgetAllocations).values(
