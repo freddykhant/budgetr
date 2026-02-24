@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
@@ -8,10 +7,10 @@ import {
   Plane,
   CreditCard,
   ChevronRight,
-  Settings,
 } from "lucide-react";
 
 import { auth } from "~/server/auth";
+import { Header } from "~/app/_components/header";
 
 // ─── Static mock data ─────────────────────────────────────────────────────────
 
@@ -162,31 +161,7 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-[#EDEDED]">
-      {/* Header */}
-      <header className="sticky top-0 z-10 border-b border-white/[0.06] bg-[#0A0A0A]/80 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-[720px] items-center justify-between px-6 py-4">
-          <span className="text-sm font-semibold tracking-tight text-white">
-            budgetr
-          </span>
-          <div className="flex items-center gap-3">
-            {user.image && (
-              <Image
-                src={user.image}
-                alt={user.name ?? "avatar"}
-                width={26}
-                height={26}
-                className="rounded-full opacity-90"
-              />
-            )}
-            <Link
-              href="/settings"
-              className="text-neutral-600 transition hover:text-neutral-400"
-            >
-              <Settings size={16} strokeWidth={1.5} />
-            </Link>
-          </div>
-        </div>
-      </header>
+      <Header user={user} />
 
       <main className="mx-auto max-w-[720px] space-y-4 px-6 py-8">
         {/* Greeting */}
