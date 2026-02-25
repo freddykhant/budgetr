@@ -1,9 +1,10 @@
-"use client";
+\"use client\";
 
-import { useEffect, useMemo, useState } from "react";
-import { Pencil, X, Check } from "lucide-react";
+import { useEffect, useMemo, useState } from \"react\";
+import { getDaysInMonth } from \"date-fns\";
+import { Pencil, X, Check } from \"lucide-react\";
 
-import { api } from "~/trpc/react";
+import { api } from \"~/trpc/react\";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -60,6 +61,23 @@ export function MonthlyBudgetCard({ month, year, onBudgetChange }: Props) {
       setIsEditing(false);
     },
   });
+
+  const today = new Date();
+  const monthDate = new Date(year, month - 1, 1);
+  const totalDaysInMonth = getDaysInMonth(monthDate);
+  const monthEnd = new Date(year, month, 0);
+
+  let daysElapsed = 0;
+  if (today < monthDate) {
+    daysElapsed = 0;
+  } else if (today > monthEnd) {
+    daysElapsed = totalDaysInMonth;
+  } else {
+    daysElapsed = today.getDate();
+  }
+
+  const monthProgressPct =
+    totalDaysInMonth > 0 ? (daysElapsed / totalDaysInMonth) * 100 : 0;
 
   const incomeNum = useMemo(
     () => Number(budgetQuery.data?.income ?? 0),
@@ -161,12 +179,27 @@ export function MonthlyBudgetCard({ month, year, onBudgetChange }: Props) {
 
   return (
     <div className="rounded-2xl border border-white/[0.06] bg-[#111111] p-6">
+      {/* Month progress bar */}
+      <div className="mb-4 h-0.5 w-full overflow-hidden rounded-full bg-white/[0.04]">
+        <div
+          className="h-full rounded-full bg-white/70 transition-all duration-500"
+          style={{ width: `${monthProgressPct}%` }}
+        />
+      </div>
+
       {/* Top row: income + edit button */}
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-xs uppercase tracking-[0.18em] text-neutral-500">
-            monthly income
-          </p>
+          <div className="flex items-center gap-2">
+            <p className="text-xs uppercase tracking-[0.18em] text-neutral-500">
+              monthly income
+            </p>
+            {daysElapsed > 0 && (
+              <span className="rounded-full border border-white/[0.08] bg-white/[0.02] px-2 py-0.5 text-[10px] text-neutral-500 tabular-nums">
+                day {daysElapsed} of {totalDaysInMonth}
+              </span>
+            )}
+          </div>
 
           {isEditing ? (
             <div className="mt-2 flex items-center rounded-xl border border-white/[0.10] bg-black/40 px-3 py-2">
