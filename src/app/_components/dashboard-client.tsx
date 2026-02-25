@@ -5,6 +5,7 @@ import { format } from "date-fns";
 
 import { api } from "~/trpc/react";
 import { MonthlyBudgetCard } from "./monthly-budget-card";
+import { SavingsCard } from "./savings-card";
 import { SpendingCard } from "./spending-card";
 
 type DashboardClientProps = {
@@ -88,13 +89,13 @@ export function DashboardClient({ user }: DashboardClientProps) {
           <MonthlyBudgetCard month={month} year={year} />
         </section>
 
-        {/* Spending summary */}
-        <section>
+        {/* Spending + Savings row */}
+        <section className="grid gap-4 md:grid-cols-2">
           <SpendingCard
-            className=""
             spent={totalSpent}
             limit={spendingAllocation || incomeNum || 1}
           />
+          <SavingsCard />
         </section>
       </div>
     </main>
