@@ -12,35 +12,39 @@ export default async function LandingPage() {
     <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-neutral-950 text-white">
       {/* Subtle glow */}
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-        <div className="h-[600px] w-[600px] rounded-full bg-white/[0.03] blur-3xl" />
+        <div className="h-[520px] w-[520px] rounded-full bg-white/[0.03] blur-3xl" />
       </div>
 
-      <div className="relative flex flex-col items-center gap-8 px-4 text-center">
-        {/* Logo mark */}
-        <div className="mb-2 flex items-center gap-2.5">
-          <span className="text-5xl font-semibold tracking-tight text-white">
-            budgetr
-          </span>
+      <div className="relative flex w-full max-w-4xl flex-col items-center gap-10 px-6 text-center md:items-start md:text-left">
+        {/* Header */}
+        <div className="flex flex-col items-center gap-3 md:items-start">
+
+          <div className="flex flex-col gap-1">
+            <h1 className="text-[40px] font-semibold tracking-tight text-white md:text-[44px]">
+              budgetr
+            </h1>
+            <p className="max-w-md text-base text-neutral-400 md:text-lg">
+              stupid simple monthly tracking. <br/>replace that old excel sheet, welcome to the future.
+            </p>
+          </div>
         </div>
 
-        {/* Tagline */}
-        <p className="max-w-sm text-base text-neutral-500">
-          stupid simple monthly budget planning.
-        </p>
+        {/* CTA + micro copy */}
+        <div className="flex flex-col items-center gap-4 md:items-start">
+          <Link
+            href="/api/auth/signin?callbackUrl=/home"
+            className="group flex items-center gap-3 rounded-full border border-neutral-800 bg-neutral-900 px-7 py-3.5 text-base font-medium text-neutral-200 transition-all duration-200 hover:border-neutral-600 hover:bg-neutral-800 hover:text-white"
+          >
+            <GoogleIcon />
+            continue with google
+          </Link>
 
-        {/* Sign in */}
-        <Link
-          href="/api/auth/signin?callbackUrl=/home"
-          className="group mt-2 flex items-center gap-3 rounded-full border border-neutral-800 bg-neutral-900 px-6 py-3 text-sm font-medium text-neutral-200 transition-all duration-200 hover:border-neutral-600 hover:bg-neutral-800 hover:text-white"
-        >
-          <GoogleIcon />
-          continue with google
-        </Link>
-
-        {/* Fine print */}
-        <p className="text-xs text-neutral-700">
-          your data stays yours. no ads, no tracking.
-        </p>
+          <div className="flex flex-col items-center gap-1 text-xs text-neutral-600 md:items-start md:text-sm">
+            <p className="text-neutral-500 md:text-neutral-600">
+              your data stays yours. no ads, no tracking.
+            </p>
+          </div>
+        </div>
       </div>
     </main>
   );
