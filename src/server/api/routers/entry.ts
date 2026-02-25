@@ -1,4 +1,4 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 
 import {
@@ -20,6 +20,33 @@ function extractMonthYear(date: string) {
 }
 
 export const entryRouter = createTRPCRouter({
+  // All entries for a category across all months (for goal-progress calculations)
+  listAllForCategory: protectedProcedure
+    .input(z.object({ categoryId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      return ctx.db.query.entries.findMany({
+        where: and(
+          eq(entries.userId, ctx.session.user.id),
+          eq(entries.categoryId, input.categoryId),
+        ),
+        orderBy: [desc(entries.date), desc(entries.createdAt)],
+      });
+    }),
+
+  // All entries for multiple categories across all months
+  listForCategories: protectedProcedure
+    .input(z.object({ categoryIds: z.array(z.number()) }))
+    .query(async ({ ctx, input }) => {
+      if (input.categoryIds.length === 0) return [];
+      return ctx.db.query.entries.findMany({
+        where: and(
+          eq(entries.userId, ctx.session.user.id),
+          inArray(entries.categoryId, input.categoryIds),
+        ),
+        orderBy: [desc(entries.date), desc(entries.createdAt)],
+      });
+    }),
+
   list: protectedProcedure
     .input(
       z.object({

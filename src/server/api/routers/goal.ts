@@ -8,6 +8,12 @@ import {
 import { categoryGoals } from "~/server/db/schema";
 
 export const goalRouter = createTRPCRouter({
+  list: protectedProcedure.query(async ({ ctx }) => {
+    return ctx.db.query.categoryGoals.findMany({
+      where: eq(categoryGoals.userId, ctx.session.user.id),
+    });
+  }),
+
   get: protectedProcedure
     .input(z.object({ categoryId: z.number() }))
     .query(async ({ ctx, input }) => {
