@@ -62,8 +62,9 @@ export function CreditCardSection() {
   return (
     <section>
       <div className="mb-3 flex items-center justify-between">
-        <p className="text-xs uppercase tracking-[0.18em] text-neutral-600">
-          credit cards
+        <p className="flex items-center gap-1 text-xs uppercase tracking-[0.18em] text-neutral-600">
+          <span className="text-sm">💳</span>
+          <span>credit cards</span>
         </p>
       </div>
 

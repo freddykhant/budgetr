@@ -142,6 +142,7 @@ export function SavingsCard({ className }: { className?: string }) {
         <div className="flex items-center gap-2">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
           <span className="text-xs uppercase tracking-[0.16em] text-neutral-400">
+            <span className="mr-1 text-sm">💰</span>
             savings
           </span>
         </div>
