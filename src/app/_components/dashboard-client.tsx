@@ -1,15 +1,13 @@
-\"use client\";
+import { useMemo } from "react";
+import { format, getDaysInMonth } from "date-fns";
 
-import { useMemo } from \"react\";
-import { format, getDaysInMonth } from \"date-fns\";
-
-import { api } from \"~/trpc/react\";
-import { CreditCardSection } from \"./credit-card-section\";
-import { CustomCategoriesSection } from \"./custom-categories-section\";
-import { InvestmentsCard } from \"./investments-card\";
-import { MonthlyBudgetCard } from \"./monthly-budget-card\";
-import { SavingsCard } from \"./savings-card\";
-import { SpendingCard } from \"./spending-card\";
+import { api } from "~/trpc/react";
+import { CreditCardSection } from "./credit-card-section";
+import { CustomCategoriesSection } from "./custom-categories-section";
+import { InvestmentsCard } from "./investments-card";
+import { MonthlyBudgetCard } from "./monthly-budget-card";
+import { SavingsCard } from "./savings-card";
+import { SpendingCard } from "./spending-card";
 
 type DashboardClientProps = {
   user: {
@@ -20,7 +18,7 @@ type DashboardClientProps = {
 };
 
 export function DashboardClient({ user }: DashboardClientProps) {
-  const firstName = user.name?.split(\" \")[0] ?? \"hey\";
+  const firstName = user.name?.split(" ")[0] ?? "hey";
   const today = new Date();
   const month = today.getMonth() + 1;
   const year = today.getFullYear();
@@ -36,7 +34,7 @@ export function DashboardClient({ user }: DashboardClientProps) {
 
   // Live spending summary (same logic as spending page, but condensed)
   const spendingCategory = useMemo(
-    () => categoriesQuery.data?.find((c) => c.type === \"spending\"),
+    () => categoriesQuery.data?.find((c) => c.type === "spending"),
     [categoriesQuery.data],
   );
 
@@ -66,8 +64,8 @@ export function DashboardClient({ user }: DashboardClientProps) {
     );
   }, [entriesQuery.data]);
 
-  const monthLabel = format(today, \"MMMM yyyy\");
-  const monthName = format(today, \"MMMM\");
+  const monthLabel = format(today, "MMMM yyyy");
+  const monthName = format(today, "MMMM");
   const dayOfMonth = today.getDate();
   const totalDaysInMonth = getDaysInMonth(today);
   const monthElapsedPct =
@@ -76,7 +74,7 @@ export function DashboardClient({ user }: DashboardClientProps) {
 
   const hour = today.getHours();
   const greeting =
-    hour < 12 ? \"good morning\" : hour < 18 ? \"good afternoon\" : \"good evening\";
+    hour < 12 ? "good morning" : hour < 18 ? "good afternoon" : "good evening";
 
   const hasSpendingBudget = spendingAllocation > 0 && !!spendingCategory;
   const spendUsedPct = hasSpendingBudget
@@ -86,43 +84,44 @@ export function DashboardClient({ user }: DashboardClientProps) {
 
   let pulse: string;
   if (!hasSpendingBudget) {
-    pulse = \"Set up your spending allocation to see how you\\'re tracking this month.\";
+    pulse =
+      "Set up your spending allocation to see how you're tracking this month.";
   } else if (spendUsedPct === 0) {
     pulse =
-      \"You haven\\'t spent from your monthly budget yet — a clean slate for the month.\";
+      "You haven't spent from your monthly budget yet — a clean slate for the month.";
   } else if (Math.abs(spendUsedPct - monthPctRounded) <= 5) {
-    pulse = `You\\'re ${monthPctRounded}% through ${monthName} and ${spendUsedPct}% through your spending budget — right on pace.`;
+    pulse = `You're ${monthPctRounded}% through ${monthName} and ${spendUsedPct}% through your spending budget — right on pace.`;
   } else if (spendUsedPct > monthPctRounded) {
-    pulse = `Heads up — you\\'ve used ${spendUsedPct}% of your spending budget with ${daysLeft} day${
-      daysLeft === 1 ? \"\" : \"s\"
+    pulse = `Heads up — you've used ${spendUsedPct}% of your spending budget with ${daysLeft} day${
+      daysLeft === 1 ? "" : "s"
     } left.`;
   } else {
-    pulse = \"Nice — you\\'re ahead of pace on spending this month.\";
+    pulse = "Nice — you're ahead of pace on spending this month.";
   }
 
   return (
-    <main className=\"px-6 py-10 xl:px-12\">
-      <div className=\"mx-auto max-w-4xl space-y-8\">
+    <main className="px-6 py-10 xl:px-12">
+      <div className="mx-auto max-w-4xl space-y-8">
         {/* Greeting */}
-        <section className=\"flex flex-col gap-3 md:flex-row md:items-end md:justify-between\">
+        <section className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className=\"text-xs uppercase tracking-[0.18em] text-neutral-500\">
+            <p className="text-xs uppercase tracking-[0.18em] text-neutral-500">
               {greeting}
             </p>
-            <h1 className=\"mt-1 text-[28px] font-semibold tracking-tight\">
+            <h1 className="mt-1 text-[28px] font-semibold tracking-tight">
               {firstName}, here&apos;s your month
             </h1>
-            <p className=\"mt-1 text-sm text-neutral-500\">{pulse}</p>
+            <p className="mt-1 text-sm text-neutral-500">{pulse}</p>
           </div>
-          <div className=\"flex items-end gap-3 md:flex-col md:items-end\">
-            <p className=\"text-xs text-neutral-600\">{monthLabel}</p>
-            <div className=\"flex flex-col items-end gap-1\">
-              <p className=\"text-[11px] text-neutral-600 tabular-nums\">
+          <div className="flex items-end gap-3 md:flex-col md:items-end">
+            <p className="text-xs text-neutral-600">{monthLabel}</p>
+            <div className="flex flex-col items-end gap-1">
+              <p className="text-[11px] text-neutral-600 tabular-nums">
                 day {dayOfMonth} of {totalDaysInMonth}
               </p>
-              <div className=\"h-1.5 w-32 overflow-hidden rounded-full bg-white/[0.05]\">
+              <div className="h-1.5 w-32 overflow-hidden rounded-full bg-white/[0.05]">
                 <div
-                  className=\"h-full rounded-full bg-white/70 transition-all duration-500\"
+                  className="h-full rounded-full bg-white/70 transition-all duration-500"
                   style={{ width: `${monthElapsedPct}%` }}
                 />
               </div>
@@ -131,7 +130,7 @@ export function DashboardClient({ user }: DashboardClientProps) {
         </section>
 
         {/* Monthly income + budget split + spending summary */}
-        <section className=\"grid gap-4 md:grid-cols-[2fr_1fr]\">
+        <section className="grid gap-4 md:grid-cols-[2fr_1fr]">
           <div>
             <MonthlyBudgetCard month={month} year={year} />
           </div>
@@ -144,7 +143,7 @@ export function DashboardClient({ user }: DashboardClientProps) {
         </section>
 
         {/* Savings · Investments */}
-        <section className=\"grid gap-4 md:grid-cols-2\">
+        <section className="grid gap-4 md:grid-cols-2">
           <SavingsCard />
           <InvestmentsCard />
         </section>

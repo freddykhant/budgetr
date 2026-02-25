@@ -1,15 +1,15 @@
-\"use client\";
+"use client";
 
-import { useMemo } from \"react\";
-import Link from \"next/link\";
-import { getDaysInMonth } from \"date-fns\";
+import { useMemo } from "react";
+import Link from "next/link";
+import { getDaysInMonth } from "date-fns";
 
-import { api } from \"~/trpc/react\";
+import { api } from "~/trpc/react";
 
 function fmt(n: number) {
-  return new Intl.NumberFormat(\"en-AU\", {
-    style: \"currency\",
-    currency: \"AUD\",
+  return new Intl.NumberFormat("en-AU", {
+    style: "currency",
+    currency: "AUD",
     maximumFractionDigits: 0,
   }).format(n);
 }
@@ -24,7 +24,7 @@ export function SavingsCard({ className }: { className?: string }) {
   const goalsQuery = api.goal.list.useQuery();
 
   const savingCategories = useMemo(
-    () => (categoriesQuery.data ?? []).filter((c) => c.type === \"saving\"),
+    () => (categoriesQuery.data ?? []).filter((c) => c.type === "saving"),
     [categoriesQuery.data],
   );
 
@@ -110,23 +110,23 @@ export function SavingsCard({ className }: { className?: string }) {
     totalDaysInMonth > 0 ? (daysElapsed / totalDaysInMonth) * 100 : 0;
 
   let statusLabel: string | null = null;
-  let statusClass = \"\";
+  let statusClass = "";
 
   if (!monthlyAllocation) {
-    statusLabel = \"no allocation set\";
-    statusClass = \"bg-white/[0.04] text-neutral-400\";
+    statusLabel = "no allocation set";
+    statusClass = "bg-white/[0.04] text-neutral-400";
   } else if (monthlyPct === 0) {
-    statusLabel = \"not started yet\";
-    statusClass = \"bg-white/[0.04] text-neutral-400\";
+    statusLabel = "not started yet";
+    statusClass = "bg-white/[0.04] text-neutral-400";
   } else if (monthlyPct >= monthElapsedPct + 5) {
-    statusLabel = \"ahead of pace\";
-    statusClass = \"bg-emerald-400/10 text-emerald-300\";
+    statusLabel = "ahead of pace";
+    statusClass = "bg-emerald-400/10 text-emerald-300";
   } else if (monthlyPct <= monthElapsedPct - 5) {
-    statusLabel = \"behind\";
-    statusClass = \"bg-amber-400/10 text-amber-300\";
+    statusLabel = "behind";
+    statusClass = "bg-amber-400/10 text-amber-300";
   } else {
-    statusLabel = \"on track\";
-    statusClass = \"bg-emerald-400/10 text-emerald-300\";
+    statusLabel = "on track";
+    statusClass = "bg-emerald-400/10 text-emerald-300";
   }
 
   const isLoading =
@@ -204,3 +204,4 @@ export function SavingsCard({ className }: { className?: string }) {
     </div>
   );
 }
+

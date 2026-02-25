@@ -1,10 +1,10 @@
-\"use client\";
+"use client";
 
-import { useEffect, useMemo, useState } from \"react\";
-import { getDaysInMonth } from \"date-fns\";
-import { Pencil, X, Check } from \"lucide-react\";
+import { useEffect, useMemo, useState } from "react";
+import { getDaysInMonth } from "date-fns";
+import { Pencil, X, Check } from "lucide-react";
 
-import { api } from \"~/trpc/react\";
+import { api } from "~/trpc/react";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -115,9 +115,7 @@ export function MonthlyBudgetCard({ month, year, onBudgetChange }: Props) {
 
   const [isEditing, setIsEditing] = useState(false);
   const [draftIncome, setDraftIncome] = useState("");
-  const [draftSplits, setDraftSplits] = useState<
-    Record<number, number>
-  >({});
+  const [draftSplits, setDraftSplits] = useState<Record<number, number>>({});
 
   useEffect(() => {
     if (budgetQuery.data) {
@@ -284,11 +282,14 @@ export function MonthlyBudgetCard({ month, year, onBudgetChange }: Props) {
 
         {/* Segmented bar */}
         <div className="flex h-1.5 w-full gap-0.5 overflow-hidden rounded-full bg-white/[0.05]">
-          {(isEditing ? allocations.map((a) => ({
-            ...a,
-            pct: draftSplits[a.id] ?? a.pct,
-            amount: (liveIncome * (draftSplits[a.id] ?? a.pct)) / 100,
-          })) : allocations).map((a) => (
+          {(isEditing
+            ? allocations.map((a) => ({
+                ...a,
+                pct: draftSplits[a.id] ?? a.pct,
+                amount: (liveIncome * (draftSplits[a.id] ?? a.pct)) / 100,
+              }))
+            : allocations
+          ).map((a) => (
             <div
               key={a.id}
               className={`h-full rounded-full ${a.color} opacity-80 transition-all duration-200`}
@@ -385,3 +386,4 @@ export function MonthlyBudgetCard({ month, year, onBudgetChange }: Props) {
     </div>
   );
 }
+
