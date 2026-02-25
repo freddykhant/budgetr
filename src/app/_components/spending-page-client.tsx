@@ -133,15 +133,17 @@ export function SpendingPageClient() {
         : "bg-orange-400";
 
   // ── Grouped transactions ──────────────────────────────────────────────────
+  const txData = entryQuery.data;
   const grouped = useMemo(() => {
-    const map = new Map<string, typeof entryQuery.data>();
-    (entryQuery.data ?? []).forEach((tx) => {
+    const txs = txData ?? [];
+    const map = new Map<string, typeof txs>();
+    txs.forEach((tx) => {
       const key = tx.date;
       if (!map.has(key)) map.set(key, []);
       map.get(key)!.push(tx);
     });
     return Array.from(map.entries()).sort(([a], [b]) => b.localeCompare(a));
-  }, [entryQuery.data]);
+  }, [txData]);
 
   // ── Handlers ────────────────────────────────────────────────────────────────
   function handleAmountKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -399,7 +401,7 @@ export function SpendingPageClient() {
                   </p>
 
                   <ul className="divide-y divide-white/[0.04]">
-                    {txs!.map((tx) => (
+                    {(txs ?? []).map((tx) => (
                       <li
                         key={tx.id}
                         className="group flex items-center justify-between py-2.5"

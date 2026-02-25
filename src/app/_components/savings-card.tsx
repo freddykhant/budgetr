@@ -59,7 +59,7 @@ export function SavingsCard({ className }: { className?: string }) {
     if (!budgetQuery.data) return 0;
     const income = Number(budgetQuery.data.income ?? 0);
     return savingCategories.reduce((sum, cat) => {
-      const alloc = budgetQuery.data!.allocations.find(
+      const alloc = budgetQuery.data.allocations.find(
         (a) => a.categoryId === cat.id,
       );
       return sum + (alloc ? (income * alloc.allocationPct) / 100 : 0);

@@ -4,7 +4,6 @@ import type { RouterOutputs } from "~/trpc/react";
 import { SpendingCard } from "./spending-card";
 import { SavingCard } from "./saving-card";
 import { InvestmentCard } from "./investment-card";
-import { TravelCard } from "./travel-card";
 import { CreditCardTracker } from "./credit-card-tracker";
 
 type Category = RouterOutputs["category"]["list"][number];

@@ -1,16 +1,10 @@
 import { relations } from "drizzle-orm";
 import {
-  boolean,
-  date,
   index,
-  integer,
-  numeric,
   pgEnum,
   pgTableCreator,
   primaryKey,
   unique,
-  varchar,
-  timestamp,
 } from "drizzle-orm/pg-core";
 import { type AdapterAccount } from "next-auth/adapters";
 

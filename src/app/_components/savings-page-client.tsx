@@ -116,7 +116,9 @@ function SavingCategoryCard({
   });
 
   // ── Derived stats ──────────────────────────────────────────────────────────
-  const allEntries = entriesQuery.data ?? [];
+  const entriesData = entriesQuery.data;
+
+  const allEntries = useMemo(() => entriesData ?? [], [entriesData]);
 
   const totalSaved = useMemo(
     () => allEntries.reduce((sum, e) => sum + Number(e.amount), 0),
@@ -575,13 +577,14 @@ export function SavingsPageClient() {
     return result;
   }, [budgetQuery.data]);
 
-  const goalsByCat = useMemo(() => {
-    const result: Record<number, (typeof goalsQuery.data)[0]> = {};
-    (goalsQuery.data ?? []).forEach((g) => {
+  const goalsData = goalsQuery.data;
+  const goalsByCat = useMemo((): Record<number, Goal | undefined> => {
+    const result: Record<number, Goal | undefined> = {};
+    (goalsData ?? []).forEach((g) => {
       result[g.categoryId] = g;
     });
     return result;
-  }, [goalsQuery.data]);
+  }, [goalsData]);
 
   const isLoading =
     categoriesQuery.isLoading ||

@@ -70,7 +70,7 @@ export function MonthlyBudgetCard({ month, year, onBudgetChange }: Props) {
     if (!budgetQuery.data || !categoriesQuery.data) return [];
     return budgetQuery.data.allocations
       .map((a) => {
-        const cat = categoriesQuery.data!.find((c) => c.id === a.categoryId);
+        const cat = categoriesQuery.data.find((c) => c.id === a.categoryId);
         if (!cat) return null;
         const colors = typeColor(cat.type);
         return {
