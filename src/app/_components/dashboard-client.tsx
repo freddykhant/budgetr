@@ -16,6 +16,7 @@ type DashboardClientProps = {
 };
 
 
+
 export function DashboardClient({ user }: DashboardClientProps) {
   const firstName = user.name?.split(" ")[0] ?? "hey";
   const today = new Date();
