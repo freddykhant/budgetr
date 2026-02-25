@@ -32,7 +32,7 @@ export default async function LandingPage() {
         {/* CTA + micro copy */}
         <div className="flex flex-col items-center gap-4 md:items-start">
           <Link
-            href="/api/auth/signin?callbackUrl=/home"
+            href="/api/auth/signin/google?callbackUrl=/home"
             className="group flex items-center gap-3 rounded-full border border-neutral-800 bg-neutral-900 px-7 py-3.5 text-base font-medium text-neutral-200 transition-all duration-200 hover:border-neutral-600 hover:bg-neutral-800 hover:text-white"
           >
             <GoogleIcon />
