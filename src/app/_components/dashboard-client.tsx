@@ -22,6 +22,21 @@ function fmt(n: number) {
   }).format(n);
 }
 
+function typeColor(type: string | null | undefined) {
+  switch (type) {
+    case "spending":
+      return "bg-orange-400";
+    case "saving":
+      return "bg-emerald-400";
+    case "investment":
+      return "bg-blue-400";
+    case "credit_card":
+      return "bg-amber-400";
+    default:
+      return "bg-neutral-500";
+  }
+}
+
 export function DashboardClient({ user }: DashboardClientProps) {
   const firstName = user.name?.split(" ")[0] ?? "hey";
   const today = new Date();
@@ -106,6 +121,41 @@ export function DashboardClient({ user }: DashboardClientProps) {
 
   const monthLabel = format(today, "MMMM yyyy");
 
+  const allocations = useMemo(() => {
+    if (!budgetQuery.data || !categoriesQuery.data) return [];
+    const income = incomeNum;
+
+    return budgetQuery.data.allocations
+      .map((a) => {
+        const cat = categoriesQuery.data!.find((c) => c.id === a.categoryId);
+        if (!cat) return null;
+        const amount = (income * a.allocationPct) / 100;
+        return {
+          id: cat.id,
+          name: cat.name,
+          type: cat.type,
+          pct: a.allocationPct,
+          amount,
+          color: typeColor(cat.type),
+        };
+      })
+      .filter(Boolean) as {
+      id: number;
+      name: string;
+      type: string | null;
+      pct: number;
+      amount: number;
+      color: string;
+    }[];
+  }, [budgetQuery.data, categoriesQuery.data, incomeNum]);
+
+  const totalAllocated = useMemo(
+    () => allocations.reduce((sum, a) => sum + a.amount, 0),
+    [allocations],
+  );
+
+  const unallocated = Math.max(0, incomeNum - totalAllocated);
+
   return (
     <main className="px-6 py-10 xl:px-12">
       <div className="mx-auto max-w-4xl space-y-8">
@@ -123,7 +173,7 @@ export function DashboardClient({ user }: DashboardClientProps) {
           <p className="text-xs text-neutral-600">{monthLabel}</p>
         </section>
 
-        {/* Monthly income card */}
+        {/* Monthly income + budget split */}
         <section className="rounded-2xl border border-white/[0.06] bg-[#111111] p-6">
           <div className="mb-4 flex items-center justify-between">
             <div>
@@ -193,6 +243,50 @@ export function DashboardClient({ user }: DashboardClientProps) {
 
           {incomeError && (
             <p className="mt-2 text-xs text-red-400">{incomeError}</p>
+          )}
+
+          {/* Budget split preview */}
+          {allocations.length > 0 && (
+            <div className="mt-6 space-y-4">
+              <div className="flex items-center justify-between text-xs text-neutral-500">
+                <span>budget split</span>
+                <span>
+                  {fmt(totalAllocated)} allocated · {fmt(unallocated)} free
+                </span>
+              </div>
+
+              {/* Segmented bar */}
+              <div className="flex h-2 w-full gap-0.5 overflow-hidden rounded-full bg-white/[0.05]">
+                {allocations.map((a) => (
+                  <div
+                    key={a.id}
+                    className={`h-full rounded-full ${a.color} opacity-80`}
+                    style={{ width: `${a.pct}%` }}
+                  />
+                ))}
+              </div>
+
+              {/* Category tiles */}
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+                {allocations.map((a) => (
+                  <div
+                    key={a.id}
+                    className="rounded-xl bg-white/[0.03] p-3.5"
+                  >
+                    <div className={`mb-2 h-1 w-5 rounded-full ${a.color}`} />
+                    <p className="font-mono text-lg font-semibold tabular-nums">
+                      {a.pct}%
+                    </p>
+                    <p className="mt-0.5 truncate text-xs text-neutral-500">
+                      {a.name}
+                    </p>
+                    <p className="mt-1 font-mono text-xs tabular-nums text-neutral-400">
+                      {fmt(a.amount)}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
         </section>
 
