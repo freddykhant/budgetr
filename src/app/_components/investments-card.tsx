@@ -1,15 +1,15 @@
-"use client";
+\"use client\";
 
-import { useMemo } from "react";
-import Link from "next/link";
-import { TrendingUp } from "lucide-react";
+import { useMemo } from \"react\";
+import Link from \"next/link\";
+import { getDaysInMonth } from \"date-fns\";
 
-import { api } from "~/trpc/react";
+import { api } from \"~/trpc/react\";
 
 function fmt(n: number) {
-  return new Intl.NumberFormat("en-AU", {
-    style: "currency",
-    currency: "AUD",
+  return new Intl.NumberFormat(\"en-AU\", {
+    style: \"currency\",
+    currency: \"AUD\",
     maximumFractionDigits: 0,
   }).format(n);
 }
@@ -25,7 +25,7 @@ export function InvestmentsCard({ className }: { className?: string }) {
 
   const investmentCategories = useMemo(
     () =>
-      (categoriesQuery.data ?? []).filter((c) => c.type === "investment"),
+      (categoriesQuery.data ?? []).filter((c) => c.type === \"investment\"),
     [categoriesQuery.data],
   );
 
@@ -95,6 +95,42 @@ export function InvestmentsCard({ className }: { className?: string }) {
     ? Math.min(100, (thisMonthTotal / monthlyAllocation) * 100)
     : 0;
 
+  const monthDate = new Date(year, month - 1, 1);
+  const totalDaysInMonth = getDaysInMonth(monthDate);
+  const monthEnd = new Date(year, month, 0);
+
+  let daysElapsed = 0;
+  if (today < monthDate) {
+    daysElapsed = 0;
+  } else if (today > monthEnd) {
+    daysElapsed = totalDaysInMonth;
+  } else {
+    daysElapsed = today.getDate();
+  }
+
+  const monthElapsedPct =
+    totalDaysInMonth > 0 ? (daysElapsed / totalDaysInMonth) * 100 : 0;
+
+  let statusLabel: string | null = null;
+  let statusClass = \"\";
+
+  if (!monthlyAllocation) {
+    statusLabel = \"no allocation set\";
+    statusClass = \"bg-white/[0.04] text-neutral-400\";
+  } else if (monthlyPct === 0) {
+    statusLabel = \"not started yet\";
+    statusClass = \"bg-white/[0.04] text-neutral-400\";
+  } else if (monthlyPct >= monthElapsedPct + 5) {
+    statusLabel = \"ahead of pace\";
+    statusClass = \"bg-emerald-400/10 text-emerald-300\";
+  } else if (monthlyPct <= monthElapsedPct - 5) {
+    statusLabel = \"behind\";
+    statusClass = \"bg-amber-400/10 text-amber-300\";
+  } else {
+    statusLabel = \"on track\";
+    statusClass = \"bg-emerald-400/10 text-emerald-300\";
+  }
+
   const isLoading =
     categoriesQuery.isLoading ||
     budgetQuery.isLoading ||
@@ -102,16 +138,14 @@ export function InvestmentsCard({ className }: { className?: string }) {
 
   return (
     <div
-      className={`rounded-2xl border border-white/[0.06] bg-[#111111] p-6 ${className ?? ""}`}
+      className={`rounded-2xl border border-blue-400/20 bg-blue-400/[0.03] p-6 ${className ?? ""}`}
     >
       <div className="mb-5 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <TrendingUp
-            size={14}
-            className="text-neutral-500"
-            strokeWidth={1.5}
-          />
-          <span className="text-sm font-medium">investments</span>
+          <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
+          <span className="text-xs uppercase tracking-[0.16em] text-neutral-400">
+            investments
+          </span>
         </div>
         <Link
           href="/investments"
@@ -124,7 +158,7 @@ export function InvestmentsCard({ className }: { className?: string }) {
       {isLoading ? (
         <div className="space-y-3">
           <div className="h-8 w-28 animate-pulse rounded-lg bg-white/[0.05]" />
-          <div className="h-1.5 w-full animate-pulse rounded-full bg-white/[0.05]" />
+          <div className="h-2.5 w-full animate-pulse rounded-full bg-white/[0.05]" />
         </div>
       ) : investmentCategories.length === 0 ? (
         <p className="text-xs text-neutral-700">
@@ -141,7 +175,7 @@ export function InvestmentsCard({ className }: { className?: string }) {
           </p>
 
           {/* Monthly progress bar */}
-          <div className="my-4 h-1.5 w-full overflow-hidden rounded-full bg-white/[0.05]">
+          <div className="my-4 h-2.5 w-full overflow-hidden rounded-full bg-white/[0.05]">
             <div
               className="h-full rounded-full bg-blue-400 transition-all duration-500"
               style={{ width: `${monthlyPct}%` }}
@@ -149,15 +183,24 @@ export function InvestmentsCard({ className }: { className?: string }) {
           </div>
 
           <div className="flex items-center justify-between">
-            <span className="text-xs text-neutral-600">
-              {Math.round(monthlyPct)}% of monthly target
-            </span>
-            {topGoalProgress && (
-              <span className="text-xs text-neutral-500">
-                {topGoalProgress.name}{" "}
-                <span className="font-mono tabular-nums text-blue-400">
-                  {Math.round(topGoalProgress.pct)}%
+            <div className="flex flex-col gap-0.5">
+              <span className="text-xs text-neutral-600">
+                {Math.round(monthlyPct)}% of monthly target
+              </span>
+              {topGoalProgress && (
+                <span className="text-xs text-neutral-500">
+                  {topGoalProgress.name}{" "}
+                  <span className="font-mono tabular-nums text-blue-400">
+                    {Math.round(topGoalProgress.pct)}%
+                  </span>
                 </span>
+              )}
+            </div>
+            {statusLabel && (
+              <span
+                className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium ${statusClass}`}
+              >
+                {statusLabel}
               </span>
             )}
           </div>
