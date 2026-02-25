@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import Link from "next/link";
 import {
   TrendingUp,
@@ -11,6 +12,9 @@ import {
   ArrowUpRight,
 } from "lucide-react";
 
+import { api } from "~/trpc/react";
+import { SpendingCard } from "./spending-card";
+
 type DashboardClientProps = {
   user: {
     name?: string | null;
@@ -19,8 +23,8 @@ type DashboardClientProps = {
   };
 };
 
-// For now this still uses static data; in the next step
-// we will wire this up to the new tRPC routers.
+// For now this still uses static data for everything except spending,
+// which is wired to live data.
 const MOCK = {
   month: "February 2025",
   income: 4100,
@@ -163,7 +167,50 @@ export function DashboardClient({ user }: DashboardClientProps) {
         )
       : null;
 
-  const spendingFill = pct(MOCK.spending.spent, spendLimit);
+  // ── Live spending data (current month) ──────────────────────────────────────
+  const today = new Date();
+  const month = today.getMonth() + 1;
+  const year = today.getFullYear();
+
+  const { data: categories } = api.category.list.useQuery();
+  const { data: budget } = api.budget.getOrCreateCurrent.useQuery({
+    month,
+    year,
+  });
+
+  const spendingCategory = useMemo(
+    () => categories?.find((c) => c.type === "spending"),
+    [categories],
+  );
+
+  const spendingAllocation = useMemo(() => {
+    if (!budget || !spendingCategory) return 0;
+    const alloc = budget.allocations.find(
+      (a) => a.categoryId === spendingCategory.id,
+    );
+    if (!alloc) return 0;
+    const incomeNum = Number(budget.income ?? 0);
+    return (incomeNum * alloc.allocationPct) / 100;
+  }, [budget, spendingCategory]);
+
+  const entriesQuery = api.entry.list.useQuery(
+    spendingCategory
+      ? { categoryId: spendingCategory.id, month, year }
+      : { categoryId: -1, month, year },
+    {
+      enabled: !!spendingCategory,
+    },
+  );
+
+  const totalSpent = useMemo(() => {
+    if (!entriesQuery.data) return 0;
+    return entriesQuery.data.reduce(
+      (sum, e) => sum + Number(e.amount ?? 0),
+      0,
+    );
+  }, [entriesQuery.data]);
+
+  const spendingFill = pct(totalSpent, spendingAllocation || 1);
 
   const splits = [
     {
@@ -322,55 +369,12 @@ export function DashboardClient({ user }: DashboardClientProps) {
           </div>
         </Card>
 
-        {/* Spending */}
-        <Card className="p-6 lg:col-span-4">
-          <div className="mb-5 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Wallet
-                size={14}
-                className="text-neutral-500"
-                strokeWidth={1.5}
-              />
-              <span className="text-sm font-medium">spending</span>
-            </div>
-            <CardLink href="/spending" />
-          </div>
-          <p className="font-mono text-3xl font-semibold tabular-nums">
-            {fmt(MOCK.spending.spent)}
-          </p>
-          <p className="mt-1 text-xs text-neutral-500">
-            of {fmt(spendLimit)} limit
-          </p>
-          <div className="my-4">
-            <Bar
-              value={MOCK.spending.spent}
-              total={spendLimit}
-              color={
-                spendingFill > 90
-                  ? "bg-red-400"
-                  : spendingFill > 70
-                    ? "bg-amber-400"
-                    : "bg-orange-400"
-              }
-            />
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-neutral-600">
-              {spendingFill}% used
-            </span>
-            <span
-              className={`text-xs font-medium tabular-nums ${
-                spendingFill > 90
-                  ? "text-red-400"
-                  : spendingFill > 70
-                    ? "text-amber-400"
-                    : "text-emerald-400"
-              }`}
-            >
-              {fmt(spendLimit - MOCK.spending.spent)} left
-            </span>
-          </div>
-        </Card>
+        {/* Spending (live data) */}
+        <SpendingCard
+          className="lg:col-span-4"
+          spent={totalSpent}
+          limit={spendingAllocation || 1}
+        />
 
         {/* Savings */}
         <Card className="p-6 lg:col-span-4">
