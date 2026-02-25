@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { format } from "date-fns";
 
 import { api } from "~/trpc/react";
+import { InvestmentsCard } from "./investments-card";
 import { MonthlyBudgetCard } from "./monthly-budget-card";
 import { SavingsCard } from "./savings-card";
 import { SpendingCard } from "./spending-card";
@@ -89,13 +90,14 @@ export function DashboardClient({ user }: DashboardClientProps) {
           <MonthlyBudgetCard month={month} year={year} />
         </section>
 
-        {/* Spending + Savings row */}
-        <section className="grid gap-4 md:grid-cols-2">
+        {/* Spending · Savings · Investments */}
+        <section className="grid gap-4 md:grid-cols-3">
           <SpendingCard
             spent={totalSpent}
             limit={spendingAllocation || incomeNum || 1}
           />
           <SavingsCard />
+          <InvestmentsCard />
         </section>
       </div>
     </main>
