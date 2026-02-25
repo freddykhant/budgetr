@@ -66,6 +66,9 @@ export function DashboardClient({ user }: DashboardClientProps) {
     );
   }, [entriesQuery.data]);
 
+  const isSpendingLoading =
+    budgetQuery.isLoading || categoriesQuery.isLoading || entriesQuery.isLoading;
+
   const monthLabel = format(today, "MMMM yyyy");
   const monthName = format(today, "MMMM");
   const dayOfMonth = today.getDate();
@@ -139,7 +142,7 @@ export function DashboardClient({ user }: DashboardClientProps) {
           <div>
             <SpendingCard
               spent={totalSpent}
-              limit={spendingAllocation || incomeNum || 1}
+              limit={isSpendingLoading ? Number.NaN : spendingAllocation || incomeNum || 1}
             />
           </div>
         </section>

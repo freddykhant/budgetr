@@ -72,6 +72,35 @@ export function SpendingCard({
     statusClass = "bg-amber-400/10 text-amber-300";
   }
 
+  // When the parent is still loading real data, show a skeleton variant.
+  if (!Number.isFinite(limit)) {
+    return (
+      <Card
+        className={`border-orange-400/20 bg-orange-400/[0.03] ${className ?? ""}`}
+      >
+        <div className="mb-5 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-orange-400" />
+            <span className="text-xs uppercase tracking-[0.16em] text-neutral-400">
+              <span className="mr-1 text-sm">💸</span>
+              spending
+            </span>
+          </div>
+          <div className="h-3 w-10 animate-pulse rounded-full bg-white/[0.06]" />
+        </div>
+        <div className="space-y-3">
+          <div className="h-7 w-24 animate-pulse rounded-md bg-white/[0.06]" />
+          <div className="h-3 w-32 animate-pulse rounded-md bg-white/[0.04]" />
+          <div className="h-2.5 w-full animate-pulse rounded-full bg-white/[0.05]" />
+          <div className="flex items-center justify-between">
+            <div className="h-3 w-16 animate-pulse rounded-md bg-white/[0.05]" />
+            <div className="h-4 w-20 animate-pulse rounded-full bg-white/[0.06]" />
+          </div>
+        </div>
+      </Card>
+    );
+  }
+
   return (
     <Card
       className={`border-orange-400/20 bg-orange-400/[0.03] ${className ?? ""}`}
