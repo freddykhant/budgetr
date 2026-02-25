@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { format } from "date-fns";
 
 import { api } from "~/trpc/react";
+import { CreditCardSection } from "./credit-card-section";
 import { CustomCategoriesSection } from "./custom-categories-section";
 import { InvestmentsCard } from "./investments-card";
 import { MonthlyBudgetCard } from "./monthly-budget-card";
@@ -100,6 +101,9 @@ export function DashboardClient({ user }: DashboardClientProps) {
           <SavingsCard />
           <InvestmentsCard />
         </section>
+
+        {/* Credit cards (only renders if user has any) */}
+        <CreditCardSection />
 
         {/* Custom categories (only renders if user has any) */}
         <CustomCategoriesSection />
