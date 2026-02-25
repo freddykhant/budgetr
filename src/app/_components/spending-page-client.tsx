@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { format } from "date-fns";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
 import { api } from "~/trpc/react";
 import { SpendingCard } from "./spending-card";
@@ -89,11 +91,20 @@ export function SpendingPageClient() {
   return (
     <main className="mx-auto max-w-4xl px-6 py-10">
       <header className="mb-8 flex items-end justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">spending</h1>
-          <p className="mt-1 text-sm text-neutral-500">
-            track where your money went this month.
-          </p>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/home"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/[0.02] text-neutral-400 transition hover:border-white/20 hover:text-neutral-100"
+            aria-label="Back to dashboard"
+          >
+            <ArrowLeft size={14} />
+          </Link>
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight">spending</h1>
+            <p className="mt-1 text-sm text-neutral-500">
+              track where your money went this month.
+            </p>
+          </div>
         </div>
         <p className="text-xs text-neutral-600">
           {format(today, "MMMM yyyy")}
