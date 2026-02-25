@@ -24,7 +24,7 @@ function Card({
 }) {
   return (
     <div
-      className={`rounded-2xl border border-white/[0.06] bg-[#111111] ${className}`}
+      className={`rounded-2xl border border-white/[0.06] bg-[#111111] p-6 ${className}`}
     >
       {children}
     </div>
