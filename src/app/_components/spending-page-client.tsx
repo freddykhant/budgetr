@@ -39,6 +39,53 @@ function dateLabel(dateStr: string) {
   return format(d, "EEE d MMM");
 }
 
+function CircularProgress({
+  value,
+  total,
+  color,
+  size = 140,
+  strokeWidth = 9,
+}: {
+  value: number;
+  total: number;
+  color: string;
+  size?: number;
+  strokeWidth?: number;
+}) {
+  const safeTotal = total || 1;
+  const pct = Math.min(100, (value / safeTotal) * 100);
+  const r = (size - strokeWidth) / 2;
+  const cx = size / 2;
+  const circumference = 2 * Math.PI * r;
+  const strokeDashoffset = circumference - (pct / 100) * circumference;
+
+  return (
+    <svg width={size} height={size} className="rotate-[-90deg]">
+      <circle
+        cx={cx}
+        cy={cx}
+        r={r}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={strokeWidth}
+        className="text-white/[0.07]"
+      />
+      <circle
+        cx={cx}
+        cy={cx}
+        r={r}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={strokeWidth}
+        strokeDasharray={circumference}
+        strokeDashoffset={strokeDashoffset}
+        strokeLinecap="round"
+        className={`${color.replace("bg-", "stroke-")} transition-all duration-500`}
+      />
+    </svg>
+  );
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function SpendingPageClient() {
@@ -199,27 +246,31 @@ export function SpendingPageClient() {
       <div className="space-y-4">
         {/* ── Summary card ─────────────────────────────────────────────── */}
         <div className="rounded-2xl border border-white/[0.06] bg-[#111111] p-6">
-          {/* Spent vs limit */}
-          <div className="mb-4 flex items-end justify-between">
-            <div>
+          {/* Circular progress + spent vs limit */}
+          <div className="mb-6 flex items-center gap-6">
+            <div className="relative flex shrink-0 items-center justify-center">
+              <CircularProgress
+                value={totalSpent}
+                total={spendingAllocation}
+                color={barColor}
+                size={140}
+                strokeWidth={9}
+              />
+              <span className="absolute font-mono text-xl font-semibold tabular-nums text-white">
+                {Math.round(usedPct)}%
+              </span>
+            </div>
+            <div className="flex min-w-0 flex-1 flex-col gap-1">
               <p className="text-xs uppercase tracking-[0.18em] text-neutral-500">
                 spent
               </p>
-              <p className="mt-1.5 font-mono text-4xl font-semibold tabular-nums tracking-tight">
+              <p className="font-mono text-3xl font-semibold tabular-nums tracking-tight">
                 {fmt(totalSpent)}
               </p>
+              <p className="text-sm text-neutral-500">
+                of {fmt(spendingAllocation)} limit
+              </p>
             </div>
-            <p className="mb-1 font-mono text-sm tabular-nums text-neutral-500">
-              of {fmt(spendingAllocation)}
-            </p>
-          </div>
-
-          {/* Progress bar */}
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/[0.05]">
-            <div
-              className={`h-full rounded-full transition-all duration-500 ${barColor}`}
-              style={{ width: `${usedPct}%` }}
-            />
           </div>
 
           {/* Stat chips */}
