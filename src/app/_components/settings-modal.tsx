@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { X, User, Wallet, LogOut, Check } from "lucide-react";
 import { signOut } from "next-auth/react";
 import Image from "next/image";
 
 import { api } from "~/trpc/react";
+import type { RouterOutputs } from "~/trpc/react";
 
 type Tab = "account" | "budget";
 
@@ -106,33 +107,36 @@ function AccountTab({ user }: { user: SettingsModalProps["user"] }) {
 
 // ─── Budget tab ───────────────────────────────────────────────────────────────
 
-function BudgetTab() {
-  const today = new Date();
-  const month = today.getMonth() + 1;
-  const year = today.getFullYear();
+type Budget = NonNullable<RouterOutputs["budget"]["getOrCreateCurrent"]>;
+type Category = RouterOutputs["category"]["list"][number];
 
-  const { data: budget, refetch: refetchBudget } =
-    api.budget.getOrCreateCurrent.useQuery({ month, year });
-  const { data: categories } = api.category.list.useQuery();
+/**
+ * Inner form — receives server data as props so state is initialised once
+ * from props (lazy useState), with no useEffect seeding needed.
+ * Keyed on budget.id by the parent so React fully resets it when data changes.
+ */
+function BudgetForm({
+  budget,
+  categories,
+  month,
+  year,
+}: {
+  budget: Budget;
+  categories: Category[];
+  month: number;
+  year: number;
+}) {
+  const utils = api.useUtils();
+  const savedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const [income, setIncome] = useState("");
-  const [allocs, setAllocs] = useState<Record<number, number>>({});
+  // Lazy initialisers — run once on mount, never need syncing via useEffect
+  const [income, setIncome] = useState(() =>
+    String(Math.round(Number(budget.income ?? 0))),
+  );
+  const [allocs, setAllocs] = useState<Record<number, number>>(() =>
+    Object.fromEntries(budget.allocations.map((a) => [a.categoryId, a.allocationPct])),
+  );
   const [saved, setSaved] = useState(false);
-
-  // Seed local state once data arrives
-  useEffect(() => {
-    if (budget && !income) {
-      setIncome(String(Math.round(Number(budget.income ?? 0))));
-    }
-    if (budget?.allocations && Object.keys(allocs).length === 0) {
-      const map: Record<number, number> = {};
-      for (const a of budget.allocations) {
-        map[a.categoryId] = a.allocationPct;
-      }
-      setAllocs(map);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [budget]);
 
   const totalPct = useMemo(
     () => Object.values(allocs).reduce((s, v) => s + (v || 0), 0),
@@ -140,12 +144,21 @@ function BudgetTab() {
   );
 
   const updateBudget = api.budget.update.useMutation({
-    onSuccess: () => {
-      void refetchBudget();
+    onSuccess: async () => {
+      // Invalidate so the dashboard and other consumers get fresh data
+      await utils.budget.getOrCreateCurrent.invalidate({ month, year });
+      // Guard against unmount race
+      savedTimerRef.current = setTimeout(() => setSaved(false), 2000);
       setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
     },
   });
+
+  // Clean up the timer on unmount
+  useEffect(() => {
+    return () => {
+      if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
+    };
+  }, []);
 
   function handleSave() {
     const parsedIncome = Number(income);
@@ -161,8 +174,6 @@ function BudgetTab() {
     });
   }
 
-  const isLoading = !budget || !categories;
-
   const fmt = (n: number) =>
     new Intl.NumberFormat("en-AU", {
       style: "currency",
@@ -177,7 +188,7 @@ function BudgetTab() {
       <div>
         <h3 className="text-sm font-medium text-white">budget</h3>
         <p className="mt-0.5 text-xs text-neutral-500">
-          update your income and how it's split across categories.
+          update your income and how it&apos;s split across categories.
         </p>
       </div>
 
@@ -217,68 +228,54 @@ function BudgetTab() {
           </span>
         </div>
 
-        {isLoading ? (
-          <div className="space-y-2">
-            {[1, 2, 3].map((i) => (
+        <div className="space-y-2">
+          {categories.map((cat) => {
+            const pct = allocs[cat.id] ?? 0;
+            const amount = incomeNum > 0 ? (incomeNum * pct) / 100 : 0;
+            return (
               <div
-                key={i}
-                className="h-12 animate-pulse rounded-xl bg-white/3"
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {categories?.map((cat) => {
-              const pct = allocs[cat.id] ?? 0;
-              const amount = incomeNum > 0 ? (incomeNum * pct) / 100 : 0;
-              return (
-                <div
-                  key={cat.id}
-                  className="flex items-center gap-3 rounded-xl border border-white/6 bg-white/2 px-3 py-2.5"
-                >
-                  <span className="w-5 shrink-0 text-base">
-                    {cat.emoji ?? "·"}
+                key={cat.id}
+                className="flex items-center gap-3 rounded-xl border border-white/6 bg-white/2 px-3 py-2.5"
+              >
+                <span className="w-5 shrink-0 text-base">
+                  {cat.emoji ?? "·"}
+                </span>
+                <span className="min-w-0 flex-1 truncate text-sm text-neutral-200">
+                  {cat.name}
+                </span>
+                {incomeNum > 0 && (
+                  <span className="shrink-0 font-mono text-xs tabular-nums text-neutral-600">
+                    {fmt(amount)}
                   </span>
-                  <span className="min-w-0 flex-1 truncate text-sm text-neutral-200">
-                    {cat.name}
-                  </span>
-                  {incomeNum > 0 && (
-                    <span className="shrink-0 font-mono text-xs tabular-nums text-neutral-600">
-                      {fmt(amount)}
-                    </span>
-                  )}
-                  <div className="flex items-center gap-1">
-                    <input
-                      value={pct === 0 ? "" : pct.toString()}
-                      onChange={(e) => {
-                        const val = Number(
-                          e.target.value.replace(/[^0-9]/g, ""),
-                        );
-                        setAllocs((prev) => ({ ...prev, [cat.id]: val }));
-                      }}
-                      className="w-12 rounded-lg border border-white/8 bg-black/40 px-1.5 py-1 text-right font-mono text-xs tabular-nums text-white outline-none transition focus:border-white/20"
-                      inputMode="numeric"
-                      placeholder="0"
-                    />
-                    <span className="text-xs text-neutral-600">%</span>
-                  </div>
+                )}
+                <div className="flex items-center gap-1">
+                  <input
+                    value={pct === 0 ? "" : pct.toString()}
+                    onChange={(e) => {
+                      const val = Number(e.target.value.replace(/[^0-9]/g, ""));
+                      setAllocs((prev) => ({ ...prev, [cat.id]: val }));
+                    }}
+                    className="w-12 rounded-lg border border-white/8 bg-black/40 px-1.5 py-1 text-right font-mono text-xs tabular-nums text-white outline-none transition focus:border-white/20"
+                    inputMode="numeric"
+                    placeholder="0"
+                  />
+                  <span className="text-xs text-neutral-600">%</span>
                 </div>
-              );
-            })}
-          </div>
-        )}
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* Save */}
       <div className="flex items-center justify-between border-t border-white/5 pt-4">
         <p className="text-xs text-neutral-600">
-          changes apply to {new Date().toLocaleString("en-AU", { month: "long", year: "numeric" })}
+          changes apply to{" "}
+          {new Date().toLocaleString("en-AU", { month: "long", year: "numeric" })}
         </p>
         <button
           onClick={handleSave}
-          disabled={
-            updateBudget.isPending || totalPct !== 100 || !income
-          }
+          disabled={updateBudget.isPending || totalPct !== 100 || !income}
           className="inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-xs font-medium text-black transition hover:bg-neutral-200 disabled:cursor-not-allowed disabled:bg-neutral-800 disabled:text-neutral-500"
         >
           {saved ? (
@@ -293,6 +290,46 @@ function BudgetTab() {
         </button>
       </div>
     </div>
+  );
+}
+
+/**
+ * Outer loader — fetches data, shows a skeleton, then renders BudgetForm
+ * keyed on budget.id so the form fully resets whenever server data changes.
+ */
+function BudgetTab() {
+  const today = new Date();
+  const month = today.getMonth() + 1;
+  const year = today.getFullYear();
+
+  const { data: budget } = api.budget.getOrCreateCurrent.useQuery({ month, year });
+  const { data: categories } = api.category.list.useQuery();
+
+  if (!budget || !categories) {
+    return (
+      <div className="space-y-6">
+        <div className="space-y-1">
+          <div className="h-4 w-16 animate-pulse rounded bg-white/5" />
+          <div className="h-3 w-56 animate-pulse rounded bg-white/3" />
+        </div>
+        <div className="h-11 animate-pulse rounded-xl bg-white/3" />
+        <div className="space-y-2">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-12 animate-pulse rounded-xl bg-white/3" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <BudgetForm
+      key={budget.id}
+      budget={budget}
+      categories={categories}
+      month={month}
+      year={year}
+    />
   );
 }
 
