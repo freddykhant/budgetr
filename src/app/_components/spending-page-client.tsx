@@ -60,7 +60,7 @@ function CircularProgress({
   const strokeDashoffset = circumference - (pct / 100) * circumference;
 
   return (
-    <svg width={size} height={size} className="rotate-[-90deg]">
+    <svg width={size} height={size} className="-rotate-90">
       <circle
         cx={cx}
         cy={cx}
