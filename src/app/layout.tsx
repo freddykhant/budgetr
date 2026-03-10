@@ -6,9 +6,9 @@ import { Geist } from "next/font/google";
 import { TRPCReactProvider } from "~/trpc/react";
 
 export const metadata: Metadata = {
-  title: "budgetr",
+  title: "budgie",
   description: "stupidly simple monthly budget planning",
-  icons: [{ rel: "icon", url: "/budgetr.svg" }],
+  icons: [{ rel: "icon", url: "/budgie.svg" }],
 };
 
 const geist = Geist({

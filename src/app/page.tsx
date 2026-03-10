@@ -22,15 +22,15 @@ export default async function LandingPage() {
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-3">
               <Image
-                src="/budgetr.svg"
-                alt="budgetr"
+                src="/budgie.svg"
+                alt="budgie"
                 width={40}
                 height={40}
                 className="rounded-md"
                 priority
               />
               <h1 className="text-[40px] font-semibold tracking-tight text-white md:text-[44px]">
-                budgetr
+                budgie
               </h1>
             </div>
             <p className="max-w-md text-base text-neutral-400 md:text-lg">

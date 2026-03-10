@@ -17,14 +17,14 @@ export function Header({ user }: HeaderProps) {
         {/* Logo */}
         <div className="flex items-center gap-2.5">
           <Image
-            src="/budgetr.svg"
-            alt="budgetr"
+            src="/budgie.svg"
+            alt="budgie"
             width={32}
             height={32}
             className="rounded-md"
           />
           <span className="text-lg font-semibold tracking-tight text-white">
-            budgetr
+            budgie
           </span>
         </div>
 

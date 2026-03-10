@@ -1,4 +1,4 @@
-# Budgetr
+# Budgie
 
 stupid simple way to track your monthly budget, no more boring excel sheets 
 
