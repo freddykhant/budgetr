@@ -20,7 +20,7 @@ export default async function SpendingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-[#EDEDED]">
+    <div className="min-h-screen bg-green-50 text-green-950">
       <Header user={session.user} />
       <SpendingPageClient />
     </div>

@@ -62,8 +62,8 @@ export function CreditCardSection() {
   return (
     <section>
       <div className="mb-3 flex items-center justify-between">
-        <p className="flex items-center gap-1 text-xs uppercase tracking-[0.18em] text-neutral-600">
-          <span className="text-sm">💳</span>
+        <p className="flex items-center gap-1 text-sm uppercase tracking-[0.18em] text-green-600">
+          <span className="text-base">💳</span>
           <span>credit cards</span>
         </p>
       </div>
@@ -98,42 +98,42 @@ export function CreditCardSection() {
             : 0;
 
           const barColor = isComplete
-            ? "bg-emerald-400"
+            ? "bg-green-500"
             : isPastEnd
-              ? "bg-neutral-600"
+              ? "bg-green-200"
               : "bg-amber-400";
 
           return (
             <Link
               key={cat.id}
               href={`/credit/${cat.id}`}
-              className="group rounded-2xl border border-white/[0.06] bg-[#111111] p-5 transition hover:border-white/[0.10] hover:bg-[#161616]"
+              className="group rounded-2xl border border-green-100 bg-white p-5 shadow-sm shadow-green-900/5 transition hover:border-green-200 hover:bg-green-50"
             >
               {/* Header */}
               <div className="mb-4 flex items-start justify-between">
                 <div className="flex items-center gap-2">
                   {cat.emoji && (
-                    <span className="text-base">{cat.emoji}</span>
+                    <span className="text-lg">{cat.emoji}</span>
                   )}
-                  <span className="text-sm font-medium text-neutral-200">
+                  <span className="text-base font-medium text-green-950">
                     {cat.name}
                   </span>
                 </div>
                 <ArrowRight
-                  size={13}
-                  className="mt-0.5 text-neutral-700 transition group-hover:text-neutral-400"
+                  size={15}
+                  className="mt-0.5 text-green-300 transition group-hover:text-green-600"
                 />
               </div>
 
               {isLoading && (
                 <div className="space-y-2">
-                  <div className="h-6 w-20 animate-pulse rounded-md bg-white/[0.05]" />
-                  <div className="h-1 w-full animate-pulse rounded-full bg-white/[0.05]" />
+                  <div className="h-7 w-20 animate-pulse rounded-md bg-green-100" />
+                  <div className="h-1.5 w-full animate-pulse rounded-full bg-green-100" />
                 </div>
               )}
 
               {!isLoading && !tracker && (
-                <p className="text-xs text-neutral-700">
+                <p className="text-sm text-green-500">
                   no tracker set up — tap to configure
                 </p>
               )}
@@ -142,20 +142,20 @@ export function CreditCardSection() {
                 <>
                   {/* Bonus points */}
                   {tracker.bonusPoints > 0 && (
-                    <p className="mb-1 font-mono text-xl font-semibold tabular-nums text-amber-400">
+                    <p className="mb-1 font-mono text-2xl font-semibold tabular-nums text-amber-500">
                       {tracker.bonusPoints.toLocaleString()} pts
                     </p>
                   )}
 
                   {/* Spend progress */}
-                  <p className="font-mono text-sm tabular-nums text-neutral-200">
+                  <p className="font-mono text-base tabular-nums text-green-950">
                     {fmt(totalSpent)}{" "}
-                    <span className="text-neutral-600">
+                    <span className="text-green-400">
                       / {fmt(spendTarget)}
                     </span>
                   </p>
 
-                  <div className="my-2.5 h-1 w-full overflow-hidden rounded-full bg-white/[0.05]">
+                  <div className="my-3 h-1.5 w-full overflow-hidden rounded-full bg-green-100">
                     <div
                       className={`h-full rounded-full transition-all duration-500 ${barColor}`}
                       style={{ width: `${spendPct}%` }}
@@ -164,7 +164,7 @@ export function CreditCardSection() {
 
                   {/* Footer row */}
                   <div className="flex items-center justify-between">
-                    <p className="font-mono text-xs tabular-nums text-neutral-600">
+                    <p className="font-mono text-sm tabular-nums text-green-500">
                       {isComplete
                         ? "bonus earned 🎉"
                         : isPastEnd
@@ -172,8 +172,8 @@ export function CreditCardSection() {
                           : `${daysLeft}d left`}
                     </p>
                     {tracker.paidInFull && (
-                      <div className="flex items-center gap-1 text-xs text-emerald-400">
-                        <CheckCircle2 size={11} />
+                      <div className="flex items-center gap-1 text-sm text-green-600">
+                        <CheckCircle2 size={13} />
                         <span>paid</span>
                       </div>
                     )}

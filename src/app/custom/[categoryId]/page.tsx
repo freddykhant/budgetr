@@ -34,7 +34,7 @@ export default async function CustomCategoryPage({
   if (category?.type !== "custom") redirect("/home");
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-[#EDEDED]">
+    <div className="min-h-screen bg-green-50 text-green-950">
       <Header user={session.user} />
       <CustomCategoryPageClient
         categoryId={category.id}

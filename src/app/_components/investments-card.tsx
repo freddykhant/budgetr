@@ -41,13 +41,11 @@ export function InvestmentsCard({ className }: { className?: string }) {
     [allEntriesQuery.data],
   );
 
-  // Total contributed across ALL time
   const totalContributed = useMemo(
     () => allEntries.reduce((sum, e) => sum + Number(e.amount), 0),
     [allEntries],
   );
 
-  // This month's contributions
   const thisMonthTotal = useMemo(
     () =>
       allEntries
@@ -56,7 +54,6 @@ export function InvestmentsCard({ className }: { className?: string }) {
     [allEntries, month, year],
   );
 
-  // Monthly allocation for all investment categories
   const monthlyAllocation = useMemo(() => {
     if (!budgetQuery.data) return 0;
     const income = Number(budgetQuery.data.income ?? 0);
@@ -68,7 +65,6 @@ export function InvestmentsCard({ className }: { className?: string }) {
     }, 0);
   }, [budgetQuery.data, investmentCategories]);
 
-  // Top goal progress
   const topGoalProgress = useMemo(() => {
     if (!goalsQuery.data || goalsQuery.data.length === 0) return null;
     const progresses = goalsQuery.data
@@ -116,19 +112,19 @@ export function InvestmentsCard({ className }: { className?: string }) {
 
   if (!monthlyAllocation) {
     statusLabel = "no allocation set";
-    statusClass = "bg-white/[0.04] text-neutral-400";
+    statusClass = "bg-green-50 text-green-500";
   } else if (monthlyPct === 0) {
     statusLabel = "not started yet";
-    statusClass = "bg-white/[0.04] text-neutral-400";
+    statusClass = "bg-green-50 text-green-500";
   } else if (monthlyPct >= monthElapsedPct + 5) {
     statusLabel = "ahead of pace";
-    statusClass = "bg-emerald-400/10 text-emerald-300";
+    statusClass = "bg-green-100 text-green-700";
   } else if (monthlyPct <= monthElapsedPct - 5) {
     statusLabel = "behind";
-    statusClass = "bg-amber-400/10 text-amber-300";
+    statusClass = "bg-amber-100 text-amber-700";
   } else {
     statusLabel = "on track";
-    statusClass = "bg-emerald-400/10 text-emerald-300";
+    statusClass = "bg-green-100 text-green-700";
   }
 
   const isLoading =
@@ -138,19 +134,19 @@ export function InvestmentsCard({ className }: { className?: string }) {
 
   return (
     <div
-      className={`rounded-2xl border border-blue-400/20 bg-blue-400/[0.03] p-6 ${className ?? ""}`}
+      className={`rounded-2xl border border-blue-200 bg-white p-6 shadow-sm shadow-blue-900/5 ${className ?? ""}`}
     >
       <div className="mb-5 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
-          <span className="text-xs uppercase tracking-[0.16em] text-neutral-400">
-            <span className="mr-1 text-sm">📈</span>
+          <span className="h-2 w-2 rounded-full bg-blue-400" />
+          <span className="text-sm uppercase tracking-[0.16em] text-green-600">
+            <span className="mr-1 text-base">📈</span>
             investments
           </span>
         </div>
         <Link
           href="/investments"
-          className="text-xs text-neutral-600 transition hover:text-neutral-300"
+          className="text-sm text-green-500 transition hover:text-green-700"
         >
           view
         </Link>
@@ -158,25 +154,25 @@ export function InvestmentsCard({ className }: { className?: string }) {
 
       {isLoading ? (
         <div className="space-y-3">
-          <div className="h-8 w-28 animate-pulse rounded-lg bg-white/[0.05]" />
-          <div className="h-2.5 w-full animate-pulse rounded-full bg-white/[0.05]" />
+          <div className="h-9 w-28 animate-pulse rounded-lg bg-green-100" />
+          <div className="h-3 w-full animate-pulse rounded-full bg-green-100" />
         </div>
       ) : investmentCategories.length === 0 ? (
-        <p className="text-xs text-neutral-700">
+        <p className="text-sm text-green-500">
           no investment categories set up.
         </p>
       ) : (
         <>
-          <p className="font-mono text-3xl font-semibold tabular-nums">
+          <p className="font-mono text-4xl font-semibold tabular-nums text-green-950">
             {fmt(totalContributed)}
           </p>
-          <p className="mt-1 text-xs text-neutral-500">
+          <p className="mt-1 text-sm text-green-600">
             {fmt(thisMonthTotal)} this month · of {fmt(monthlyAllocation)}{" "}
             allocated
           </p>
 
           {/* Monthly progress bar */}
-          <div className="my-4 h-2.5 w-full overflow-hidden rounded-full bg-white/[0.05]">
+          <div className="my-4 h-3 w-full overflow-hidden rounded-full bg-blue-100">
             <div
               className="h-full rounded-full bg-blue-400 transition-all duration-500"
               style={{ width: `${monthlyPct}%` }}
@@ -185,13 +181,13 @@ export function InvestmentsCard({ className }: { className?: string }) {
 
           <div className="flex items-center justify-between">
             <div className="flex flex-col gap-0.5">
-              <span className="text-xs text-neutral-600">
+              <span className="text-sm text-green-600">
                 {Math.round(monthlyPct)}% of monthly target
               </span>
               {topGoalProgress && (
-                <span className="text-xs text-neutral-500">
+                <span className="text-sm text-green-500">
                   {topGoalProgress.name}{" "}
-                  <span className="font-mono tabular-nums text-blue-400">
+                  <span className="font-mono tabular-nums text-blue-500">
                     {Math.round(topGoalProgress.pct)}%
                   </span>
                 </span>
@@ -199,7 +195,7 @@ export function InvestmentsCard({ className }: { className?: string }) {
             </div>
             {statusLabel && (
               <span
-                className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium ${statusClass}`}
+                className={`rounded-full px-3 py-0.5 text-xs font-medium ${statusClass}`}
               >
                 {statusLabel}
               </span>
@@ -210,4 +206,3 @@ export function InvestmentsCard({ className }: { className?: string }) {
     </div>
   );
 }
-

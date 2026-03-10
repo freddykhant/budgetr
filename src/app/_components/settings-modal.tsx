@@ -34,15 +34,15 @@ function AccountTab({ user }: { user: SettingsModalProps["user"] }) {
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-sm font-medium text-white">account</h3>
-        <p className="mt-0.5 text-xs text-neutral-500">
+        <h3 className="text-base font-medium text-green-950">account</h3>
+        <p className="mt-0.5 text-sm text-green-600">
           your profile from Google sign-in.
         </p>
       </div>
 
       {/* Avatar + info */}
-      <div className="flex items-center gap-4 rounded-xl border border-white/6 bg-white/2 px-4 py-4">
-        <div className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-neutral-800">
+      <div className="flex items-center gap-4 rounded-xl border border-green-100 bg-green-50 px-4 py-4">
+        <div className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-green-200">
           {user.image ? (
             <Image
               src={user.image}
@@ -52,21 +52,21 @@ function AccountTab({ user }: { user: SettingsModalProps["user"] }) {
               className="rounded-full"
             />
           ) : (
-            <span className="text-base font-semibold text-white">
+            <span className="text-base font-semibold text-green-700">
               {initials}
             </span>
           )}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-medium text-white">
+          <p className="truncate text-base font-medium text-green-950">
             {user.name ?? "—"}
           </p>
-          <p className="truncate text-xs text-neutral-500">{user.email ?? "—"}</p>
+          <p className="truncate text-sm text-green-600">{user.email ?? "—"}</p>
         </div>
       </div>
 
-      <div className="rounded-xl border border-white/6 bg-white/2 p-4">
-        <p className="mb-1 text-xs font-medium text-neutral-400">sign-in method</p>
+      <div className="rounded-xl border border-green-100 bg-green-50 p-4">
+        <p className="mb-1 text-sm font-medium text-green-600">sign-in method</p>
         <div className="flex items-center gap-2">
           <svg className="size-4 shrink-0" viewBox="0 0 24 24">
             <path
@@ -86,18 +86,18 @@ function AccountTab({ user }: { user: SettingsModalProps["user"] }) {
               d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
             />
           </svg>
-          <span className="text-xs text-neutral-400">Google</span>
+          <span className="text-sm text-green-600">Google</span>
         </div>
       </div>
 
       {/* Danger zone */}
-      <div className="border-t border-white/5 pt-6">
-        <p className="mb-3 text-xs font-medium text-neutral-500">session</p>
+      <div className="border-t border-green-100 pt-6">
+        <p className="mb-3 text-sm font-medium text-green-500">session</p>
         <button
           onClick={() => signOut({ callbackUrl: "/" })}
-          className="flex items-center gap-2 rounded-lg border border-red-500/20 bg-red-500/6 px-3 py-2 text-xs font-medium text-red-400 transition hover:border-red-500/40 hover:bg-red-500/10"
+          className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-500 transition hover:border-red-300 hover:bg-red-100"
         >
-          <LogOut size={13} />
+          <LogOut size={14} />
           sign out
         </button>
       </div>
@@ -110,11 +110,6 @@ function AccountTab({ user }: { user: SettingsModalProps["user"] }) {
 type Budget = NonNullable<RouterOutputs["budget"]["getOrCreateCurrent"]>;
 type Category = RouterOutputs["category"]["list"][number];
 
-/**
- * Inner form — receives server data as props so state is initialised once
- * from props (lazy useState), with no useEffect seeding needed.
- * Keyed on budget.id by the parent so React fully resets it when data changes.
- */
 function BudgetForm({
   budget,
   categories,
@@ -129,7 +124,6 @@ function BudgetForm({
   const utils = api.useUtils();
   const savedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Lazy initialisers — run once on mount, never need syncing via useEffect
   const [income, setIncome] = useState(() =>
     String(Math.round(Number(budget.income ?? 0))),
   );
@@ -145,15 +139,12 @@ function BudgetForm({
 
   const updateBudget = api.budget.update.useMutation({
     onSuccess: async () => {
-      // Invalidate so the dashboard and other consumers get fresh data
       await utils.budget.getOrCreateCurrent.invalidate({ month, year });
-      // Guard against unmount race
       savedTimerRef.current = setTimeout(() => setSaved(false), 2000);
       setSaved(true);
     },
   });
 
-  // Clean up the timer on unmount
   useEffect(() => {
     return () => {
       if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
@@ -186,23 +177,23 @@ function BudgetForm({
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-sm font-medium text-white">budget</h3>
-        <p className="mt-0.5 text-xs text-neutral-500">
+        <h3 className="text-base font-medium text-green-950">budget</h3>
+        <p className="mt-0.5 text-sm text-green-600">
           update your income and how it&apos;s split across categories.
         </p>
       </div>
 
       {/* Income */}
       <div className="space-y-1.5">
-        <label className="text-xs font-medium text-neutral-400">
+        <label className="text-sm font-medium text-green-600">
           monthly income (after tax)
         </label>
-        <div className="flex items-center overflow-hidden rounded-xl border border-white/8 bg-black/40 px-3 py-2.5 transition focus-within:border-white/20">
-          <span className="mr-2 text-sm text-neutral-500">$</span>
+        <div className="flex items-center overflow-hidden rounded-xl border border-green-200 bg-green-50 px-3 py-2.5 transition focus-within:border-green-400">
+          <span className="mr-2 text-base text-green-500">$</span>
           <input
             value={income}
             onChange={(e) => setIncome(e.target.value.replace(/[^0-9.]/g, ""))}
-            className="w-full bg-transparent font-mono text-base font-semibold tabular-nums text-white outline-none placeholder:text-neutral-700"
+            className="w-full bg-transparent font-mono text-lg font-semibold tabular-nums text-green-950 outline-none placeholder:text-green-300"
             placeholder="4100"
             inputMode="decimal"
           />
@@ -212,16 +203,16 @@ function BudgetForm({
       {/* Allocations */}
       <div className="space-y-1.5">
         <div className="flex items-center justify-between">
-          <label className="text-xs font-medium text-neutral-400">
+          <label className="text-sm font-medium text-green-600">
             budget split
           </label>
           <span
-            className={`font-mono text-xs tabular-nums ${
+            className={`font-mono text-sm tabular-nums ${
               totalPct === 100
-                ? "text-emerald-400"
+                ? "text-green-600"
                 : totalPct > 100
-                  ? "text-red-400"
-                  : "text-amber-400"
+                  ? "text-red-500"
+                  : "text-amber-500"
             }`}
           >
             {totalPct}% of 100%
@@ -235,16 +226,16 @@ function BudgetForm({
             return (
               <div
                 key={cat.id}
-                className="flex items-center gap-3 rounded-xl border border-white/6 bg-white/2 px-3 py-2.5"
+                className="flex items-center gap-3 rounded-xl border border-green-100 bg-green-50 px-3 py-2.5"
               >
-                <span className="w-5 shrink-0 text-base">
+                <span className="w-5 shrink-0 text-lg">
                   {cat.emoji ?? "·"}
                 </span>
-                <span className="min-w-0 flex-1 truncate text-sm text-neutral-200">
+                <span className="min-w-0 flex-1 truncate text-base text-green-800">
                   {cat.name}
                 </span>
                 {incomeNum > 0 && (
-                  <span className="shrink-0 font-mono text-xs tabular-nums text-neutral-600">
+                  <span className="shrink-0 font-mono text-sm tabular-nums text-green-500">
                     {fmt(amount)}
                   </span>
                 )}
@@ -255,11 +246,11 @@ function BudgetForm({
                       const val = Number(e.target.value.replace(/[^0-9]/g, ""));
                       setAllocs((prev) => ({ ...prev, [cat.id]: val }));
                     }}
-                    className="w-12 rounded-lg border border-white/8 bg-black/40 px-1.5 py-1 text-right font-mono text-xs tabular-nums text-white outline-none transition focus:border-white/20"
+                    className="w-12 rounded-lg border border-green-200 bg-white px-1.5 py-1 text-right font-mono text-sm tabular-nums text-green-950 outline-none transition focus:border-green-400"
                     inputMode="numeric"
                     placeholder="0"
                   />
-                  <span className="text-xs text-neutral-600">%</span>
+                  <span className="text-sm text-green-500">%</span>
                 </div>
               </div>
             );
@@ -268,19 +259,19 @@ function BudgetForm({
       </div>
 
       {/* Save */}
-      <div className="flex items-center justify-between border-t border-white/5 pt-4">
-        <p className="text-xs text-neutral-600">
+      <div className="flex items-center justify-between border-t border-green-100 pt-4">
+        <p className="text-sm text-green-500">
           changes apply to{" "}
           {new Date().toLocaleString("en-AU", { month: "long", year: "numeric" })}
         </p>
         <button
           onClick={handleSave}
           disabled={updateBudget.isPending || totalPct !== 100 || !income}
-          className="inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-xs font-medium text-black transition hover:bg-neutral-200 disabled:cursor-not-allowed disabled:bg-neutral-800 disabled:text-neutral-500"
+          className="inline-flex items-center gap-1.5 rounded-full bg-green-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-600 disabled:cursor-not-allowed disabled:bg-green-200 disabled:text-green-400"
         >
           {saved ? (
             <>
-              <Check size={12} /> saved
+              <Check size={13} /> saved
             </>
           ) : updateBudget.isPending ? (
             "saving…"
@@ -293,10 +284,6 @@ function BudgetForm({
   );
 }
 
-/**
- * Outer loader — fetches data, shows a skeleton, then renders BudgetForm
- * keyed on budget.id so the form fully resets whenever server data changes.
- */
 function BudgetTab() {
   const today = new Date();
   const month = today.getMonth() + 1;
@@ -309,13 +296,13 @@ function BudgetTab() {
     return (
       <div className="space-y-6">
         <div className="space-y-1">
-          <div className="h-4 w-16 animate-pulse rounded bg-white/5" />
-          <div className="h-3 w-56 animate-pulse rounded bg-white/3" />
+          <div className="h-5 w-16 animate-pulse rounded bg-green-100" />
+          <div className="h-4 w-56 animate-pulse rounded bg-green-50" />
         </div>
-        <div className="h-11 animate-pulse rounded-xl bg-white/3" />
+        <div className="h-12 animate-pulse rounded-xl bg-green-50" />
         <div className="space-y-2">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-12 animate-pulse rounded-xl bg-white/3" />
+            <div key={i} className="h-14 animate-pulse rounded-xl bg-green-50" />
           ))}
         </div>
       </div>
@@ -336,14 +323,13 @@ function BudgetTab() {
 // ─── Modal shell ──────────────────────────────────────────────────────────────
 
 const NAV: { id: Tab; label: string; icon: React.ReactNode }[] = [
-  { id: "account", label: "account", icon: <User size={14} /> },
-  { id: "budget", label: "budget", icon: <Wallet size={14} /> },
+  { id: "account", label: "account", icon: <User size={15} /> },
+  { id: "budget", label: "budget", icon: <Wallet size={15} /> },
 ];
 
 export function SettingsModal({ isOpen, onClose, user }: SettingsModalProps) {
   const [tab, setTab] = useState<Tab>("account");
 
-  // Close on Escape
   useEffect(() => {
     if (!isOpen) return;
     function onKey(e: KeyboardEvent) {
@@ -359,15 +345,15 @@ export function SettingsModal({ isOpen, onClose, user }: SettingsModalProps) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+        className="absolute inset-0 bg-green-950/40 backdrop-blur-sm"
         onClick={onClose}
       />
 
       {/* Modal */}
-      <div className="relative z-10 flex h-[520px] w-full max-w-2xl overflow-hidden rounded-2xl border border-white/8 bg-[#141414] shadow-2xl">
+      <div className="relative z-10 flex h-[540px] w-full max-w-2xl overflow-hidden rounded-2xl border border-green-100 bg-white shadow-2xl shadow-green-900/15">
         {/* Left sidebar */}
-        <aside className="flex w-44 shrink-0 flex-col border-r border-white/6 bg-[#111111] p-3">
-          <p className="mb-4 px-2 pt-1 text-xs font-semibold uppercase tracking-[0.18em] text-neutral-600">
+        <aside className="flex w-48 shrink-0 flex-col border-r border-green-100 bg-green-50 p-3">
+          <p className="mb-4 px-2 pt-1 text-xs font-semibold uppercase tracking-[0.18em] text-green-500">
             settings
           </p>
           <nav className="flex flex-col gap-0.5">
@@ -375,10 +361,10 @@ export function SettingsModal({ isOpen, onClose, user }: SettingsModalProps) {
               <button
                 key={item.id}
                 onClick={() => setTab(item.id)}
-                className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors ${
+                className={`flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-base transition-colors ${
                   tab === item.id
-                    ? "bg-white/7 text-white"
-                    : "text-neutral-500 hover:bg-white/4 hover:text-neutral-300"
+                    ? "bg-green-100 text-green-900"
+                    : "text-green-500 hover:bg-green-100 hover:text-green-800"
                 }`}
               >
                 <span className="shrink-0">{item.icon}</span>
@@ -391,14 +377,14 @@ export function SettingsModal({ isOpen, onClose, user }: SettingsModalProps) {
         {/* Right content */}
         <div className="flex min-w-0 flex-1 flex-col">
           {/* Header */}
-          <div className="flex items-center justify-between border-b border-white/6 px-6 py-4">
-            <p className="text-sm font-medium capitalize text-white">{tab}</p>
+          <div className="flex items-center justify-between border-b border-green-100 px-6 py-4">
+            <p className="text-base font-medium capitalize text-green-950">{tab}</p>
             <button
               onClick={onClose}
-              className="rounded-lg p-1.5 text-neutral-500 transition hover:bg-white/6 hover:text-neutral-300"
+              className="rounded-lg p-1.5 text-green-500 transition hover:bg-green-100 hover:text-green-700"
               aria-label="Close settings"
             >
-              <X size={15} />
+              <X size={16} />
             </button>
           </div>
 

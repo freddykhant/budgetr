@@ -34,7 +34,7 @@ export default async function CreditCardPage({
   if (category?.type !== "credit_card") redirect("/home");
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-[#EDEDED]">
+    <div className="min-h-screen bg-green-50 text-green-950">
       <Header user={session.user} />
       <CreditCardPageClient
         categoryId={category.id}

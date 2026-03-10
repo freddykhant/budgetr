@@ -6,7 +6,7 @@ function CircularProgress({
   value,
   total,
   color,
-  size = 92,
+  size = 96,
   strokeWidth = 7,
 }: {
   value: number;
@@ -31,7 +31,7 @@ function CircularProgress({
         fill="none"
         stroke="currentColor"
         strokeWidth={strokeWidth}
-        className="text-white/[0.07]"
+        className="text-orange-100"
       />
       <circle
         cx={cx}
@@ -57,7 +57,7 @@ function Card({
   className?: string;
 }) {
   return (
-    <div className={`rounded-2xl border p-6 ${className}`}>
+    <div className={`rounded-2xl border p-6 shadow-sm ${className}`}>
       {children}
     </div>
   );
@@ -88,42 +88,42 @@ export function SpendingCard({
     usedPct > 90 ? "bg-red-400" : usedPct > 70 ? "bg-amber-400" : "bg-orange-400";
 
   let statusLabel = "on track";
-  let statusClass = "bg-emerald-400/10 text-emerald-300";
+  let statusClass = "bg-green-100 text-green-700";
 
   if (usedPct > 85) {
     statusLabel = "over budget";
-    statusClass = "bg-red-400/10 text-red-300";
+    statusClass = "bg-red-100 text-red-600";
   } else if (usedPct > 60) {
     statusLabel = "watch spending";
-    statusClass = "bg-amber-400/10 text-amber-300";
+    statusClass = "bg-amber-100 text-amber-700";
   }
 
   // When the parent is still loading real data, show a skeleton variant.
   if (!Number.isFinite(limit)) {
     return (
       <Card
-        className={`border-orange-400/20 bg-orange-400/[0.03] ${className ?? ""}`}
+        className={`border-orange-200 bg-orange-50/50 shadow-orange-900/5 ${className ?? ""}`}
       >
         <div className="mb-5 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-orange-400" />
-            <span className="text-xs uppercase tracking-[0.16em] text-neutral-400">
-              <span className="mr-1 text-sm">💸</span>
+            <span className="h-2 w-2 rounded-full bg-orange-400" />
+            <span className="text-sm uppercase tracking-[0.16em] text-green-600">
+              <span className="mr-1 text-base">💸</span>
               spending
             </span>
           </div>
-          <div className="h-3 w-10 animate-pulse rounded-full bg-white/[0.06]" />
+          <div className="h-3.5 w-12 animate-pulse rounded-full bg-green-100" />
         </div>
         <div className="flex items-center gap-5">
-          <div className="h-[92px] w-[92px] shrink-0 animate-pulse rounded-full bg-white/6" />
+          <div className="h-24 w-24 shrink-0 animate-pulse rounded-full bg-green-100" />
           <div className="space-y-2">
-            <div className="h-6 w-28 animate-pulse rounded-md bg-white/5" />
-            <div className="h-3 w-32 animate-pulse rounded-md bg-white/4" />
-            <div className="h-3 w-20 animate-pulse rounded-md bg-white/5" />
+            <div className="h-7 w-28 animate-pulse rounded-md bg-green-100" />
+            <div className="h-4 w-32 animate-pulse rounded-md bg-green-50" />
+            <div className="h-4 w-20 animate-pulse rounded-md bg-green-100" />
           </div>
         </div>
         <div className="mt-4 flex justify-end">
-          <div className="h-5 w-20 animate-pulse rounded-full bg-white/6" />
+          <div className="h-6 w-20 animate-pulse rounded-full bg-green-100" />
         </div>
       </Card>
     );
@@ -131,19 +131,19 @@ export function SpendingCard({
 
   return (
     <Card
-      className={`border-orange-400/20 bg-orange-400/[0.03] ${className ?? ""}`}
+      className={`border-orange-200 bg-orange-50/50 shadow-orange-900/5 ${className ?? ""}`}
     >
       <div className="mb-5 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="h-1.5 w-1.5 rounded-full bg-orange-400" />
-          <span className="text-xs uppercase tracking-[0.16em] text-neutral-400">
-            <span className="mr-1 text-sm">💸</span>
+          <span className="h-2 w-2 rounded-full bg-orange-400" />
+          <span className="text-sm uppercase tracking-[0.16em] text-green-600">
+            <span className="mr-1 text-base">💸</span>
             spending
           </span>
         </div>
         <Link
           href="/spending"
-          className="text-xs text-neutral-600 transition hover:text-neutral-300"
+          className="text-sm text-green-500 transition hover:text-green-700"
         >
           view
         </Link>
@@ -151,21 +151,21 @@ export function SpendingCard({
       <div className="my-4 flex items-center gap-5">
         <div className="relative flex shrink-0 items-center justify-center">
           <CircularProgress value={spent} total={safeLimit} color={barColor} />
-          <span className="absolute text-sm font-semibold tabular-nums text-white">
+          <span className="absolute text-base font-semibold tabular-nums text-orange-600">
             {usedPct}%
           </span>
         </div>
         <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <p className="font-mono text-2xl font-semibold tabular-nums">
+          <p className="font-mono text-3xl font-semibold tabular-nums text-green-950">
             {fmt(spent)}
           </p>
-          <p className="text-xs text-neutral-500">of {fmt(limit)} limit</p>
-          <p className="text-xs text-neutral-600">{fmt(remaining)} left</p>
+          <p className="text-sm text-green-600">of {fmt(limit)} limit</p>
+          <p className="text-sm text-green-500">{fmt(remaining)} left</p>
         </div>
       </div>
       <div className="flex items-center justify-end">
         <span
-          className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium ${statusClass}`}
+          className={`rounded-full px-3 py-0.5 text-xs font-medium ${statusClass}`}
         >
           {statusLabel}
         </span>
@@ -173,4 +173,3 @@ export function SpendingCard({
     </Card>
   );
 }
-

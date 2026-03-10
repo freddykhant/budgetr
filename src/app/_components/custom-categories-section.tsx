@@ -40,7 +40,6 @@ export function CustomCategoriesSection() {
     [allEntriesQuery.data],
   );
 
-  // Per-category stats for this month
   const statsByCat = useMemo(() => {
     if (!budgetQuery.data) return {} as Record<number, { monthTotal: number; allocation: number; totalLogged: number }>;
     const income = Number(budgetQuery.data.income ?? 0);
@@ -84,7 +83,7 @@ export function CustomCategoriesSection() {
   return (
     <section>
       <div className="mb-3 flex items-center justify-between">
-        <p className="text-xs uppercase tracking-[0.18em] text-neutral-600">
+        <p className="text-sm uppercase tracking-[0.18em] text-green-600">
           custom
         </p>
       </div>
@@ -117,80 +116,78 @@ export function CustomCategoriesSection() {
             <Link
               key={cat.id}
               href={`/custom/${cat.id}`}
-              className="group rounded-2xl border border-white/[0.06] bg-[#111111] p-5 transition hover:border-white/[0.10] hover:bg-[#161616]"
+              className="group rounded-2xl border border-green-100 bg-white p-5 shadow-sm shadow-green-900/5 transition hover:border-green-200 hover:bg-green-50"
             >
               {/* Header */}
               <div className="mb-4 flex items-start justify-between">
                 <div className="flex items-center gap-2">
                   {cat.emoji && (
-                    <span className="text-base">{cat.emoji}</span>
+                    <span className="text-lg">{cat.emoji}</span>
                   )}
-                  <span className="text-sm font-medium text-neutral-200">
+                  <span className="text-base font-medium text-green-950">
                     {cat.name}
                   </span>
                 </div>
                 <ArrowRight
-                  size={13}
-                  className="mt-0.5 text-neutral-700 transition group-hover:text-neutral-400"
+                  size={15}
+                  className="mt-0.5 text-green-300 transition group-hover:text-green-600"
                 />
               </div>
 
               {/* Skeleton */}
               {isLoading && (
                 <div className="space-y-2">
-                  <div className="h-6 w-20 animate-pulse rounded-md bg-white/[0.05]" />
-                  <div className="h-1 w-full animate-pulse rounded-full bg-white/[0.05]" />
+                  <div className="h-7 w-20 animate-pulse rounded-md bg-green-100" />
+                  <div className="h-1.5 w-full animate-pulse rounded-full bg-green-100" />
                 </div>
               )}
 
               {/* Stats */}
               {!isLoading && (
                 <>
-                  {/* Goal mode (if goal set): show total / target */}
                   {goal && goalTargetNum !== null ? (
                     <div className="mb-3">
-                      <p className="font-mono text-xl font-semibold tabular-nums">
+                      <p className="font-mono text-2xl font-semibold tabular-nums text-green-950">
                         {fmt(stats.totalLogged)}
                       </p>
-                      <p className="mt-0.5 text-xs text-neutral-600">
+                      <p className="mt-0.5 text-sm text-green-500">
                         of {fmt(goalTargetNum)} · {goal.name}
                       </p>
-                      <div className="mt-2.5 h-1 w-full overflow-hidden rounded-full bg-white/[0.05]">
+                      <div className="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-green-100">
                         <div
                           className="h-full rounded-full bg-violet-400 transition-all duration-500"
                           style={{ width: `${goalPct ?? 0}%` }}
                         />
                       </div>
                       {goalPct !== null && (
-                        <p className="mt-1.5 font-mono text-xs tabular-nums text-neutral-600">
+                        <p className="mt-1.5 font-mono text-sm tabular-nums text-green-500">
                           {Math.round(goalPct)}% to goal
                         </p>
                       )}
                     </div>
                   ) : (
-                    /* Budget mode: show this month vs allocation */
                     <div className="mb-3">
-                      <p className="font-mono text-xl font-semibold tabular-nums">
+                      <p className="font-mono text-2xl font-semibold tabular-nums text-green-950">
                         {fmt(stats.monthTotal)}
                       </p>
                       {stats.allocation > 0 ? (
-                        <p className="mt-0.5 text-xs text-neutral-600">
+                        <p className="mt-0.5 text-sm text-green-500">
                           of {fmt(stats.allocation)} this month
                         </p>
                       ) : (
-                        <p className="mt-0.5 text-xs text-neutral-700">
+                        <p className="mt-0.5 text-sm text-green-400">
                           this month · no allocation set
                         </p>
                       )}
                       {stats.allocation > 0 && (
                         <>
-                          <div className="mt-2.5 h-1 w-full overflow-hidden rounded-full bg-white/[0.05]">
+                          <div className="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-green-100">
                             <div
                               className={`h-full rounded-full transition-all duration-500 ${barColor}`}
                               style={{ width: `${monthlyPct}%` }}
                             />
                           </div>
-                          <p className="mt-1.5 font-mono text-xs tabular-nums text-neutral-600">
+                          <p className="mt-1.5 font-mono text-sm tabular-nums text-green-500">
                             {Math.round(monthlyPct)}% used
                           </p>
                         </>
