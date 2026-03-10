@@ -12,18 +12,18 @@ interface HeaderProps {
 
 export function Header({ user }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-10 border-b border-white/[0.06] bg-[#0A0A0A]/80 backdrop-blur-sm">
-      <div className="flex items-center justify-between px-6 py-3">
+    <header className="sticky top-0 z-10 border-b border-green-400/30 bg-linear-to-r from-green-500 to-green-400">
+      <div className="flex items-center justify-between px-6 py-3.5">
         {/* Logo */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-3">
           <Image
             src="/budgie.svg"
             alt="budgie"
-            width={32}
-            height={32}
-            className="rounded-md"
+            width={36}
+            height={36}
+            className="rounded-lg shadow-sm shadow-green-900/20"
           />
-          <span className="text-lg font-semibold tracking-tight text-white">
+          <span className="text-xl font-semibold tracking-tight text-white">
             budgie
           </span>
         </div>

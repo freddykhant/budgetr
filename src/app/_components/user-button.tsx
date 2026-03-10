@@ -45,7 +45,7 @@ export function UserButton({ user }: UserButtonProps) {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex size-8 items-center justify-center overflow-hidden rounded-full bg-neutral-800 ring-1 ring-white/10 transition-all hover:ring-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+        className="flex size-9 items-center justify-center overflow-hidden rounded-full bg-white/20 ring-2 ring-white/30 transition-all hover:ring-white/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
         aria-label="User menu"
         aria-expanded={isOpen}
       >
@@ -53,12 +53,12 @@ export function UserButton({ user }: UserButtonProps) {
           <Image
             src={user.image}
             alt={user.name ?? "User"}
-            width={32}
-            height={32}
+            width={36}
+            height={36}
             className="rounded-full"
           />
         ) : (
-          <span className="text-xs font-semibold text-white">{initials}</span>
+          <span className="text-sm font-semibold text-white">{initials}</span>
         )}
       </button>
 
@@ -69,30 +69,30 @@ export function UserButton({ user }: UserButtonProps) {
             onClick={() => setIsOpen(false)}
             aria-hidden="true"
           />
-          <div className="absolute right-0 top-full z-50 mt-2 w-60 overflow-hidden rounded-xl border border-white/[0.08] bg-[#1C1C1C] shadow-2xl">
+          <div className="absolute right-0 top-full z-50 mt-2 w-64 overflow-hidden rounded-2xl border border-green-100 bg-white shadow-xl shadow-green-900/10">
             {/* User info */}
-            <div className="border-b border-white/[0.06] px-4 py-3">
+            <div className="border-b border-green-100 px-4 py-3.5">
               <div className="flex items-center gap-3">
-                <div className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-neutral-700">
+                <div className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-green-100">
                   {user.image ? (
                     <Image
                       src={user.image}
                       alt={user.name ?? "User"}
-                      width={36}
-                      height={36}
+                      width={40}
+                      height={40}
                       className="rounded-full"
                     />
                   ) : (
-                    <span className="text-sm font-semibold text-white">
+                    <span className="text-base font-semibold text-green-700">
                       {initials}
                     </span>
                   )}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-white">
+                  <p className="truncate text-base font-medium text-green-950">
                     {user.name ?? "User"}
                   </p>
-                  <p className="truncate text-xs text-neutral-500">
+                  <p className="truncate text-sm text-green-600">
                     {user.email}
                   </p>
                 </div>
@@ -100,22 +100,22 @@ export function UserButton({ user }: UserButtonProps) {
             </div>
 
             {/* Menu items */}
-            <div className="p-1">
+            <div className="p-1.5">
               <button
                 onClick={() => {
                   setIsOpen(false);
                   setIsSettingsOpen(true);
                 }}
-                className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-neutral-300 transition-colors hover:bg-white/[0.06] hover:text-white"
+                className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-base text-green-700 transition-colors hover:bg-green-50 hover:text-green-950"
               >
-                <Settings size={15} className="text-neutral-500" strokeWidth={1.5} />
+                <Settings size={16} className="text-green-500" strokeWidth={1.5} />
                 settings
               </button>
               <button
                 onClick={() => signOut({ callbackUrl: "/" })}
-                className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-neutral-300 transition-colors hover:bg-white/[0.06] hover:text-white"
+                className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-base text-green-700 transition-colors hover:bg-green-50 hover:text-green-950"
               >
-                <LogOut size={15} className="text-neutral-500" strokeWidth={1.5} />
+                <LogOut size={16} className="text-green-500" strokeWidth={1.5} />
                 sign out
               </button>
             </div>

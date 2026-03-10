@@ -110,23 +110,23 @@ export function DashboardClient({ user }: DashboardClientProps) {
         {/* Greeting */}
         <section className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.18em] text-neutral-500">
+            <p className="text-sm uppercase tracking-[0.18em] text-green-500">
               {greeting}
             </p>
-            <h1 className="mt-1 text-[28px] font-semibold tracking-tight">
+            <h1 className="mt-1 text-[32px] font-semibold tracking-tight text-green-950">
               {firstName}, here&apos;s your month
             </h1>
-            <p className="mt-1 text-sm text-neutral-500">{pulse}</p>
+            <p className="mt-1 text-base text-green-700">{pulse}</p>
           </div>
           <div className="flex items-end gap-3 md:flex-col md:items-end">
-            <p className="text-xs text-neutral-600">{monthLabel}</p>
+            <p className="text-sm text-green-600">{monthLabel}</p>
             <div className="flex flex-col items-end gap-1">
-              <p className="text-[11px] text-neutral-600 tabular-nums">
+              <p className="text-xs text-green-600 tabular-nums">
                 day {dayOfMonth} of {totalDaysInMonth}
               </p>
-              <div className="h-1.5 w-32 overflow-hidden rounded-full bg-white/[0.05]">
+              <div className="h-1.5 w-36 overflow-hidden rounded-full bg-green-200">
                 <div
-                  className="h-full rounded-full bg-white/70 transition-all duration-500"
+                  className="h-full rounded-full bg-green-500 transition-all duration-500"
                   style={{ width: `${monthElapsedPct}%` }}
                 />
               </div>
@@ -162,4 +162,3 @@ export function DashboardClient({ user }: DashboardClientProps) {
     </main>
   );
 }
-

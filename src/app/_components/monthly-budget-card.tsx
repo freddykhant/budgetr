@@ -21,13 +21,13 @@ function typeColor(type: string | null | undefined) {
     case "spending":
       return { bar: "bg-orange-400", slider: "accent-orange-400" };
     case "saving":
-      return { bar: "bg-emerald-400", slider: "accent-emerald-400" };
+      return { bar: "bg-green-500", slider: "accent-green-500" };
     case "investment":
       return { bar: "bg-blue-400", slider: "accent-blue-400" };
     case "credit_card":
       return { bar: "bg-amber-400", slider: "accent-amber-400" };
     default:
-      return { bar: "bg-neutral-500", slider: "accent-neutral-400" };
+      return { bar: "bg-green-300", slider: "accent-green-400" };
   }
 }
 
@@ -176,11 +176,11 @@ export function MonthlyBudgetCard({ month, year, onBudgetChange }: Props) {
   const liveIncome = isEditing ? (draftIncomeNum || 0) : incomeNum;
 
   return (
-    <div className="rounded-2xl border border-white/[0.06] bg-[#111111] p-6">
+    <div className="rounded-2xl border border-green-100 bg-white p-6 shadow-sm shadow-green-900/5">
       {/* Month progress bar */}
-      <div className="mb-4 h-0.5 w-full overflow-hidden rounded-full bg-white/[0.04]">
+      <div className="mb-4 h-0.5 w-full overflow-hidden rounded-full bg-green-100">
         <div
-          className="h-full rounded-full bg-white/70 transition-all duration-500"
+          className="h-full rounded-full bg-green-400 transition-all duration-500"
           style={{ width: `${monthProgressPct}%` }}
         />
       </div>
@@ -189,32 +189,32 @@ export function MonthlyBudgetCard({ month, year, onBudgetChange }: Props) {
       <div className="flex items-start justify-between">
         <div>
           <div className="flex items-center gap-2">
-            <p className="text-xs uppercase tracking-[0.18em] text-neutral-500">
+            <p className="text-sm uppercase tracking-[0.18em] text-green-500">
               monthly income
             </p>
             {daysElapsed > 0 && (
-              <span className="rounded-full border border-white/[0.08] bg-white/[0.02] px-2 py-0.5 text-[10px] text-neutral-500 tabular-nums">
+              <span className="rounded-full border border-green-200 bg-green-50 px-2 py-0.5 text-xs text-green-600 tabular-nums">
                 day {daysElapsed} of {totalDaysInMonth}
               </span>
             )}
           </div>
 
           {isEditing ? (
-            <div className="mt-2 flex items-center rounded-xl border border-white/[0.10] bg-black/40 px-3 py-2">
-              <span className="mr-1.5 text-sm text-neutral-500">$</span>
+            <div className="mt-2 flex items-center rounded-xl border border-green-200 bg-green-50 px-3 py-2">
+              <span className="mr-1.5 text-base text-green-500">$</span>
               <input
                 value={draftIncome}
                 onChange={(e) =>
                   setDraftIncome(e.target.value.replace(/[^0-9.]/g, ""))
                 }
-                className="w-36 bg-transparent font-mono text-2xl font-semibold tabular-nums outline-none placeholder:text-neutral-600"
+                className="w-36 bg-transparent font-mono text-3xl font-semibold tabular-nums text-green-950 outline-none placeholder:text-green-300"
                 placeholder="4100"
                 inputMode="decimal"
                 autoFocus
               />
             </div>
           ) : (
-            <p className="mt-2 font-mono text-4xl font-semibold tabular-nums tracking-tight">
+            <p className="mt-2 font-mono text-5xl font-semibold tabular-nums tracking-tight text-green-950">
               {fmt(incomeNum)}
             </p>
           )}
@@ -226,17 +226,17 @@ export function MonthlyBudgetCard({ month, year, onBudgetChange }: Props) {
               <button
                 type="button"
                 onClick={handleCancel}
-                className="flex h-8 w-8 items-center justify-center rounded-full border border-white/[0.08] text-neutral-500 transition hover:text-neutral-200"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-green-200 text-green-500 transition hover:text-green-700"
               >
-                <X size={14} />
+                <X size={15} />
               </button>
               <button
                 type="button"
                 onClick={handleSave}
                 disabled={!canSave}
-                className="flex h-8 items-center gap-1.5 rounded-full bg-white px-3 text-xs font-medium text-black transition hover:bg-neutral-200 disabled:cursor-not-allowed disabled:bg-neutral-700 disabled:text-neutral-400"
+                className="flex h-9 items-center gap-1.5 rounded-full bg-green-500 px-4 text-sm font-medium text-white transition hover:bg-green-600 disabled:cursor-not-allowed disabled:bg-green-200 disabled:text-green-400"
               >
-                <Check size={13} />
+                <Check size={14} />
                 {updateBudget.isPending ? "saving…" : "save"}
               </button>
             </>
@@ -244,9 +244,9 @@ export function MonthlyBudgetCard({ month, year, onBudgetChange }: Props) {
             <button
               type="button"
               onClick={() => setIsEditing(true)}
-              className="flex h-8 items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] px-3 text-xs text-neutral-400 transition hover:border-white/[0.16] hover:text-neutral-100"
+              className="flex h-9 items-center gap-1.5 rounded-full border border-green-200 bg-green-50 px-4 text-sm text-green-600 transition hover:border-green-300 hover:text-green-800"
             >
-              <Pencil size={12} />
+              <Pencil size={13} />
               edit
             </button>
           )}
@@ -254,11 +254,11 @@ export function MonthlyBudgetCard({ month, year, onBudgetChange }: Props) {
       </div>
 
       {/* Divider */}
-      <div className="my-5 h-px bg-white/[0.05]" />
+      <div className="my-5 h-px bg-green-100" />
 
       {/* Budget split */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between text-xs text-neutral-500">
+        <div className="flex items-center justify-between text-sm text-green-600">
           <span>budget split</span>
           {!isEditing && (
             <span className="tabular-nums">
@@ -269,10 +269,10 @@ export function MonthlyBudgetCard({ month, year, onBudgetChange }: Props) {
             <span
               className={`tabular-nums transition-colors ${
                 draftTotalPct === 100
-                  ? "text-emerald-400"
+                  ? "text-green-600"
                   : draftTotalPct > 100
-                    ? "text-red-400"
-                    : "text-amber-400"
+                    ? "text-red-500"
+                    : "text-amber-500"
               }`}
             >
               {draftTotalPct}% of 100%
@@ -281,7 +281,7 @@ export function MonthlyBudgetCard({ month, year, onBudgetChange }: Props) {
         </div>
 
         {/* Segmented bar */}
-        <div className="flex h-1.5 w-full gap-0.5 overflow-hidden rounded-full bg-white/[0.05]">
+        <div className="flex h-2 w-full gap-0.5 overflow-hidden rounded-full bg-green-100">
           {(isEditing
             ? allocations.map((a) => ({
                 ...a,
@@ -292,7 +292,7 @@ export function MonthlyBudgetCard({ month, year, onBudgetChange }: Props) {
           ).map((a) => (
             <div
               key={a.id}
-              className={`h-full rounded-full ${a.color} opacity-80 transition-all duration-200`}
+              className={`h-full rounded-full ${a.color} transition-all duration-200`}
               style={{ width: `${a.pct}%` }}
             />
           ))}
@@ -308,18 +308,18 @@ export function MonthlyBudgetCard({ month, year, onBudgetChange }: Props) {
                 <div key={a.id} className="space-y-1.5">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm">
+                      <span className="text-base">
                         {a.emoji ?? ""}
                       </span>
-                      <span className="text-sm text-neutral-200">
+                      <span className="text-base text-green-800">
                         {a.name}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-xs tabular-nums text-neutral-500">
+                      <span className="font-mono text-sm tabular-nums text-green-500">
                         {fmt(draftAmount)}
                       </span>
-                      <div className="flex items-center rounded-lg border border-white/[0.08] bg-black/40 px-2 py-1">
+                      <div className="flex items-center rounded-lg border border-green-200 bg-green-50 px-2 py-1">
                         <input
                           type="number"
                           min={0}
@@ -337,9 +337,9 @@ export function MonthlyBudgetCard({ month, year, onBudgetChange }: Props) {
                               ),
                             )
                           }
-                          className="w-10 bg-transparent text-right font-mono text-sm tabular-nums outline-none"
+                          className="w-10 bg-transparent text-right font-mono text-sm tabular-nums text-green-950 outline-none"
                         />
-                        <span className="ml-0.5 text-xs text-neutral-500">
+                        <span className="ml-0.5 text-sm text-green-500">
                           %
                         </span>
                       </div>
@@ -355,7 +355,7 @@ export function MonthlyBudgetCard({ month, year, onBudgetChange }: Props) {
                     onChange={(e) =>
                       setSplit(a.id, parseInt(e.target.value, 10))
                     }
-                    className={`h-1 w-full cursor-pointer appearance-none rounded-full bg-white/[0.07] ${a.sliderAccent}`}
+                    className={`h-1 w-full cursor-pointer appearance-none rounded-full bg-green-200 ${a.sliderAccent}`}
                   />
                 </div>
               );
@@ -364,18 +364,18 @@ export function MonthlyBudgetCard({ month, year, onBudgetChange }: Props) {
         ) : (
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
             {allocations.map((a) => (
-              <div key={a.id} className="rounded-xl bg-white/[0.03] p-3.5">
-                <div className={`mb-2 h-1 w-5 rounded-full ${a.color}`} />
-                <p className="font-mono text-lg font-semibold tabular-nums">
+              <div key={a.id} className="rounded-xl bg-green-50 p-3.5">
+                <div className={`mb-2 h-1 w-6 rounded-full ${a.color}`} />
+                <p className="font-mono text-xl font-semibold tabular-nums text-green-950">
                   {a.pct}%
                 </p>
-                <p className="mt-0.5 truncate text-xs text-neutral-500">
+                <p className="mt-0.5 truncate text-sm text-green-600">
                   {a.emoji && (
                     <span className="mr-1">{a.emoji}</span>
                   )}
                   {a.name}
                 </p>
-                <p className="mt-1 font-mono text-xs tabular-nums text-neutral-400">
+                <p className="mt-1 font-mono text-sm tabular-nums text-green-500">
                   {fmt(a.amount)}
                 </p>
               </div>
@@ -386,4 +386,3 @@ export function MonthlyBudgetCard({ month, year, onBudgetChange }: Props) {
     </div>
   );
 }
-
