@@ -8,7 +8,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { type AdapterAccount } from "next-auth/adapters";
 
-export const createTable = pgTableCreator((name) => `budgie_${name}`);
+export const createTable = pgTableCreator((name) => `budgetr_${name}`);
 
 // ─── Enums ────────────────────────────────────────────────────────────────────
 
