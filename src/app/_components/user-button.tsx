@@ -45,7 +45,7 @@ export function UserButton({ user }: UserButtonProps) {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex size-9 items-center justify-center overflow-hidden rounded-full bg-white/20 ring-2 ring-white/30 transition-all hover:ring-white/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
+        className="flex size-9 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-white/20 ring-2 ring-white/30 transition-all hover:ring-white/50 focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:outline-none"
         aria-label="User menu"
         aria-expanded={isOpen}
       >
@@ -69,7 +69,7 @@ export function UserButton({ user }: UserButtonProps) {
             onClick={() => setIsOpen(false)}
             aria-hidden="true"
           />
-          <div className="absolute right-0 top-full z-50 mt-2 w-64 overflow-hidden rounded-2xl border border-green-100 bg-white shadow-xl shadow-green-900/10">
+          <div className="absolute top-full right-0 z-50 mt-2 w-64 overflow-hidden rounded-2xl border border-green-100 bg-white shadow-xl shadow-green-900/10">
             {/* User info */}
             <div className="border-b border-green-100 px-4 py-3.5">
               <div className="flex items-center gap-3">
@@ -106,16 +106,24 @@ export function UserButton({ user }: UserButtonProps) {
                   setIsOpen(false);
                   setIsSettingsOpen(true);
                 }}
-                className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-base text-green-700 transition-colors hover:bg-green-50 hover:text-green-950"
+                className="flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-base text-green-700 transition-colors hover:bg-green-50 hover:text-green-950"
               >
-                <Settings size={16} className="text-green-500" strokeWidth={1.5} />
+                <Settings
+                  size={16}
+                  className="text-green-500"
+                  strokeWidth={1.5}
+                />
                 settings
               </button>
               <button
                 onClick={() => signOut({ callbackUrl: "/" })}
-                className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-base text-green-700 transition-colors hover:bg-green-50 hover:text-green-950"
+                className="flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-base text-green-700 transition-colors hover:bg-green-50 hover:text-green-950"
               >
-                <LogOut size={16} className="text-green-500" strokeWidth={1.5} />
+                <LogOut
+                  size={16}
+                  className="text-green-500"
+                  strokeWidth={1.5}
+                />
                 sign out
               </button>
             </div>
