@@ -17,7 +17,7 @@ export function Header({ user }: HeaderProps) {
         {/* Logo */}
         <div className="flex items-center gap-3">
           <Image
-            src="/budgie.svg"
+            src="/budgie_1.png"
             alt="budgie"
             width={36}
             height={36}
