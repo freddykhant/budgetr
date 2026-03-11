@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   format,
   isToday,
@@ -9,7 +9,7 @@ import {
   subDays,
 } from "date-fns";
 import Link from "next/link";
-import { ArrowLeft, Trash2 } from "lucide-react";
+import { ArrowLeft, Loader2, Trash2 } from "lucide-react";
 
 import { api } from "~/trpc/react";
 
@@ -71,6 +71,15 @@ function CircularProgress({
   );
 }
 
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+type PendingEntry = {
+  tempId: string;
+  amount: number;
+  description: string;
+  date: string;
+};
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function SpendingPageClient() {
@@ -84,7 +93,16 @@ export function SpendingPageClient() {
   const [description, setDescription] = useState("");
   const [dateMode, setDateMode] = useState<"today" | "yesterday" | "pick">("today");
   const [pickDate, setPickDate] = useState(todayStr);
+  const [pendingEntries, setPendingEntries] = useState<PendingEntry[]>([]);
+  const [errorTempId, setErrorTempId] = useState<string | null>(null);
+
+  const amountRef = useRef<HTMLInputElement>(null);
   const descRef = useRef<HTMLInputElement>(null);
+
+  // Auto-focus amount on mount — zero friction to start logging
+  useEffect(() => {
+    amountRef.current?.focus();
+  }, []);
 
   const entryDate = dateMode === "today" ? todayStr : dateMode === "yesterday" ? yesterdayStr : pickDate;
 
@@ -106,11 +124,35 @@ export function SpendingPageClient() {
   );
 
   const createEntry = api.entry.create.useMutation({
-    onSuccess: () => {
+    onSuccess: (_, vars) => {
+      // Remove the matching pending entry by matching amount + date + description
+      setPendingEntries((prev) =>
+        prev.filter(
+          (e) =>
+            !(
+              e.amount === vars.amount &&
+              e.date === vars.date &&
+              e.description === (vars.description ?? "")
+            ),
+        ),
+      );
       void entryQuery.refetch();
-      setAmount("");
-      setDescription("");
-      setDateMode("today");
+    },
+    onError: (_, vars) => {
+      // Flash the failed entry red then remove it
+      const match = pendingEntries.find(
+        (e) =>
+          e.amount === vars.amount &&
+          e.date === vars.date &&
+          e.description === (vars.description ?? ""),
+      );
+      if (match) {
+        setErrorTempId(match.tempId);
+        setTimeout(() => {
+          setPendingEntries((prev) => prev.filter((e) => e.tempId !== match.tempId));
+          setErrorTempId(null);
+        }, 1200);
+      }
     },
   });
 
@@ -118,10 +160,14 @@ export function SpendingPageClient() {
     onSuccess: () => void entryQuery.refetch(),
   });
 
+  const confirmedEntries = entryQuery.data ?? [];
+
+  // Total includes pending amounts so the summary updates instantly
+  const pendingTotal = pendingEntries.reduce((sum, e) => sum + e.amount, 0);
   const totalSpent = useMemo(
-    () => (entryQuery.data ?? []).reduce((sum, e) => sum + Number(e.amount ?? 0), 0),
-    [entryQuery.data],
-  );
+    () => confirmedEntries.reduce((sum, e) => sum + Number(e.amount ?? 0), 0),
+    [confirmedEntries],
+  ) + pendingTotal;
 
   const remaining = Math.max(0, spendingAllocation - totalSpent);
   const overspent = totalSpent > spendingAllocation;
@@ -132,17 +178,32 @@ export function SpendingPageClient() {
 
   const barColor = usedPct > 90 ? "bg-red-400" : usedPct > 70 ? "bg-amber-400" : "bg-orange-400";
 
-  const txData = entryQuery.data;
+  // Merge confirmed + pending into grouped list, pending entries go to the top of their date group
   const grouped = useMemo(() => {
-    const txs = txData ?? [];
-    const map = new Map<string, typeof txs>();
-    txs.forEach((tx) => {
-      const key = tx.date;
-      if (!map.has(key)) map.set(key, []);
-      map.get(key)!.push(tx);
+    const map = new Map<string, Array<{ id: number | string; amount: string; description: string | null; date: string; isPending?: boolean; tempId?: string }>>();
+
+    confirmedEntries.forEach((tx) => {
+      if (!map.has(tx.date)) map.set(tx.date, []);
+      map.get(tx.date)!.push({ ...tx, amount: String(tx.amount ?? 0), description: tx.description ?? null });
     });
+
+    // Prepend pending entries to their date group
+    pendingEntries.forEach((pe) => {
+      if (!map.has(pe.date)) map.set(pe.date, []);
+      map.get(pe.date)!.unshift({
+        id: pe.tempId,
+        amount: String(pe.amount),
+        description: pe.description || null,
+        date: pe.date,
+        isPending: true,
+        tempId: pe.tempId,
+      });
+    });
+
     return Array.from(map.entries()).sort(([a], [b]) => b.localeCompare(a));
-  }, [txData]);
+  }, [confirmedEntries, pendingEntries]);
+
+  const txCount = confirmedEntries.length + pendingEntries.length;
 
   function handleAmountKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Tab" && amount) {
@@ -156,16 +217,30 @@ export function SpendingPageClient() {
     if (!spendingCategory) return;
     const value = Number(amount);
     if (!Number.isFinite(value) || value <= 0) return;
+
+    const desc = description.trim();
+    const tempId = crypto.randomUUID();
+
+    // Clear form & add to pending immediately — don't wait for the server
+    setAmount("");
+    setDescription("");
+    setDateMode("today");
+    amountRef.current?.focus();
+
+    setPendingEntries((prev) => [
+      ...prev,
+      { tempId, amount: value, description: desc, date: entryDate },
+    ]);
+
     createEntry.mutate({
       categoryId: spendingCategory.id,
       amount: value,
       date: entryDate,
-      description: description.trim() || undefined,
+      description: desc || undefined,
     });
   }
 
   const isLoading = !categories || !budget || entryQuery.isLoading;
-  const txCount = entryQuery.data?.length ?? 0;
 
   return (
     <main className="mx-auto max-w-2xl px-6 py-10">
@@ -262,6 +337,7 @@ export function SpendingPageClient() {
             <div className="flex items-center gap-1 rounded-xl border border-green-200 bg-green-50 px-3 py-2.5">
               <span className="text-base text-green-500">$</span>
               <input
+                ref={amountRef}
                 value={amount}
                 onChange={(e) => setAmount(e.target.value.replace(/[^0-9.]/g, ""))}
                 onKeyDown={handleAmountKeyDown}
@@ -275,10 +351,10 @@ export function SpendingPageClient() {
               placeholder="what was it for?"
             />
             <button
-              type="submit" disabled={createEntry.isPending || !amount || !spendingCategory}
+              type="submit" disabled={!amount || !spendingCategory}
               className="shrink-0 rounded-full bg-green-500 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-green-600 disabled:cursor-not-allowed disabled:bg-green-200 disabled:text-green-400"
             >
-              {createEntry.isPending ? "adding…" : "add"}
+              add
             </button>
           </div>
         </form>
@@ -319,23 +395,41 @@ export function SpendingPageClient() {
                 <div key={dateStr}>
                   <p className="mb-2 text-sm font-medium text-green-600">{dateLabel(dateStr)}</p>
                   <ul className="divide-y divide-green-100">
-                    {(txs ?? []).map((tx) => (
-                      <li key={tx.id} className="group flex items-center justify-between py-2.5">
-                        <p className="text-base text-green-800">
-                          {tx.description ?? <span className="text-green-400">no description</span>}
-                        </p>
-                        <div className="flex items-center gap-3">
-                          <p className="font-mono text-base tabular-nums text-green-800">{fmtFull(Number(tx.amount))}</p>
-                          <button
-                            type="button" onClick={() => deleteEntry.mutate({ id: tx.id })}
-                            disabled={deleteEntry.isPending}
-                            className="opacity-0 transition-opacity group-hover:opacity-100" aria-label="Delete transaction"
-                          >
-                            <Trash2 size={14} className="text-green-400 transition hover:text-red-500" />
-                          </button>
-                        </div>
-                      </li>
-                    ))}
+                    {(txs ?? []).map((tx) => {
+                      const isError = tx.isPending && tx.tempId === errorTempId;
+                      return (
+                        <li
+                          key={tx.id}
+                          className={`group flex items-center justify-between py-2.5 transition-all duration-300 ${
+                            isError
+                              ? "opacity-0 -translate-x-2"
+                              : tx.isPending
+                                ? "opacity-50"
+                                : "opacity-100"
+                          }`}
+                        >
+                          <p className={`text-base ${tx.isPending ? "text-green-600 italic" : "text-green-800"}`}>
+                            {tx.description ?? <span className="text-green-400 not-italic">no description</span>}
+                          </p>
+                          <div className="flex items-center gap-3">
+                            <p className={`font-mono text-base tabular-nums ${tx.isPending ? "text-green-500" : "text-green-800"}`}>
+                              {fmtFull(Number(tx.amount))}
+                            </p>
+                            {tx.isPending ? (
+                              <Loader2 size={14} className="animate-spin text-green-400" />
+                            ) : (
+                              <button
+                                type="button" onClick={() => deleteEntry.mutate({ id: tx.id as number })}
+                                disabled={deleteEntry.isPending}
+                                className="opacity-0 transition-opacity group-hover:opacity-100" aria-label="Delete transaction"
+                              >
+                                <Trash2 size={14} className="text-green-400 transition hover:text-red-500" />
+                              </button>
+                            )}
+                          </div>
+                        </li>
+                      );
+                    })}
                   </ul>
                 </div>
               ))}
