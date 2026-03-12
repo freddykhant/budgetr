@@ -95,7 +95,7 @@ function AccountTab({ user }: { user: SettingsModalProps["user"] }) {
         <p className="mb-3 text-sm font-medium text-green-500">session</p>
         <button
           onClick={() => signOut({ callbackUrl: "/" })}
-          className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-500 transition hover:border-red-300 hover:bg-red-100"
+          className="flex cursor-pointer items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-500 transition hover:border-red-300 hover:bg-red-100"
         >
           <LogOut size={14} />
           sign out
@@ -267,7 +267,7 @@ function BudgetForm({
         <button
           onClick={handleSave}
           disabled={updateBudget.isPending || totalPct !== 100 || !income}
-          className="inline-flex items-center gap-1.5 rounded-full bg-green-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-600 disabled:cursor-not-allowed disabled:bg-green-200 disabled:text-green-400"
+          className="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-green-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-600 disabled:cursor-not-allowed disabled:bg-green-200 disabled:text-green-400"
         >
           {saved ? (
             <>
@@ -361,7 +361,7 @@ export function SettingsModal({ isOpen, onClose, user }: SettingsModalProps) {
               <button
                 key={item.id}
                 onClick={() => setTab(item.id)}
-                className={`flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-base transition-colors ${
+                className={`flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2.5 text-base transition-colors ${
                   tab === item.id
                     ? "bg-green-100 text-green-900"
                     : "text-green-500 hover:bg-green-100 hover:text-green-800"
@@ -381,7 +381,7 @@ export function SettingsModal({ isOpen, onClose, user }: SettingsModalProps) {
             <p className="text-base font-medium capitalize text-green-950">{tab}</p>
             <button
               onClick={onClose}
-              className="rounded-lg p-1.5 text-green-500 transition hover:bg-green-100 hover:text-green-700"
+              className="cursor-pointer rounded-lg p-1.5 text-green-500 transition hover:bg-green-100 hover:text-green-700"
               aria-label="Close settings"
             >
               <X size={16} />

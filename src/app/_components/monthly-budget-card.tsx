@@ -226,7 +226,7 @@ export function MonthlyBudgetCard({ month, year, onBudgetChange }: Props) {
               <button
                 type="button"
                 onClick={handleCancel}
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-green-200 text-green-500 transition hover:text-green-700"
+                className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-green-200 text-green-500 transition hover:text-green-700"
               >
                 <X size={15} />
               </button>
@@ -234,7 +234,7 @@ export function MonthlyBudgetCard({ month, year, onBudgetChange }: Props) {
                 type="button"
                 onClick={handleSave}
                 disabled={!canSave}
-                className="flex h-9 items-center gap-1.5 rounded-full bg-green-500 px-4 text-sm font-medium text-white transition hover:bg-green-600 disabled:cursor-not-allowed disabled:bg-green-200 disabled:text-green-400"
+                className="flex h-9 cursor-pointer items-center gap-1.5 rounded-full bg-green-500 px-4 text-sm font-medium text-white transition hover:bg-green-600 disabled:cursor-not-allowed disabled:bg-green-200 disabled:text-green-400"
               >
                 <Check size={14} />
                 {updateBudget.isPending ? "saving…" : "save"}
@@ -244,7 +244,7 @@ export function MonthlyBudgetCard({ month, year, onBudgetChange }: Props) {
             <button
               type="button"
               onClick={() => setIsEditing(true)}
-              className="flex h-9 items-center gap-1.5 rounded-full border border-green-200 bg-green-50 px-4 text-sm text-green-600 transition hover:border-green-300 hover:text-green-800"
+              className="flex h-9 cursor-pointer items-center gap-1.5 rounded-full border border-green-200 bg-green-50 px-4 text-sm text-green-600 transition hover:border-green-300 hover:text-green-800"
             >
               <Pencil size={13} />
               edit
