@@ -131,11 +131,11 @@ export default function OnboardingPage() {
                     <option value="credit_card">credit card</option>
                     <option value="custom">custom</option>
                   </select>
-                  <button type="button" onClick={() => handleRemoveCategory(cat.id)} className="text-base text-green-400 hover:text-green-700">×</button>
+                  <button type="button" onClick={() => handleRemoveCategory(cat.id)} className="cursor-pointer text-base text-green-400 hover:text-green-700">×</button>
                 </div>
               ))}
             </div>
-            <button type="button" onClick={handleAddCategory} className="flex items-center gap-2 text-sm font-medium text-green-600 transition hover:text-green-800">
+            <button type="button" onClick={handleAddCategory} className="flex cursor-pointer items-center gap-2 text-sm font-medium text-green-600 transition hover:text-green-800">
               <Plus size={15} /> add category
             </button>
           </section>

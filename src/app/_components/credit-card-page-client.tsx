@@ -217,7 +217,7 @@ export function CreditCardPageClient({
                 <div className="rounded-2xl border border-green-100 bg-white p-5 shadow-sm shadow-green-900/5">
                   <div className="mb-4 flex items-center justify-between">
                     <p className="text-sm uppercase tracking-[0.18em] text-green-500">edit tracker</p>
-                    <button type="button" onClick={() => setShowEditForm(false)} className="text-green-500 transition hover:text-green-700"><X size={14} /></button>
+                    <button type="button" onClick={() => setShowEditForm(false)} className="cursor-pointer text-green-500 transition hover:text-green-700"><X size={14} /></button>
                   </div>
                   <form onSubmit={handleEditSave} className="space-y-3">
                     <div className="grid gap-3 sm:grid-cols-2">
@@ -242,9 +242,9 @@ export function CreditCardPageClient({
                       </div>
                     </div>
                     <div className="flex items-center justify-between">
-                      <button type="button" onClick={() => deleteTracker.mutate({ id: tracker.id })} disabled={deleteTracker.isPending} className="text-sm text-green-400 transition hover:text-red-500">delete tracker</button>
+                      <button type="button" onClick={() => deleteTracker.mutate({ id: tracker.id })} disabled={deleteTracker.isPending} className="cursor-pointer text-sm text-green-400 transition hover:text-red-500 disabled:cursor-not-allowed">delete tracker</button>
                       <div className="flex gap-2">
-                        <button type="button" onClick={() => setShowEditForm(false)} className="rounded-full px-3 py-1.5 text-sm text-green-500 transition hover:text-green-700">cancel</button>
+                        <button type="button" onClick={() => setShowEditForm(false)} className="cursor-pointer rounded-full px-3 py-1.5 text-sm text-green-500 transition hover:text-green-700">cancel</button>
                         <button type="submit" disabled={upsertTracker.isPending}
                           className="rounded-full bg-green-500 px-4 py-1.5 text-sm font-medium text-white transition hover:bg-green-600 disabled:bg-green-200 disabled:text-green-400"
                         >{upsertTracker.isPending ? "saving…" : "save"}</button>
@@ -345,7 +345,7 @@ export function CreditCardPageClient({
                     <form onSubmit={handleAddSubmit} className="space-y-3 rounded-2xl border border-green-100 bg-white p-5 shadow-sm shadow-green-900/5">
                       <div className="flex items-center justify-between">
                         <p className="text-sm uppercase tracking-[0.18em] text-green-500">log spend</p>
-                        <button type="button" onClick={() => setShowAddForm(false)} className="text-green-500 transition hover:text-green-700"><X size={14} /></button>
+                        <button type="button" onClick={() => setShowAddForm(false)} className="cursor-pointer text-green-500 transition hover:text-green-700"><X size={14} /></button>
                       </div>
                       <div className="flex flex-wrap items-center gap-1.5">
                         {(["today", "yesterday"] as const).map((d) => (

@@ -163,7 +163,7 @@ export function CustomCategoryPageClient({
             <p className="text-sm uppercase tracking-[0.18em] text-green-500">goal</p>
             <div className="flex items-center gap-2">
               {goal && (
-                <button type="button" onClick={() => deleteGoal.mutate({ categoryId })} disabled={deleteGoal.isPending} className="text-sm text-green-400 transition hover:text-red-500">remove</button>
+                <button type="button" onClick={() => deleteGoal.mutate({ categoryId })} disabled={deleteGoal.isPending} className="cursor-pointer text-sm text-green-400 transition hover:text-red-500 disabled:cursor-not-allowed">remove</button>
               )}
               <button
                 type="button"
@@ -177,7 +177,7 @@ export function CustomCategoryPageClient({
             <form onSubmit={handleGoalSubmit} className="mt-4 space-y-3 rounded-xl border border-green-200 bg-green-50 p-4">
               <div className="flex items-center justify-between">
                 <p className="text-sm text-green-600">{goal ? "update goal" : "create a goal"}</p>
-                <button type="button" onClick={() => setShowGoalForm(false)} className="text-green-500 transition hover:text-green-700"><X size={14} /></button>
+                <button type="button" onClick={() => setShowGoalForm(false)} className="cursor-pointer text-green-500 transition hover:text-green-700"><X size={14} /></button>
               </div>
               <div className="flex gap-2">
                 <input value={goalName} onChange={(e) => setGoalName(e.target.value)} placeholder="Goal name"
@@ -191,7 +191,7 @@ export function CustomCategoryPageClient({
                 </div>
               </div>
               <div className="flex justify-end gap-2">
-                <button type="button" onClick={() => setShowGoalForm(false)} className="rounded-full px-3 py-1.5 text-sm text-green-500 transition hover:text-green-700">cancel</button>
+                <button type="button" onClick={() => setShowGoalForm(false)} className="cursor-pointer rounded-full px-3 py-1.5 text-sm text-green-500 transition hover:text-green-700">cancel</button>
                 <button type="submit" disabled={upsertGoal.isPending || !goalTarget}
                   className="rounded-full bg-green-500 px-4 py-1.5 text-sm font-medium text-white transition hover:bg-green-600 disabled:cursor-not-allowed disabled:bg-green-200 disabled:text-green-400"
                 >{upsertGoal.isPending ? "saving…" : "save"}</button>
@@ -237,7 +237,7 @@ export function CustomCategoryPageClient({
           <form onSubmit={handleAddSubmit} className="space-y-3 rounded-2xl border border-green-100 bg-white p-5 shadow-sm shadow-green-900/5">
             <div className="flex items-center justify-between">
               <p className="text-sm uppercase tracking-[0.18em] text-green-500">log entry</p>
-              <button type="button" onClick={() => setShowAddForm(false)} className="text-green-500 transition hover:text-green-700"><X size={14} /></button>
+              <button type="button" onClick={() => setShowAddForm(false)} className="cursor-pointer text-green-500 transition hover:text-green-700"><X size={14} /></button>
             </div>
             <div className="flex flex-wrap items-center gap-1.5">
               {(["today", "yesterday"] as const).map((d) => (
@@ -323,7 +323,7 @@ export function CustomCategoryPageClient({
                 );
               })}
               {hiddenCount > 0 && (
-                <button type="button" onClick={() => setShowAllHistory((v) => !v)} className="text-sm text-green-500 transition hover:text-green-700">
+                <button type="button" onClick={() => setShowAllHistory((v) => !v)} className="cursor-pointer text-sm text-green-500 transition hover:text-green-700">
                   {showAllHistory ? "show less" : `show ${hiddenCount} more ${hiddenCount === 1 ? "month" : "months"}`}
                 </button>
               )}

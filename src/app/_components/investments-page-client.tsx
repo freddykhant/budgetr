@@ -120,7 +120,7 @@ function InvestmentCategoryCard({
         <form onSubmit={handleGoalSubmit} className="mb-5 space-y-3 rounded-xl border border-green-200 bg-green-50 p-4">
           <div className="flex items-center justify-between">
             <p className="text-sm uppercase tracking-[0.18em] text-green-500">{goal ? "edit goal" : "set a goal"}</p>
-            <button type="button" onClick={() => setShowGoalForm(false)} className="text-green-500 transition hover:text-green-700"><X size={14} /></button>
+            <button type="button" onClick={() => setShowGoalForm(false)} className="cursor-pointer text-green-500 transition hover:text-green-700"><X size={14} /></button>
           </div>
           <div className="flex gap-2">
             <input value={goalName} onChange={(e) => setGoalName(e.target.value)} placeholder="e.g. Retirement fund"
@@ -135,7 +135,7 @@ function InvestmentCategoryCard({
             </div>
           </div>
           <div className="flex justify-end gap-2">
-            <button type="button" onClick={() => setShowGoalForm(false)} className="rounded-full px-3 py-1.5 text-sm text-green-500 transition hover:text-green-700">cancel</button>
+            <button type="button" onClick={() => setShowGoalForm(false)} className="cursor-pointer rounded-full px-3 py-1.5 text-sm text-green-500 transition hover:text-green-700">cancel</button>
             <button type="submit" disabled={upsertGoal.isPending || !goalTarget}
               className="rounded-full bg-green-500 px-4 py-1.5 text-sm font-medium text-white transition hover:bg-green-600 disabled:cursor-not-allowed disabled:bg-green-200 disabled:text-green-400"
             >{upsertGoal.isPending ? "saving…" : "save goal"}</button>
@@ -194,7 +194,7 @@ function InvestmentCategoryCard({
         <form onSubmit={handleAddSubmit} className="mb-5 space-y-3 rounded-xl border border-green-200 bg-green-50 p-4">
           <div className="flex items-center justify-between">
             <p className="text-sm uppercase tracking-[0.18em] text-green-500">add contribution</p>
-            <button type="button" onClick={() => setShowAddForm(false)} className="text-green-500 transition hover:text-green-700"><X size={14} /></button>
+            <button type="button" onClick={() => setShowAddForm(false)} className="cursor-pointer text-green-500 transition hover:text-green-700"><X size={14} /></button>
           </div>
           <div className="flex flex-wrap items-center gap-1.5">
             {(["today", "yesterday"] as const).map((d) => (
@@ -281,7 +281,7 @@ function InvestmentCategoryCard({
             })}
           </div>
           {hiddenCount > 0 && (
-            <button type="button" onClick={() => setShowAllHistory((v) => !v)} className="mt-3 text-sm text-green-500 transition hover:text-green-700">
+            <button type="button" onClick={() => setShowAllHistory((v) => !v)} className="cursor-pointer mt-3 text-sm text-green-500 transition hover:text-green-700">
               {showAllHistory ? "show less" : `show ${hiddenCount} more ${hiddenCount === 1 ? "month" : "months"}`}
             </button>
           )}
