@@ -17,12 +17,13 @@ export const goalRouter = createTRPCRouter({
   get: protectedProcedure
     .input(z.object({ categoryId: z.number() }))
     .query(async ({ ctx, input }) => {
-      return ctx.db.query.categoryGoals.findFirst({
+      const result = await ctx.db.query.categoryGoals.findFirst({
         where: and(
           eq(categoryGoals.categoryId, input.categoryId),
           eq(categoryGoals.userId, ctx.session.user.id),
         ),
       });
+      return result ?? null;
     }),
 
   upsert: protectedProcedure
