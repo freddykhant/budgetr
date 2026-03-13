@@ -158,7 +158,7 @@ export function SpendingCard({ className, spent, limit }: { className?: string; 
             </div>
           </div>
 
-          <div className="min-w-0 flex-1">
+          <div className="h-[6rem] min-w-0 flex-1 overflow-hidden">
             {overspent ? (
               <>
                 <p className="text-xs font-semibold uppercase tracking-widest text-red-400">over budget</p>
@@ -198,7 +198,7 @@ export function SpendingCard({ className, spent, limit }: { className?: string; 
         <div className="mt-6 h-px bg-orange-100" />
 
         {/* Stats */}
-        <div className="mt-5 grid grid-cols-2 gap-x-6">
+        <div className="mt-5 grid h-10 grid-cols-2 gap-x-6">
           {view === "daily" ? (
             <>
               <div>
