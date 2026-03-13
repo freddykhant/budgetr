@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { getDaysInMonth } from "date-fns";
-import { Pencil, X, Check } from "lucide-react";
+import { Pencil, X, Check, Trash2 as TrashIcon } from "lucide-react";
 
 import { api } from "~/trpc/react";
 import { useToast } from "./toast-provider";
@@ -118,8 +118,27 @@ export function MonthlyBudgetCard({ month, year, onBudgetChange }: Props) {
   // ── Edit state ──────────────────────────────────────────────────────────────
 
   const [isEditing, setIsEditing] = useState(false);
+  const [confirmClear, setConfirmClear] = useState(false);
   const [draftIncome, setDraftIncome] = useState("");
   const [draftSplits, setDraftSplits] = useState<Record<number, number>>({});
+
+  const clearMonth = api.entry.clearMonth.useMutation({
+    onSuccess: async () => {
+      await Promise.all([
+        utils.entry.list.invalidate(),
+        utils.entry.listForCategories.invalidate(),
+        utils.entry.listAllForCategory.invalidate(),
+      ]);
+      handleSave();
+      const monthName = new Date(year, month - 1, 1).toLocaleString("en-AU", {
+        month: "long",
+      });
+      showToast(
+        `Month reset. Fresh start for ${monthName}.`,
+        "info",
+      );
+    },
+  });
 
   useEffect(() => {
     if (budgetQuery.data) {
@@ -147,6 +166,7 @@ export function MonthlyBudgetCard({ month, year, onBudgetChange }: Props) {
 
   function handleSave() {
     if (!canSave) return;
+    setConfirmClear(false);
     updateBudget.mutate({
       month,
       year,
@@ -161,6 +181,7 @@ export function MonthlyBudgetCard({ month, year, onBudgetChange }: Props) {
 
   function handleCancel() {
     setIsEditing(false);
+    setConfirmClear(false);
     if (budgetQuery.data) {
       setDraftIncome(String(incomeNum || ""));
       const splits: Record<number, number> = {};
@@ -226,24 +247,71 @@ export function MonthlyBudgetCard({ month, year, onBudgetChange }: Props) {
 
         <div className="flex items-center gap-2">
           {isEditing ? (
-            <>
-              <button
-                type="button"
-                onClick={handleCancel}
-                className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-green-200 text-green-500 transition hover:text-green-700"
-              >
-                <X size={15} />
-              </button>
-              <button
-                type="button"
-                onClick={handleSave}
-                disabled={!canSave}
-                className="flex h-9 cursor-pointer items-center gap-1.5 rounded-full bg-green-500 px-4 text-sm font-medium text-white transition hover:bg-green-600 disabled:cursor-not-allowed disabled:bg-green-200 disabled:text-green-400"
-              >
-                <Check size={14} />
-                {updateBudget.isPending ? "saving…" : "save"}
-              </button>
-            </>
+            confirmClear ? (
+              <div className="flex flex-col items-end gap-2 rounded-xl border border-amber-100 bg-amber-50 px-3 py-2 text-xs text-amber-700">
+                <p>
+                  This will delete all logged entries for this month.
+                </p>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setConfirmClear(false)}
+                    className="flex h-8 cursor-pointer items-center gap-1.5 rounded-full border border-amber-100 bg-white px-3 text-xs text-amber-700 transition hover:border-amber-200 hover:text-amber-800"
+                  >
+                    <X size={12} />
+                    cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSave}
+                    disabled={!canSave || updateBudget.isPending}
+                    className="flex h-8 cursor-pointer items-center gap-1.5 rounded-full border border-green-200 bg-green-500 px-3 text-xs font-medium text-white transition hover:bg-green-600 disabled:cursor-not-allowed disabled:bg-green-200 disabled:text-green-400"
+                  >
+                    <Check size={12} />
+                    save only
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      clearMonth.mutate({
+                        month,
+                        year,
+                      })
+                    }
+                    disabled={clearMonth.isPending || updateBudget.isPending}
+                    className="flex h-8 cursor-pointer items-center gap-1.5 rounded-full border border-amber-200 bg-amber-500 px-3 text-xs font-medium text-white transition hover:bg-amber-600 disabled:cursor-not-allowed disabled:bg-amber-200 disabled:text-amber-300"
+                  >
+                    {clearMonth.isPending ? (
+                      "clearing…"
+                    ) : (
+                      <>
+                        <TrashIcon size={12} />
+                        clear month + save
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={handleCancel}
+                  className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-green-200 text-green-500 transition hover:text-green-700"
+                >
+                  <X size={15} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setConfirmClear(true)}
+                  disabled={!canSave}
+                  className="flex h-9 cursor-pointer items-center gap-1.5 rounded-full bg-green-500 px-4 text-sm font-medium text-white transition hover:bg-green-600 disabled:cursor-not-allowed disabled:bg-green-200 disabled:text-green-400"
+                >
+                  <Check size={14} />
+                  {updateBudget.isPending ? "saving…" : "save"}
+                </button>
+              </>
+            )
           ) : (
             <button
               type="button"

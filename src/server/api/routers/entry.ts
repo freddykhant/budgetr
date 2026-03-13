@@ -148,5 +148,24 @@ export const entryRouter = createTRPCRouter({
           ),
         );
     }),
+
+  clearMonth: protectedProcedure
+    .input(
+      z.object({
+        month: z.number().min(1).max(12),
+        year: z.number(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db
+        .delete(entries)
+        .where(
+          and(
+            eq(entries.userId, ctx.session.user.id),
+            eq(entries.month, input.month),
+            eq(entries.year, input.year),
+          ),
+        );
+    }),
 });
 
