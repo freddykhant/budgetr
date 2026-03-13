@@ -189,7 +189,7 @@ export function MonthlyBudgetCard({ month, year, onBudgetChange }: Props) {
       <div className="flex items-start justify-between">
         <div>
           <div className="flex items-center gap-2">
-            <p className="text-sm uppercase tracking-[0.18em] text-green-500">
+            <p className="text-xs font-semibold uppercase tracking-widest text-green-400">
               monthly income
             </p>
             {daysElapsed > 0 && (

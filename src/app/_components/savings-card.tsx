@@ -132,21 +132,21 @@ export function SavingsCard({ className }: { className?: string }) {
 
   return (
     <div
-      className={`rounded-2xl border border-green-200 bg-white p-6 shadow-sm shadow-green-900/5 ${className ?? ""}`}
+      className={`rounded-2xl border border-green-100 bg-white p-6 shadow-sm shadow-green-900/5 ${className ?? ""}`}
     >
       <div className="mb-5 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="h-2 w-2 rounded-full bg-green-500" />
-          <span className="text-sm uppercase tracking-[0.16em] text-green-600">
-            <span className="mr-1 text-base">💰</span>
+          <span className="h-2 w-2 rounded-full bg-green-400" />
+          <span className="text-xs font-semibold uppercase tracking-widest text-green-500">
+            <span className="mr-1 text-sm">💰</span>
             savings
           </span>
         </div>
         <Link
           href="/savings"
-          className="text-sm text-green-500 transition hover:text-green-700"
+          className="text-xs font-medium text-green-400 transition hover:text-green-600"
         >
-          view
+          view →
         </Link>
       </div>
 
@@ -180,7 +180,7 @@ export function SavingsCard({ className }: { className?: string }) {
                 {Math.round(monthlyPct)}% of monthly target
               </span>
               {topGoalProgress && (
-                <span className="text-sm text-green-500">
+                <span className="text-xs text-green-400">
                   {topGoalProgress.name}{" "}
                   <span className="font-mono tabular-nums text-green-600">
                     {Math.round(topGoalProgress.pct)}%

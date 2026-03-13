@@ -112,19 +112,19 @@ export function InvestmentsCard({ className }: { className?: string }) {
 
   if (!monthlyAllocation) {
     statusLabel = "no allocation set";
-    statusClass = "bg-green-50 text-green-500";
+    statusClass = "bg-blue-50 text-blue-400";
   } else if (monthlyPct === 0) {
     statusLabel = "not started yet";
-    statusClass = "bg-green-50 text-green-500";
+    statusClass = "bg-blue-50 text-blue-400";
   } else if (monthlyPct >= monthElapsedPct + 5) {
     statusLabel = "ahead of pace";
-    statusClass = "bg-green-100 text-green-700";
+    statusClass = "bg-blue-50 text-blue-600";
   } else if (monthlyPct <= monthElapsedPct - 5) {
     statusLabel = "behind";
-    statusClass = "bg-amber-100 text-amber-700";
+    statusClass = "bg-amber-50 text-amber-600";
   } else {
     statusLabel = "on track";
-    statusClass = "bg-green-100 text-green-700";
+    statusClass = "bg-blue-50 text-blue-600";
   }
 
   const isLoading =
@@ -134,28 +134,28 @@ export function InvestmentsCard({ className }: { className?: string }) {
 
   return (
     <div
-      className={`rounded-2xl border border-blue-200 bg-white p-6 shadow-sm shadow-blue-900/5 ${className ?? ""}`}
+      className={`rounded-2xl border border-blue-100 bg-white p-6 shadow-sm shadow-blue-900/5 ${className ?? ""}`}
     >
       <div className="mb-5 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="h-2 w-2 rounded-full bg-blue-400" />
-          <span className="text-sm uppercase tracking-[0.16em] text-green-600">
-            <span className="mr-1 text-base">📈</span>
+          <span className="text-xs font-semibold uppercase tracking-widest text-blue-500">
+            <span className="mr-1 text-sm">📈</span>
             investments
           </span>
         </div>
         <Link
           href="/investments"
-          className="text-sm text-green-500 transition hover:text-green-700"
+          className="text-xs font-medium text-blue-400 transition hover:text-blue-600"
         >
-          view
+          view →
         </Link>
       </div>
 
       {isLoading ? (
         <div className="space-y-3">
-          <div className="h-9 w-28 animate-pulse rounded-lg bg-green-100" />
-          <div className="h-3 w-full animate-pulse rounded-full bg-green-100" />
+          <div className="h-9 w-28 animate-pulse rounded-lg bg-blue-50" />
+          <div className="h-3 w-full animate-pulse rounded-full bg-blue-50" />
         </div>
       ) : investmentCategories.length === 0 ? (
         <p className="text-sm text-green-500">
@@ -185,9 +185,9 @@ export function InvestmentsCard({ className }: { className?: string }) {
                 {Math.round(monthlyPct)}% of monthly target
               </span>
               {topGoalProgress && (
-                <span className="text-sm text-green-500">
+                <span className="text-xs text-blue-400">
                   {topGoalProgress.name}{" "}
-                  <span className="font-mono tabular-nums text-blue-500">
+                  <span className="font-mono tabular-nums text-blue-600">
                     {Math.round(topGoalProgress.pct)}%
                   </span>
                 </span>

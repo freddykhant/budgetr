@@ -110,18 +110,18 @@ export function DashboardClient({ user }: DashboardClientProps) {
         {/* Greeting */}
         <section className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="text-sm uppercase tracking-[0.18em] text-green-500">
+            <p className="text-xs font-semibold uppercase tracking-widest text-green-400">
               {greeting}
             </p>
             <h1 className="mt-1 text-[32px] font-semibold tracking-tight text-green-950">
               {firstName}, here&apos;s your month
             </h1>
-            <p className="mt-1 text-base text-green-700">{pulse}</p>
+            <p className="mt-1 text-base text-green-600">{pulse}</p>
           </div>
           <div className="flex items-end gap-3 md:flex-col md:items-end">
             <p className="text-sm text-green-600">{monthLabel}</p>
             <div className="flex flex-col items-end gap-1">
-              <p className="text-xs text-green-600 tabular-nums">
+              <p className="text-xs text-green-400 tabular-nums">
                 day {dayOfMonth} of {totalDaysInMonth}
               </p>
               <div className="h-1.5 w-36 overflow-hidden rounded-full bg-green-200">

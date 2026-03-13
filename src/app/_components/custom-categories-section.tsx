@@ -83,7 +83,7 @@ export function CustomCategoriesSection() {
   return (
     <section>
       <div className="mb-3 flex items-center justify-between">
-        <p className="text-sm uppercase tracking-[0.18em] text-green-600">
+        <p className="text-xs font-semibold uppercase tracking-widest text-green-400">
           custom
         </p>
       </div>
