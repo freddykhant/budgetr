@@ -6,8 +6,8 @@ import Link from "next/link";
 function CircularProgress({
   spendPct,
   monthPct,
-  size = 88,
-  strokeWidth = 7,
+  size = 112,
+  strokeWidth = 8,
 }: {
   spendPct: number;
   monthPct: number;
@@ -17,16 +17,10 @@ function CircularProgress({
   const r = (size - strokeWidth) / 2;
   const cx = size / 2;
   const circumference = 2 * Math.PI * r;
-
   const spendOffset = circumference - (Math.min(100, spendPct) / 100) * circumference;
   const monthOffset = circumference - (Math.min(100, monthPct) / 100) * circumference;
-
   const spendColor =
-    spendPct > monthPct + 10
-      ? "stroke-red-400"
-      : spendPct > monthPct
-        ? "stroke-amber-400"
-        : "stroke-orange-400";
+    spendPct > monthPct + 10 ? "stroke-red-400" : spendPct > monthPct ? "stroke-amber-400" : "stroke-orange-400";
 
   return (
     <svg width={size} height={size} className="-rotate-90">
@@ -34,7 +28,7 @@ function CircularProgress({
       <circle
         cx={cx} cy={cx} r={r} fill="none" stroke="currentColor" strokeWidth={2}
         strokeDasharray={circumference} strokeDashoffset={monthOffset} strokeLinecap="round"
-        className="text-green-300 opacity-60 transition-all duration-700"
+        className="text-orange-300/50 transition-all duration-700"
       />
       <circle
         cx={cx} cy={cx} r={r} fill="none" stroke="currentColor" strokeWidth={strokeWidth}
@@ -46,24 +40,12 @@ function CircularProgress({
 }
 
 function fmt(n: number) {
-  return new Intl.NumberFormat("en-AU", {
-    style: "currency",
-    currency: "AUD",
-    maximumFractionDigits: 0,
-  }).format(n);
+  return new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD", maximumFractionDigits: 0 }).format(n);
 }
 
 type View = "daily" | "monthly";
 
-export function SpendingCard({
-  className,
-  spent,
-  limit,
-}: {
-  className?: string;
-  spent: number;
-  limit: number;
-}) {
+export function SpendingCard({ className, spent, limit }: { className?: string; spent: number; limit: number }) {
   const [view, setView] = useState<View>("daily");
 
   const today = new Date();
@@ -76,7 +58,6 @@ export function SpendingCard({
   const usedPct = Math.min(100, (spent / safeLimit) * 100);
   const remaining = Math.max(0, limit - spent);
   const overspent = spent > limit;
-
   const dailyAllowance = remaining / daysLeft;
 
   const expectedSpend = limit * (dayOfMonth / daysInMonth);
@@ -86,174 +67,175 @@ export function SpendingCard({
   const isAhead = spendDelta > 0 && !overspent;
   const isBehind = spendDelta < -limit * 0.05;
 
-  const paceColor = overspent
-    ? { bg: "bg-red-50", label: "text-red-400", value: "text-red-500" }
-    : isAhead
-      ? { bg: "bg-green-50", label: "text-green-500", value: "text-green-700" }
-      : isBehind
-        ? { bg: "bg-amber-50", label: "text-amber-500", value: "text-amber-600" }
-        : { bg: "bg-white/60", label: "text-green-500", value: "text-green-700" };
-
-  const paceLabel = overspent
-    ? "over limit"
+  const pace = overspent
+    ? { label: "over limit", color: "text-red-500", dot: "bg-red-400" }
     : daysDelta === 0
-      ? "on pace"
+      ? { label: "on pace", color: "text-green-600", dot: "bg-green-400" }
       : isAhead
-        ? `${daysDelta}d ahead`
-        : `${daysDelta}d behind`;
+        ? { label: `${daysDelta}d ahead`, color: "text-green-600", dot: "bg-green-400" }
+        : isBehind
+          ? { label: `${daysDelta}d behind`, color: "text-amber-600", dot: "bg-amber-400" }
+          : { label: "on pace", color: "text-green-600", dot: "bg-green-400" };
 
-  // Loading state
+  // Loading skeleton
   if (!Number.isFinite(limit)) {
     return (
-      <div className={`rounded-2xl border border-orange-200 bg-orange-50/50 p-6 shadow-sm shadow-orange-900/5 ${className ?? ""}`}>
-        <div className="mb-5 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-orange-400" />
-            <span className="text-sm uppercase tracking-[0.16em] text-green-600">
-              <span className="mr-1 text-base">💸</span>spending
-            </span>
+      <div className={`overflow-hidden rounded-2xl border border-orange-200 bg-linear-to-br from-orange-50 to-white shadow-sm shadow-orange-900/5 ${className ?? ""}`}>
+        <div className="p-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">💸</span>
+              <div className="h-3 w-16 animate-pulse rounded-full bg-orange-200" />
+            </div>
+            <div className="h-3 w-12 animate-pulse rounded-full bg-orange-100" />
           </div>
-          <div className="h-3.5 w-28 animate-pulse rounded-full bg-green-100" />
-        </div>
-        <div className="flex items-center gap-4">
-          <div className="h-[88px] w-[88px] shrink-0 animate-pulse rounded-full bg-green-100" />
-          <div className="space-y-2">
-            <div className="h-8 w-24 animate-pulse rounded-md bg-green-100" />
-            <div className="h-4 w-32 animate-pulse rounded-md bg-green-50" />
-            <div className="h-4 w-20 animate-pulse rounded-md bg-green-100" />
+          <div className="mt-5 h-9 animate-pulse rounded-xl bg-orange-100/60" />
+          <div className="mt-6 flex items-center gap-6">
+            <div className="h-28 w-28 shrink-0 animate-pulse rounded-full bg-orange-100" />
+            <div className="flex-1 space-y-3">
+              <div className="h-3 w-24 animate-pulse rounded-full bg-orange-100" />
+              <div className="h-9 w-32 animate-pulse rounded-lg bg-orange-100" />
+              <div className="h-3 w-28 animate-pulse rounded-full bg-orange-50" />
+            </div>
           </div>
-        </div>
-        <div className="mt-5 h-px bg-orange-100" />
-        <div className="mt-4 grid grid-cols-2 gap-2">
-          <div className="h-12 animate-pulse rounded-xl bg-green-50" />
-          <div className="h-12 animate-pulse rounded-xl bg-green-50" />
+          <div className="mt-6 h-px bg-orange-100" />
+          <div className="mt-5 grid grid-cols-2 gap-4">
+            <div className="h-10 animate-pulse rounded-lg bg-orange-50" />
+            <div className="h-10 animate-pulse rounded-lg bg-orange-50" />
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className={`rounded-2xl border border-orange-200 bg-orange-50/50 p-6 shadow-sm shadow-orange-900/5 ${className ?? ""}`}>
-      {/* Header */}
-      <div className="mb-5 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="h-2 w-2 rounded-full bg-orange-400" />
-          <span className="text-sm uppercase tracking-[0.16em] text-green-600">
-            <span className="mr-1 text-base">💸</span>spending
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          {/* Toggle */}
-          <div className="flex rounded-full border border-orange-200 bg-white/60 p-0.5 text-xs">
-            <button
-              type="button"
-              onClick={() => setView("daily")}
-              className={`cursor-pointer rounded-full px-2.5 py-1 font-medium transition-all duration-200 ${
-                view === "daily"
-                  ? "bg-orange-400 text-white shadow-sm"
-                  : "text-green-500 hover:text-green-700"
-              }`}
-            >
-              daily
-            </button>
-            <button
-              type="button"
-              onClick={() => setView("monthly")}
-              className={`cursor-pointer rounded-full px-2.5 py-1 font-medium transition-all duration-200 ${
-                view === "monthly"
-                  ? "bg-orange-400 text-white shadow-sm"
-                  : "text-green-500 hover:text-green-700"
-              }`}
-            >
-              monthly
-            </button>
+    <div className={`overflow-hidden rounded-2xl border border-orange-200 bg-linear-to-br from-orange-50 to-white shadow-sm shadow-orange-900/5 ${className ?? ""}`}>
+      <div className="p-6">
+
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-lg">💸</span>
+            <span className="text-xs font-semibold uppercase tracking-widest text-orange-400">
+              spending
+            </span>
           </div>
-          <Link href="/spending" className="cursor-pointer text-sm text-green-500 transition hover:text-green-700">
-            view →
+          <Link
+            href="/spending"
+            className="cursor-pointer text-xs font-medium text-green-400 transition hover:text-green-600"
+          >
+            view all →
           </Link>
         </div>
-      </div>
 
-      {/* Hero */}
-      <div className="flex items-center gap-4">
-        <div className="relative flex shrink-0 items-center justify-center">
-          <CircularProgress spendPct={usedPct} monthPct={monthElapsedPct} />
-          <span className="absolute text-sm font-semibold tabular-nums text-orange-600">
-            {Math.round(usedPct)}%
-          </span>
+        {/* Segmented toggle */}
+        <div className="mt-5 flex rounded-xl bg-orange-100/60 p-1">
+          {(["daily", "monthly"] as View[]).map((v) => (
+            <button
+              key={v}
+              type="button"
+              onClick={() => setView(v)}
+              className={`flex-1 cursor-pointer rounded-lg py-1.5 text-sm font-medium transition-all duration-200 ${
+                view === v
+                  ? "bg-white text-orange-500 shadow-sm"
+                  : "text-green-500 hover:text-green-700"
+              }`}
+            >
+              {v}
+            </button>
+          ))}
         </div>
 
-        <div className="min-w-0 flex-1">
-          {overspent ? (
+        {/* Hero */}
+        <div className="mt-6 flex items-center gap-5">
+          <div className="relative flex shrink-0 items-center justify-center">
+            <CircularProgress spendPct={usedPct} monthPct={monthElapsedPct} />
+            <div className="absolute flex flex-col items-center">
+              <span className="font-mono text-base font-bold tabular-nums text-orange-500">
+                {Math.round(usedPct)}%
+              </span>
+              <span className="text-[10px] text-orange-300">used</span>
+            </div>
+          </div>
+
+          <div className="min-w-0 flex-1">
+            {overspent ? (
+              <>
+                <p className="text-xs font-semibold uppercase tracking-widest text-red-400">over budget</p>
+                <p className="mt-1 font-mono text-4xl font-bold tabular-nums leading-none text-red-500">
+                  {fmt(spent - limit)}
+                </p>
+                <p className="mt-1.5 text-sm text-green-400">over your {fmt(limit)} limit</p>
+              </>
+            ) : view === "daily" ? (
+              <>
+                <p className="text-xs font-semibold uppercase tracking-widest text-green-400">
+                  today&apos;s allowance
+                </p>
+                <p className="mt-1 font-mono text-4xl font-bold tabular-nums leading-none text-green-950">
+                  {fmt(dailyAllowance)}
+                  <span className="ml-1 text-lg font-normal text-green-400">/day</span>
+                </p>
+                <p className="mt-1.5 text-sm text-green-400">
+                  {fmt(remaining)} left &middot; {daysLeft}d to go
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="text-xs font-semibold uppercase tracking-widest text-green-400">
+                  spent this month
+                </p>
+                <p className="mt-1 font-mono text-4xl font-bold tabular-nums leading-none text-green-950">
+                  {fmt(spent)}
+                </p>
+                <p className="mt-1.5 text-sm text-green-400">of {fmt(limit)} limit</p>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div className="mt-6 h-px bg-orange-100" />
+
+        {/* Stats */}
+        <div className="mt-5 grid grid-cols-2 gap-x-6">
+          {view === "daily" ? (
             <>
-              <p className="text-xs uppercase tracking-[0.14em] text-red-400">over budget</p>
-              <p className="mt-0.5 font-mono text-3xl font-semibold tabular-nums leading-none text-red-500">
-                {fmt(spent - limit)}
-              </p>
-              <p className="mt-1 text-sm text-green-500">over your {fmt(limit)} limit</p>
-            </>
-          ) : view === "daily" ? (
-            <>
-              <p className="text-xs uppercase tracking-[0.14em] text-green-500">today&apos;s allowance</p>
-              <p className="mt-0.5 font-mono text-3xl font-semibold tabular-nums leading-none text-green-950">
-                {fmt(dailyAllowance)}
-                <span className="ml-1 text-base font-normal text-green-500">/day</span>
-              </p>
-              <p className="mt-1 text-sm text-green-500">
-                {fmt(remaining)} left · {daysLeft}d remaining
-              </p>
+              <div>
+                <p className="text-xs text-green-400">spent</p>
+                <p className="mt-0.5 font-mono text-sm font-semibold tabular-nums text-green-800">
+                  {fmt(spent)}
+                  <span className="ml-1 font-normal text-green-300">/ {fmt(limit)}</span>
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-green-400">pace</p>
+                <p className={`mt-0.5 flex items-center gap-1.5 text-sm font-semibold ${pace.color}`}>
+                  <span className={`inline-block h-1.5 w-1.5 rounded-full ${pace.dot}`} />
+                  {pace.label}
+                </p>
+              </div>
             </>
           ) : (
             <>
-              <p className="text-xs uppercase tracking-[0.14em] text-green-500">spent this month</p>
-              <p className="mt-0.5 font-mono text-3xl font-semibold tabular-nums leading-none text-green-950">
-                {fmt(spent)}
-              </p>
-              <p className="mt-1 text-sm text-green-500">
-                of {fmt(limit)} limit
-              </p>
+              <div>
+                <p className="text-xs text-green-400">{overspent ? "overspent" : "remaining"}</p>
+                <p className={`mt-0.5 font-mono text-sm font-semibold tabular-nums ${overspent ? "text-red-500" : "text-green-800"}`}>
+                  {overspent ? fmt(spent - limit) : fmt(remaining)}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-green-400">budget used</p>
+                <p className={`mt-0.5 font-mono text-sm font-semibold tabular-nums ${
+                  usedPct > 90 ? "text-red-500" : usedPct > 70 ? "text-amber-500" : "text-green-800"
+                }`}>
+                  {Math.round(usedPct)}%
+                </p>
+              </div>
             </>
           )}
         </div>
-      </div>
 
-      {/* Divider */}
-      <div className="my-4 h-px bg-orange-100" />
-
-      {/* Stats row — swaps content with the view */}
-      <div className="grid grid-cols-2 gap-2">
-        {view === "daily" ? (
-          <>
-            <div className="rounded-xl bg-white/60 px-3 py-2.5">
-              <p className="text-xs text-green-500">spent</p>
-              <p className="mt-0.5 font-mono text-sm font-semibold tabular-nums text-green-950">
-                {fmt(spent)}
-                <span className="ml-1 font-normal text-green-400">/ {fmt(limit)}</span>
-              </p>
-            </div>
-            <div className={`rounded-xl px-3 py-2.5 ${paceColor.bg}`}>
-              <p className={`text-xs ${paceColor.label}`}>pace</p>
-              <p className={`mt-0.5 text-sm font-semibold ${paceColor.value}`}>{paceLabel}</p>
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="rounded-xl bg-white/60 px-3 py-2.5">
-              <p className="text-xs text-green-500">{overspent ? "overspent" : "remaining"}</p>
-              <p className={`mt-0.5 font-mono text-sm font-semibold tabular-nums ${overspent ? "text-red-500" : "text-green-950"}`}>
-                {overspent ? fmt(spent - limit) : fmt(remaining)}
-              </p>
-            </div>
-            <div className="rounded-xl bg-white/60 px-3 py-2.5">
-              <p className="text-xs text-green-500">used</p>
-              <p className={`mt-0.5 font-mono text-sm font-semibold tabular-nums ${
-                usedPct > 90 ? "text-red-500" : usedPct > 70 ? "text-amber-600" : "text-green-950"
-              }`}>
-                {Math.round(usedPct)}%
-              </p>
-            </div>
-          </>
-        )}
       </div>
     </div>
   );
