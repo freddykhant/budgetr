@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 
 function CircularProgress({
@@ -29,15 +30,12 @@ function CircularProgress({
 
   return (
     <svg width={size} height={size} className="-rotate-90">
-      {/* Track */}
       <circle cx={cx} cy={cx} r={r} fill="none" stroke="currentColor" strokeWidth={strokeWidth} className="text-orange-100" />
-      {/* Month elapsed ghost ring */}
       <circle
         cx={cx} cy={cx} r={r} fill="none" stroke="currentColor" strokeWidth={2}
         strokeDasharray={circumference} strokeDashoffset={monthOffset} strokeLinecap="round"
         className="text-green-300 opacity-60 transition-all duration-700"
       />
-      {/* Spend ring */}
       <circle
         cx={cx} cy={cx} r={r} fill="none" stroke="currentColor" strokeWidth={strokeWidth}
         strokeDasharray={circumference} strokeDashoffset={spendOffset} strokeLinecap="round"
@@ -55,6 +53,8 @@ function fmt(n: number) {
   }).format(n);
 }
 
+type View = "daily" | "monthly";
+
 export function SpendingCard({
   className,
   spent,
@@ -64,6 +64,8 @@ export function SpendingCard({
   spent: number;
   limit: number;
 }) {
+  const [view, setView] = useState<View>("daily");
+
   const today = new Date();
   const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
   const dayOfMonth = today.getDate();
@@ -75,16 +77,30 @@ export function SpendingCard({
   const remaining = Math.max(0, limit - spent);
   const overspent = spent > limit;
 
-  // The number that actually drives decisions: how much per day from here
   const dailyAllowance = remaining / daysLeft;
 
-  // Pace: expected spend at this point in the month
   const expectedSpend = limit * (dayOfMonth / daysInMonth);
-  const spendDelta = expectedSpend - spent; // positive = under expected = ahead
+  const spendDelta = expectedSpend - spent;
   const dailyRate = limit / daysInMonth;
   const daysDelta = dailyRate > 0 ? Math.round(Math.abs(spendDelta) / dailyRate) : 0;
   const isAhead = spendDelta > 0 && !overspent;
-  const isBehind = spendDelta < -limit * 0.05; // >5% over expected
+  const isBehind = spendDelta < -limit * 0.05;
+
+  const paceColor = overspent
+    ? { bg: "bg-red-50", label: "text-red-400", value: "text-red-500" }
+    : isAhead
+      ? { bg: "bg-green-50", label: "text-green-500", value: "text-green-700" }
+      : isBehind
+        ? { bg: "bg-amber-50", label: "text-amber-500", value: "text-amber-600" }
+        : { bg: "bg-white/60", label: "text-green-500", value: "text-green-700" };
+
+  const paceLabel = overspent
+    ? "over limit"
+    : daysDelta === 0
+      ? "on pace"
+      : isAhead
+        ? `${daysDelta}d ahead`
+        : `${daysDelta}d behind`;
 
   // Loading state
   if (!Number.isFinite(limit)) {
@@ -97,7 +113,7 @@ export function SpendingCard({
               <span className="mr-1 text-base">💸</span>spending
             </span>
           </div>
-          <div className="h-3.5 w-12 animate-pulse rounded-full bg-green-100" />
+          <div className="h-3.5 w-28 animate-pulse rounded-full bg-green-100" />
         </div>
         <div className="flex items-center gap-4">
           <div className="h-[88px] w-[88px] shrink-0 animate-pulse rounded-full bg-green-100" />
@@ -126,12 +142,39 @@ export function SpendingCard({
             <span className="mr-1 text-base">💸</span>spending
           </span>
         </div>
-        <Link href="/spending" className="cursor-pointer text-sm text-green-500 transition hover:text-green-700">
-          view →
-        </Link>
+        <div className="flex items-center gap-2">
+          {/* Toggle */}
+          <div className="flex rounded-full border border-orange-200 bg-white/60 p-0.5 text-xs">
+            <button
+              type="button"
+              onClick={() => setView("daily")}
+              className={`cursor-pointer rounded-full px-2.5 py-1 font-medium transition-all duration-200 ${
+                view === "daily"
+                  ? "bg-orange-400 text-white shadow-sm"
+                  : "text-green-500 hover:text-green-700"
+              }`}
+            >
+              daily
+            </button>
+            <button
+              type="button"
+              onClick={() => setView("monthly")}
+              className={`cursor-pointer rounded-full px-2.5 py-1 font-medium transition-all duration-200 ${
+                view === "monthly"
+                  ? "bg-orange-400 text-white shadow-sm"
+                  : "text-green-500 hover:text-green-700"
+              }`}
+            >
+              monthly
+            </button>
+          </div>
+          <Link href="/spending" className="cursor-pointer text-sm text-green-500 transition hover:text-green-700">
+            view →
+          </Link>
+        </div>
       </div>
 
-      {/* Hero: ring + daily allowance */}
+      {/* Hero */}
       <div className="flex items-center gap-4">
         <div className="relative flex shrink-0 items-center justify-center">
           <CircularProgress spendPct={usedPct} monthPct={monthElapsedPct} />
@@ -149,7 +192,7 @@ export function SpendingCard({
               </p>
               <p className="mt-1 text-sm text-green-500">over your {fmt(limit)} limit</p>
             </>
-          ) : (
+          ) : view === "daily" ? (
             <>
               <p className="text-xs uppercase tracking-[0.14em] text-green-500">today&apos;s allowance</p>
               <p className="mt-0.5 font-mono text-3xl font-semibold tabular-nums leading-none text-green-950">
@@ -160,6 +203,16 @@ export function SpendingCard({
                 {fmt(remaining)} left · {daysLeft}d remaining
               </p>
             </>
+          ) : (
+            <>
+              <p className="text-xs uppercase tracking-[0.14em] text-green-500">spent this month</p>
+              <p className="mt-0.5 font-mono text-3xl font-semibold tabular-nums leading-none text-green-950">
+                {fmt(spent)}
+              </p>
+              <p className="mt-1 text-sm text-green-500">
+                of {fmt(limit)} limit
+              </p>
+            </>
           )}
         </div>
       </div>
@@ -167,41 +220,40 @@ export function SpendingCard({
       {/* Divider */}
       <div className="my-4 h-px bg-orange-100" />
 
-      {/* Stats row */}
+      {/* Stats row — swaps content with the view */}
       <div className="grid grid-cols-2 gap-2">
-        <div className="rounded-xl bg-white/60 px-3 py-2.5">
-          <p className="text-xs text-green-500">spent</p>
-          <p className="mt-0.5 font-mono text-sm font-semibold tabular-nums text-green-950">
-            {fmt(spent)}
-            <span className="ml-1 font-normal text-green-400">/ {fmt(limit)}</span>
-          </p>
-        </div>
-
-        {/* Pace chip */}
-        <div className={`rounded-xl px-3 py-2.5 ${
-          overspent
-            ? "bg-red-50"
-            : isAhead
-              ? "bg-green-50"
-              : isBehind
-                ? "bg-amber-50"
-                : "bg-white/60"
-        }`}>
-          <p className={`text-xs ${
-            overspent ? "text-red-400" : isAhead ? "text-green-500" : isBehind ? "text-amber-500" : "text-green-500"
-          }`}>pace</p>
-          <p className={`mt-0.5 text-sm font-semibold ${
-            overspent ? "text-red-500" : isAhead ? "text-green-700" : isBehind ? "text-amber-600" : "text-green-700"
-          }`}>
-            {overspent
-              ? "over limit"
-              : daysDelta === 0
-                ? "on pace"
-                : isAhead
-                  ? `${daysDelta}d ahead`
-                  : `${daysDelta}d behind`}
-          </p>
-        </div>
+        {view === "daily" ? (
+          <>
+            <div className="rounded-xl bg-white/60 px-3 py-2.5">
+              <p className="text-xs text-green-500">spent</p>
+              <p className="mt-0.5 font-mono text-sm font-semibold tabular-nums text-green-950">
+                {fmt(spent)}
+                <span className="ml-1 font-normal text-green-400">/ {fmt(limit)}</span>
+              </p>
+            </div>
+            <div className={`rounded-xl px-3 py-2.5 ${paceColor.bg}`}>
+              <p className={`text-xs ${paceColor.label}`}>pace</p>
+              <p className={`mt-0.5 text-sm font-semibold ${paceColor.value}`}>{paceLabel}</p>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="rounded-xl bg-white/60 px-3 py-2.5">
+              <p className="text-xs text-green-500">{overspent ? "overspent" : "remaining"}</p>
+              <p className={`mt-0.5 font-mono text-sm font-semibold tabular-nums ${overspent ? "text-red-500" : "text-green-950"}`}>
+                {overspent ? fmt(spent - limit) : fmt(remaining)}
+              </p>
+            </div>
+            <div className="rounded-xl bg-white/60 px-3 py-2.5">
+              <p className="text-xs text-green-500">used</p>
+              <p className={`mt-0.5 font-mono text-sm font-semibold tabular-nums ${
+                usedPct > 90 ? "text-red-500" : usedPct > 70 ? "text-amber-600" : "text-green-950"
+              }`}>
+                {Math.round(usedPct)}%
+              </p>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
