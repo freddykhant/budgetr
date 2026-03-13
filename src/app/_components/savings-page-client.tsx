@@ -95,7 +95,7 @@ function SavingCategoryCard({
       const isNew = !goal;
       showToast(
         isNew
-          ? `🎯 Goal set — ${fmt(vars.targetAmount as number)} for ${category.name}. Let's build it.`
+          ? `🎯 Goal set — ${fmt(Number(vars.targetAmount))} for ${category.name}. Let's build it.`
           : "Goal updated.",
         isNew ? "celebration" : "success",
       );

@@ -96,7 +96,10 @@ export function SpendingPageClient() {
 
   const deleteEntry = api.entry.delete.useMutation({ onSuccess: () => void utils.entry.list.invalidate() });
 
-  const confirmedEntries = entryQuery.data ?? [];
+  const confirmedEntries = useMemo(
+    () => entryQuery.data ?? [],
+    [entryQuery.data],
+  );
   const pendingTotal = pendingEntries.reduce((sum, e) => sum + e.amount, 0);
   const totalSpent = useMemo(
     () => confirmedEntries.reduce((sum, e) => sum + Number(e.amount ?? 0), 0),

@@ -25,7 +25,13 @@ type ToastContextValue = {
 
 // ─── Context ──────────────────────────────────────────────────────────────────
 
-const ToastContext = createContext<ToastContextValue>({ showToast: () => {} });
+const ToastContext = createContext<ToastContextValue>({
+  showToast: () => {
+    if (typeof window !== "undefined") {
+      console.warn("useToast must be used within ToastProvider");
+    }
+  },
+});
 
 export function useToast() {
   return useContext(ToastContext);

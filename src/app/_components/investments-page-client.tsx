@@ -93,7 +93,7 @@ function InvestmentCategoryCard({
       const isNew = !goal;
       showToast(
         isNew
-          ? `🎯 Investment goal set — ${fmt(vars.targetAmount as number)} for ${category.name}.`
+          ? `🎯 Investment goal set — ${fmt(Number(vars.targetAmount))} for ${category.name}.`
           : "Goal updated.",
         isNew ? "celebration" : "success",
       );

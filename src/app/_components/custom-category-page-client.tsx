@@ -84,7 +84,7 @@ export function CustomCategoryPageClient({
       const isNew = !goal;
       showToast(
         isNew
-          ? `🎯 Goal set — ${fmt(vars.targetAmount as number)} for ${categoryName}.`
+          ? `🎯 Goal set — ${fmt(Number(vars.targetAmount))} for ${categoryName}.`
           : "Goal updated.",
         isNew ? "celebration" : "success",
       );
