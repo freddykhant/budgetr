@@ -45,12 +45,28 @@ function SavingCategoryCard({
 
   const entryDate = dateMode === "today" ? todayStr : dateMode === "yesterday" ? yesterdayStr : pickDate;
 
+  const utils = api.useUtils();
   const entriesQuery = api.entry.listAllForCategory.useQuery({ categoryId: category.id });
   const createEntry = api.entry.create.useMutation({
-    onSuccess: () => { void entriesQuery.refetch(); setAmount(""); setDescription(""); setDateMode("today"); setShowAddForm(false); },
+    onSuccess: () => {
+      void utils.entry.listAllForCategory.invalidate({ categoryId: category.id });
+      void utils.entry.listForCategories.invalidate();
+      setAmount(""); setDescription(""); setDateMode("today"); setShowAddForm(false);
+    },
   });
-  const deleteEntry = api.entry.delete.useMutation({ onSuccess: () => void entriesQuery.refetch() });
-  const upsertGoal = api.goal.upsert.useMutation({ onSuccess: () => { onGoalChange(); setShowGoalForm(false); } });
+  const deleteEntry = api.entry.delete.useMutation({
+    onSuccess: () => {
+      void utils.entry.listAllForCategory.invalidate({ categoryId: category.id });
+      void utils.entry.listForCategories.invalidate();
+    },
+  });
+  const upsertGoal = api.goal.upsert.useMutation({
+    onSuccess: () => {
+      onGoalChange();
+      void utils.goal.list.invalidate();
+      setShowGoalForm(false);
+    },
+  });
 
   const allEntries = useMemo(() => entriesQuery.data ?? [], [entriesQuery.data]);
   const totalSaved = useMemo(() => allEntries.reduce((sum, e) => sum + Number(e.amount), 0), [allEntries]);

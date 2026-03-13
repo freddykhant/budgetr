@@ -71,12 +71,14 @@ export function SpendingPageClient() {
     { enabled: !!spendingCategory },
   );
 
+  const utils = api.useUtils();
+
   const createEntry = api.entry.create.useMutation({
     onSuccess: (_, vars) => {
       setPendingEntries((prev) =>
         prev.filter((e) => !(e.amount === vars.amount && e.date === vars.date && e.description === (vars.description ?? ""))),
       );
-      void entryQuery.refetch();
+      void utils.entry.list.invalidate();
     },
     onError: (_, vars) => {
       const match = pendingEntries.find(
@@ -92,7 +94,7 @@ export function SpendingPageClient() {
     },
   });
 
-  const deleteEntry = api.entry.delete.useMutation({ onSuccess: () => void entryQuery.refetch() });
+  const deleteEntry = api.entry.delete.useMutation({ onSuccess: () => void utils.entry.list.invalidate() });
 
   const confirmedEntries = entryQuery.data ?? [];
   const pendingTotal = pendingEntries.reduce((sum, e) => sum + e.amount, 0);

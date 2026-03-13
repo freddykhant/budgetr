@@ -53,11 +53,12 @@ type Props = {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function MonthlyBudgetCard({ month, year, onBudgetChange }: Props) {
+  const utils = api.useUtils();
   const budgetQuery = api.budget.getOrCreateCurrent.useQuery({ month, year });
   const categoriesQuery = api.category.list.useQuery();
   const updateBudget = api.budget.update.useMutation({
     onSuccess: () => {
-      void budgetQuery.refetch();
+      void utils.budget.getOrCreateCurrent.invalidate({ month, year });
       setIsEditing(false);
     },
   });

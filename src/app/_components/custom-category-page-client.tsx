@@ -42,12 +42,24 @@ export function CustomCategoryPageClient({
   const goalQuery = api.goal.get.useQuery({ categoryId });
   const budgetQuery = api.budget.getOrCreateCurrent.useQuery({ month, year });
 
+  const utils = api.useUtils();
   const createEntry = api.entry.create.useMutation({
     onSuccess: () => { void entriesQuery.refetch(); setAmount(""); setDescription(""); setDateMode("today"); setShowAddForm(false); },
   });
   const deleteEntry = api.entry.delete.useMutation({ onSuccess: () => void entriesQuery.refetch() });
-  const upsertGoal = api.goal.upsert.useMutation({ onSuccess: () => { void goalQuery.refetch(); setShowGoalForm(false); } });
-  const deleteGoal = api.goal.delete.useMutation({ onSuccess: () => void goalQuery.refetch() });
+  const upsertGoal = api.goal.upsert.useMutation({
+    onSuccess: () => {
+      void utils.goal.get.invalidate({ categoryId });
+      void utils.goal.list.invalidate();
+      setShowGoalForm(false);
+    },
+  });
+  const deleteGoal = api.goal.delete.useMutation({
+    onSuccess: () => {
+      void utils.goal.get.invalidate({ categoryId });
+      void utils.goal.list.invalidate();
+    },
+  });
 
   const allEntries = useMemo(() => entriesQuery.data ?? [], [entriesQuery.data]);
   const totalLogged = useMemo(() => allEntries.reduce((sum, e) => sum + Number(e.amount), 0), [allEntries]);
