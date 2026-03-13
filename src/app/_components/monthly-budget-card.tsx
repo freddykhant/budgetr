@@ -141,6 +141,15 @@ export function MonthlyBudgetCard({ month, year, onBudgetChange }: Props) {
   });
 
   useEffect(() => {
+    if (!confirmClear) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setConfirmClear(false);
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [confirmClear]);
+
+  useEffect(() => {
     if (budgetQuery.data) {
       setDraftIncome(String(incomeNum || ""));
       const splits: Record<number, number> = {};
@@ -287,48 +296,61 @@ export function MonthlyBudgetCard({ month, year, onBudgetChange }: Props) {
         </div>
       </div>
 
-      {/* Confirmation: save options — full-width, appears when user clicks save */}
+      {/* Confirmation modal — save options */}
       {isEditing && confirmClear && (
-        <div
-          className="mt-4 rounded-xl border border-amber-100 bg-amber-50/80 p-4"
-          role="alertdialog"
-          aria-labelledby="save-confirm-title"
-          aria-describedby="save-confirm-desc"
-        >
-          <p id="save-confirm-title" className="text-sm font-medium text-green-950">
-            How would you like to save?
-          </p>
-          <p id="save-confirm-desc" className="mt-0.5 text-sm text-green-600">
-            {(() => {
-              const monthName = new Date(year, month - 1, 1).toLocaleString("en-AU", { month: "long" });
-              return `Keep your logged entries, or clear ${monthName} and start fresh.`;
-            })()}
-          </p>
-          <div className="mt-4 flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              onClick={handleSave}
-              disabled={!canSave || updateBudget.isPending}
-              className="flex h-9 cursor-pointer items-center gap-2 rounded-full bg-green-500 px-4 text-sm font-medium text-white transition hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <Check size={14} />
-              Save budget only
-            </button>
-            <button
-              type="button"
-              onClick={() => clearMonth.mutate({ month, year })}
-              disabled={clearMonth.isPending || updateBudget.isPending}
-              className="flex h-9 cursor-pointer items-center gap-2 rounded-full border border-amber-200 bg-white px-4 text-sm font-medium text-amber-700 transition hover:border-amber-300 hover:bg-amber-50 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {clearMonth.isPending ? (
-                "Clearing…"
-              ) : (
-                <>
-                  <TrashIcon size={14} />
-                  Save & clear this month
-                </>
-              )}
-            </button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-green-950/40 backdrop-blur-sm"
+            onClick={() => setConfirmClear(false)}
+          />
+          <div
+            className="relative z-10 w-full max-w-sm overflow-hidden rounded-2xl border border-green-100 bg-white p-6 shadow-2xl shadow-green-900/15"
+            role="alertdialog"
+            aria-labelledby="save-confirm-title"
+            aria-describedby="save-confirm-desc"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p id="save-confirm-title" className="text-base font-semibold text-green-950">
+              How would you like to save?
+            </p>
+            <p id="save-confirm-desc" className="mt-1.5 text-sm text-green-600">
+              Keep your logged entries, or clear{" "}
+              {new Date(year, month - 1, 1).toLocaleString("en-AU", { month: "long" })}{" "}
+              and start fresh.
+            </p>
+            <div className="mt-6 flex flex-col gap-2">
+              <button
+                type="button"
+                onClick={handleSave}
+                disabled={!canSave || updateBudget.isPending}
+                className="flex h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-green-500 text-sm font-medium text-white transition hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <Check size={14} />
+                Save budget only
+              </button>
+              <button
+                type="button"
+                onClick={() => clearMonth.mutate({ month, year })}
+                disabled={clearMonth.isPending || updateBudget.isPending}
+                className="flex h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-amber-200 bg-white text-sm font-medium text-amber-700 transition hover:border-amber-300 hover:bg-amber-50 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {clearMonth.isPending ? (
+                  "Clearing…"
+                ) : (
+                  <>
+                    <TrashIcon size={14} />
+                    Save & clear this month
+                  </>
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => setConfirmClear(false)}
+                className="mt-2 flex h-9 w-full cursor-pointer items-center justify-center rounded-xl text-sm text-green-500 transition hover:bg-green-50 hover:text-green-700"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}
