@@ -109,7 +109,7 @@ function InvestmentCategoryCard({
         <button
           type="button"
           onClick={() => { setGoalName(goal?.name ?? category.name); setGoalTarget(goal ? String(Number(goal.targetAmount)) : ""); setShowGoalForm((v) => !v); }}
-          className="flex items-center gap-1.5 rounded-full border border-green-200 bg-green-50 px-3 py-1.5 text-sm text-green-600 transition hover:border-green-300 hover:text-green-800"
+          className="flex cursor-pointer items-center gap-1.5 rounded-full border border-green-200 bg-green-50 px-3 py-1.5 text-sm text-green-600 transition hover:border-green-300 hover:text-green-800"
         >
           <Pencil size={12} />
           {goal ? "edit goal" : "set goal"}
@@ -162,28 +162,29 @@ function InvestmentCategoryCard({
         )}
       </div>
 
-      <div className="mb-5 grid grid-cols-2 gap-2">
-        <div className="rounded-xl bg-green-50 px-4 py-3">
+      <div className="mb-5 rounded-xl bg-green-50 px-4 py-3">
+        <div className="mb-1.5 flex items-center justify-between">
           <p className="text-sm text-green-600">this month</p>
-          <p className="mt-0.5 font-mono text-base font-semibold tabular-nums text-green-950">{fmt(thisMonthTotal)}</p>
-          {monthlyAllocation > 0 && (
-            <>
-              <p className="mt-0.5 text-sm text-green-600">of {fmt(monthlyAllocation)} allocated</p>
-              <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-blue-100">
-                <div className="h-full rounded-full bg-blue-400 transition-all duration-500" style={{ width: `${monthlyPct}%` }} />
-              </div>
-            </>
-          )}
+          <p className="font-mono text-sm tabular-nums text-green-700">
+            {fmt(thisMonthTotal)}
+            {monthlyAllocation > 0 && <span className="text-green-500"> of {fmt(monthlyAllocation)}</span>}
+          </p>
         </div>
-        <div className="rounded-xl bg-green-50 px-4 py-3">
-          <p className="text-sm text-green-600">avg / month</p>
-          <p className="mt-0.5 font-mono text-base font-semibold tabular-nums text-green-950">{avgMonthly > 0 ? fmt(avgMonthly) : "—"}</p>
-          {avgMonthly > 0 && monthlyAllocation > 0 && (
-            <p className={`mt-0.5 text-sm ${avgMonthly >= monthlyAllocation ? "text-blue-500" : "text-green-500"}`}>
-              {avgMonthly >= monthlyAllocation ? "on track" : `${fmt(monthlyAllocation - avgMonthly)} below target`}
+        {monthlyAllocation > 0 ? (
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-blue-100">
+            <div className="h-full rounded-full bg-blue-400 transition-all duration-500" style={{ width: `${monthlyPct}%` }} />
+          </div>
+        ) : (
+          <p className="text-sm text-green-400">no monthly allocation — set one in the budget split</p>
+        )}
+        {avgMonthly > 0 && (
+          <div className="mt-2.5 flex items-center justify-between border-t border-green-100 pt-2.5">
+            <p className="text-sm text-green-600">avg / month</p>
+            <p className={`font-mono text-sm tabular-nums font-medium ${avgMonthly >= monthlyAllocation && monthlyAllocation > 0 ? "text-blue-500" : "text-green-700"}`}>
+              {fmt(avgMonthly)}
             </p>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {!showAddForm ? (
@@ -199,11 +200,11 @@ function InvestmentCategoryCard({
           <div className="flex flex-wrap items-center gap-1.5">
             {(["today", "yesterday"] as const).map((d) => (
               <button key={d} type="button" onClick={() => setDateMode(d)}
-                className={`rounded-full px-3 py-1 text-sm transition ${dateMode === d ? "bg-green-500 font-medium text-white" : "border border-green-200 text-green-600 hover:text-green-800"}`}
+                className={`cursor-pointer rounded-full px-3 py-1 text-sm transition ${dateMode === d ? "bg-green-500 font-medium text-white" : "border border-green-200 text-green-600 hover:text-green-800"}`}
               >{d}</button>
             ))}
             <button type="button" onClick={() => setDateMode("pick")}
-              className={`rounded-full px-3 py-1 text-sm transition ${dateMode === "pick" ? "bg-green-500 font-medium text-white" : "border border-green-200 text-green-600 hover:text-green-800"}`}
+              className={`cursor-pointer rounded-full px-3 py-1 text-sm transition ${dateMode === "pick" ? "bg-green-500 font-medium text-white" : "border border-green-200 text-green-600 hover:text-green-800"}`}
             >{dateMode === "pick" ? format(parseISO(pickDate), "d MMM") : "pick date"}</button>
             {dateMode === "pick" && (
               <input type="date" value={pickDate} max={todayStr} onChange={(e) => setPickDate(e.target.value)}
