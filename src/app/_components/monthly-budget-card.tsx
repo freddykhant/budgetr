@@ -5,6 +5,7 @@ import { getDaysInMonth } from "date-fns";
 import { Pencil, X, Check, Trash2 as TrashIcon } from "lucide-react";
 
 import { api } from "~/trpc/react";
+import { BudgieMascot } from "./budgie-mascot";
 import { useToast } from "./toast-provider";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -310,6 +311,9 @@ export function MonthlyBudgetCard({ month, year, onBudgetChange }: Props) {
             aria-describedby="save-confirm-desc"
             onClick={(e) => e.stopPropagation()}
           >
+            <div className="absolute right-4 top-4 opacity-40">
+              <BudgieMascot size={36} animate="bob" />
+            </div>
             <p id="save-confirm-title" className="text-lg font-semibold tracking-tight text-green-950">
               How would you like to save?
             </p>

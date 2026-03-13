@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { redirect } from "next/navigation";
 
+import { BudgieMascot } from "~/app/_components/budgie-mascot";
 import { LandingSignInButton } from "~/app/_components/landing-signin-button";
 import { auth } from "~/server/auth";
 
@@ -11,6 +12,16 @@ export default async function LandingPage() {
 
   return (
     <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-linear-to-br from-[#86efac] via-[#22c55e] to-[#16a34a] text-white">
+      {/* Floating budgies */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute right-[12%] top-[18%] opacity-25">
+          <BudgieMascot size={56} animate="float" />
+        </div>
+        <div className="absolute bottom-[20%] left-[8%] opacity-20">
+          <BudgieMascot size={40} animate="bob" />
+        </div>
+      </div>
+
       {/* Background glow orbs */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute top-1/3 left-1/2 h-[640px] w-[640px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-lime-300/30 blur-[130px]" />

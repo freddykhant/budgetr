@@ -8,6 +8,8 @@ import {
 } from "react";
 import { X } from "lucide-react";
 
+import { BudgieMascot } from "./budgie-mascot";
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export type ToastType = "success" | "celebration" | "info" | "error";
@@ -75,7 +77,13 @@ function Toast({
           : "translate-y-3 opacity-0"
       }`}
     >
-      <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${dot}`} />
+      {toast.type === "celebration" ? (
+        <span className="shrink-0">
+          <BudgieMascot size={24} animate="bob" />
+        </span>
+      ) : (
+        <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${dot}`} />
+      )}
       <p className="flex-1 text-sm font-medium text-green-950">
         {toast.message}
       </p>
