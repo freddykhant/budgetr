@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowLeft, Pencil, Plus, Trash2, X } from "lucide-react";
 
 import { api } from "~/trpc/react";
+import { useToast } from "./toast-provider";
 
 function fmt(n: number) {
   return new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD", maximumFractionDigits: 0 }).format(n);
@@ -43,15 +44,50 @@ export function CustomCategoryPageClient({
   const budgetQuery = api.budget.getOrCreateCurrent.useQuery({ month, year });
 
   const utils = api.useUtils();
+  const { showToast } = useToast();
   const createEntry = api.entry.create.useMutation({
-    onSuccess: () => { void entriesQuery.refetch(); setAmount(""); setDescription(""); setDateMode("today"); setShowAddForm(false); },
+    onSuccess: (_, vars) => {
+      void entriesQuery.refetch();
+      setAmount(""); setDescription(""); setDateMode("today"); setShowAddForm(false);
+
+      const amt = vars.amount;
+      const newTotal = totalLogged + amt;
+      if (goalTargetNum !== null) {
+        const oldPct = goalTargetNum > 0 ? (totalLogged / goalTargetNum) * 100 : 0;
+        const newPct = goalTargetNum > 0 ? (newTotal / goalTargetNum) * 100 : 0;
+        if (newPct >= 100 && oldPct < 100) {
+          showToast(`🏆 Goal reached! ${categoryName} is complete.`, "celebration", 4500);
+        } else if (newPct >= 75 && oldPct < 75) {
+          showToast(`🎯 75% to ${goal?.name ?? categoryName}. So close!`, "celebration");
+        } else if (newPct >= 50 && oldPct < 50) {
+          showToast(`📍 Halfway to ${goal?.name ?? categoryName}. Keep going!`, "success");
+        } else if (amt >= 500) {
+          showToast(`🚀 ${fmt(amt)} added to ${categoryName}. Big push!`, "celebration");
+        } else if (amt >= 100) {
+          showToast(`💰 ${fmt(amt)} logged to ${categoryName}.`, "success");
+        }
+      } else {
+        if (amt >= 500) {
+          showToast(`🚀 ${fmt(amt)} added to ${categoryName}. Nice chunk!`, "celebration");
+        } else if (amt >= 100) {
+          showToast(`💰 ${fmt(amt)} logged to ${categoryName}.`, "success");
+        }
+      }
+    },
   });
   const deleteEntry = api.entry.delete.useMutation({ onSuccess: () => void entriesQuery.refetch() });
   const upsertGoal = api.goal.upsert.useMutation({
-    onSuccess: () => {
+    onSuccess: (_, vars) => {
       void utils.goal.get.invalidate({ categoryId });
       void utils.goal.list.invalidate();
       setShowGoalForm(false);
+      const isNew = !goal;
+      showToast(
+        isNew
+          ? `🎯 Goal set — ${fmt(vars.targetAmount as number)} for ${categoryName}.`
+          : "Goal updated.",
+        isNew ? "celebration" : "success",
+      );
     },
   });
   const deleteGoal = api.goal.delete.useMutation({

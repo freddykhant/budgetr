@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowLeft, Pencil, Plus, Trash2, X } from "lucide-react";
 
 import { api } from "~/trpc/react";
+import { useToast } from "./toast-provider";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -44,12 +45,38 @@ function InvestmentCategoryCard({
   const entryDate = dateMode === "today" ? todayStr : dateMode === "yesterday" ? yesterdayStr : pickDate;
 
   const utils = api.useUtils();
+  const { showToast } = useToast();
   const entriesQuery = api.entry.listAllForCategory.useQuery({ categoryId: category.id });
   const createEntry = api.entry.create.useMutation({
-    onSuccess: () => {
+    onSuccess: (_, vars) => {
       void utils.entry.listAllForCategory.invalidate({ categoryId: category.id });
       void utils.entry.listForCategories.invalidate();
       setAmount(""); setDescription(""); setDateMode("today"); setShowAddForm(false);
+
+      const amt = vars.amount;
+      const newTotal = totalContributed + amt;
+
+      if (goalTargetNum !== null) {
+        const oldPct = goalTargetNum > 0 ? (totalContributed / goalTargetNum) * 100 : 0;
+        const newPct = goalTargetNum > 0 ? (newTotal / goalTargetNum) * 100 : 0;
+        if (newPct >= 100 && oldPct < 100) {
+          showToast(`🏆 Investment goal hit! ${category.name} is fully funded.`, "celebration", 4500);
+        } else if (newPct >= 75 && oldPct < 75) {
+          showToast(`📈 75% to ${goal?.name ?? category.name}. Compounding from here!`, "celebration");
+        } else if (newPct >= 50 && oldPct < 50) {
+          showToast(`📍 Halfway to ${goal?.name ?? category.name}. Momentum is everything.`, "success");
+        } else if (amt >= 500) {
+          showToast(`🚀 ${fmt(amt)} invested in ${category.name}. That's how it's done.`, "celebration");
+        } else if (amt >= 100) {
+          showToast(`📈 ${fmt(amt)} into ${category.name}. Nice move.`, "success");
+        }
+      } else {
+        if (amt >= 500) {
+          showToast(`🚀 ${fmt(amt)} invested in ${category.name}. Your portfolio thanks you.`, "celebration");
+        } else if (amt >= 100) {
+          showToast(`📈 ${fmt(amt)} into ${category.name}. Every bit compounds.`, "success");
+        }
+      }
     },
   });
   const deleteEntry = api.entry.delete.useMutation({
@@ -59,10 +86,17 @@ function InvestmentCategoryCard({
     },
   });
   const upsertGoal = api.goal.upsert.useMutation({
-    onSuccess: () => {
+    onSuccess: (_, vars) => {
       onGoalChange();
       void utils.goal.list.invalidate();
       setShowGoalForm(false);
+      const isNew = !goal;
+      showToast(
+        isNew
+          ? `🎯 Investment goal set — ${fmt(vars.targetAmount as number)} for ${category.name}.`
+          : "Goal updated.",
+        isNew ? "celebration" : "success",
+      );
     },
   });
 

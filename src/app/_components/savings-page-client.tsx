@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowLeft, Pencil, Plus, Trash2, X } from "lucide-react";
 
 import { api } from "~/trpc/react";
+import { useToast } from "./toast-provider";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -46,12 +47,38 @@ function SavingCategoryCard({
   const entryDate = dateMode === "today" ? todayStr : dateMode === "yesterday" ? yesterdayStr : pickDate;
 
   const utils = api.useUtils();
+  const { showToast } = useToast();
   const entriesQuery = api.entry.listAllForCategory.useQuery({ categoryId: category.id });
   const createEntry = api.entry.create.useMutation({
-    onSuccess: () => {
+    onSuccess: (_, vars) => {
       void utils.entry.listAllForCategory.invalidate({ categoryId: category.id });
       void utils.entry.listForCategories.invalidate();
       setAmount(""); setDescription(""); setDateMode("today"); setShowAddForm(false);
+
+      const amt = vars.amount;
+      const newTotal = totalSaved + amt;
+
+      if (goalTargetNum !== null) {
+        const oldPct = goalTargetNum > 0 ? (totalSaved / goalTargetNum) * 100 : 0;
+        const newPct = goalTargetNum > 0 ? (newTotal / goalTargetNum) * 100 : 0;
+        if (newPct >= 100 && oldPct < 100) {
+          showToast(`🏆 Goal smashed! ${category.name} is complete.`, "celebration", 4500);
+        } else if (newPct >= 75 && oldPct < 75) {
+          showToast(`🎯 75% to your ${goal?.name ?? category.name} goal. Almost there!`, "celebration");
+        } else if (newPct >= 50 && oldPct < 50) {
+          showToast(`📍 Halfway to ${goal?.name ?? category.name}. Keep stacking!`, "success");
+        } else if (amt >= 500) {
+          showToast(`🚀 ${fmt(amt)} into ${category.name}. Big energy.`, "celebration");
+        } else if (amt >= 100) {
+          showToast(`💰 ${fmt(amt)} added to ${category.name}. Solid work.`, "success");
+        }
+      } else {
+        if (amt >= 500) {
+          showToast(`🚀 ${fmt(amt)} saved to ${category.name}. Future you is hyped.`, "celebration");
+        } else if (amt >= 100) {
+          showToast(`💰 ${fmt(amt)} added to ${category.name}. Nice work!`, "success");
+        }
+      }
     },
   });
   const deleteEntry = api.entry.delete.useMutation({
@@ -61,10 +88,17 @@ function SavingCategoryCard({
     },
   });
   const upsertGoal = api.goal.upsert.useMutation({
-    onSuccess: () => {
+    onSuccess: (_, vars) => {
       onGoalChange();
       void utils.goal.list.invalidate();
       setShowGoalForm(false);
+      const isNew = !goal;
+      showToast(
+        isNew
+          ? `🎯 Goal set — ${fmt(vars.targetAmount as number)} for ${category.name}. Let's build it.`
+          : "Goal updated.",
+        isNew ? "celebration" : "success",
+      );
     },
   });
 
