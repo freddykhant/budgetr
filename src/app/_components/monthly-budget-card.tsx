@@ -300,45 +300,45 @@ export function MonthlyBudgetCard({ month, year, onBudgetChange }: Props) {
       {isEditing && confirmClear && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
-            className="absolute inset-0 bg-green-950/40 backdrop-blur-sm"
+            className="absolute inset-0 bg-green-950/20 backdrop-blur-md [animation:backdrop-enter_0.2s_ease-out]"
             onClick={() => setConfirmClear(false)}
           />
           <div
-            className="relative z-10 w-full max-w-sm overflow-hidden rounded-2xl border border-green-100 bg-white p-6 shadow-2xl shadow-green-900/15"
+            className="relative z-10 w-full max-w-sm overflow-hidden rounded-3xl border border-white/60 bg-white p-8 shadow-[0_0_0_1px_rgba(0,0,0,0.04),0_2px_4px_-2px_rgba(0,0,0,0.05),0_12px_24px_-4px_rgba(0,0,0,0.08),0_24px_48px_-8px_rgba(0,0,0,0.06)] [animation:modal-enter_0.25s_cubic-bezier(0.16,1,0.3,1)]"
             role="alertdialog"
             aria-labelledby="save-confirm-title"
             aria-describedby="save-confirm-desc"
             onClick={(e) => e.stopPropagation()}
           >
-            <p id="save-confirm-title" className="text-base font-semibold text-green-950">
+            <p id="save-confirm-title" className="text-lg font-semibold tracking-tight text-green-950">
               How would you like to save?
             </p>
-            <p id="save-confirm-desc" className="mt-1.5 text-sm text-green-600">
+            <p id="save-confirm-desc" className="mt-2 text-[15px] leading-relaxed text-green-600">
               Keep your logged entries, or clear{" "}
               {new Date(year, month - 1, 1).toLocaleString("en-AU", { month: "long" })}{" "}
               and start fresh.
             </p>
-            <div className="mt-6 flex flex-col gap-2">
+            <div className="mt-8 flex flex-col gap-3">
               <button
                 type="button"
                 onClick={handleSave}
                 disabled={!canSave || updateBudget.isPending}
-                className="flex h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-green-500 text-sm font-medium text-white transition hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-green-500 text-sm font-medium text-white shadow-[0_1px_2px_rgba(0,0,0,0.05)] transition hover:bg-green-600 hover:shadow-[0_2px_8px_rgba(34,197,94,0.25)] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
               >
-                <Check size={14} />
+                <Check size={15} />
                 Save budget only
               </button>
               <button
                 type="button"
                 onClick={() => clearMonth.mutate({ month, year })}
                 disabled={clearMonth.isPending || updateBudget.isPending}
-                className="flex h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-amber-200 bg-white text-sm font-medium text-amber-700 transition hover:border-amber-300 hover:bg-amber-50 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-amber-200/80 bg-amber-50/50 text-sm font-medium text-amber-800 transition hover:border-amber-300 hover:bg-amber-50 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {clearMonth.isPending ? (
                   "Clearing…"
                 ) : (
                   <>
-                    <TrashIcon size={14} />
+                    <TrashIcon size={15} />
                     Save & clear this month
                   </>
                 )}
@@ -346,7 +346,7 @@ export function MonthlyBudgetCard({ month, year, onBudgetChange }: Props) {
               <button
                 type="button"
                 onClick={() => setConfirmClear(false)}
-                className="mt-2 flex h-9 w-full cursor-pointer items-center justify-center rounded-xl text-sm text-green-500 transition hover:bg-green-50 hover:text-green-700"
+                className="mt-1 flex h-10 w-full cursor-pointer items-center justify-center rounded-xl text-sm text-green-500 transition hover:bg-green-50/80 hover:text-green-700"
               >
                 Cancel
               </button>
