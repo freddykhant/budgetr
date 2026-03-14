@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { X, User, Wallet, LogOut, Check, Settings } from "lucide-react";
-import { signOut } from "next-auth/react";
+import { authClient } from "~/lib/auth-client";
 import Image from "next/image";
 
 import { api } from "~/trpc/react";
@@ -95,7 +95,7 @@ function AccountTab({ user }: { user: SettingsModalProps["user"] }) {
       <div className="border-t border-green-100 pt-6">
         <p className="mb-3 text-sm font-medium text-green-500">session</p>
         <button
-          onClick={() => signOut({ callbackUrl: "/" })}
+          onClick={() => authClient.signOut({ fetchOptions: { onSuccess: () => { window.location.href = "/"; } } })}
           className="flex cursor-pointer items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-500 transition hover:border-red-300 hover:bg-red-100"
         >
           <LogOut size={14} />

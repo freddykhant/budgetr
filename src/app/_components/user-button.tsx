@@ -1,9 +1,10 @@
 "use client";
 
 import { LogOut, Settings } from "lucide-react";
-import { signOut } from "next-auth/react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+
+import { authClient } from "~/lib/auth-client";
 
 import { SettingsModal } from "./settings-modal";
 
@@ -116,7 +117,7 @@ export function UserButton({ user }: UserButtonProps) {
                 settings
               </button>
               <button
-                onClick={() => signOut({ callbackUrl: "/" })}
+                onClick={() => authClient.signOut({ fetchOptions: { onSuccess: () => { window.location.href = "/"; } } })}
                 className="flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-base text-green-700 transition-colors hover:bg-green-50 hover:text-green-950"
               >
                 <LogOut
