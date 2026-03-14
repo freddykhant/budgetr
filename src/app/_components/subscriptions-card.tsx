@@ -56,7 +56,7 @@ export function SubscriptionsCard() {
         </p>
         <Link
           href="/subscriptions"
-          className="inline-flex items-center gap-1.5 rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-sm font-medium text-indigo-600 transition hover:border-indigo-300 hover:bg-indigo-100"
+          className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-sm font-medium text-indigo-600 transition hover:border-indigo-300 hover:bg-indigo-100 active:scale-95"
         >
           <Plus size={13} />
           add your first subscription

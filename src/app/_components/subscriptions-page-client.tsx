@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, Pencil, Plus, Trash2 } from "lucide-react";
 
 import { api } from "~/trpc/react";
@@ -39,23 +39,32 @@ type Subscription = {
 // ─── Color options ────────────────────────────────────────────────────────────
 
 const COLOR_OPTIONS = [
-  { key: "violet",  bg: "bg-violet-100",  text: "text-violet-700",  ring: "ring-violet-400"  },
-  { key: "indigo",  bg: "bg-indigo-100",  text: "text-indigo-700",  ring: "ring-indigo-400"  },
-  { key: "blue",    bg: "bg-blue-100",    text: "text-blue-700",    ring: "ring-blue-400"    },
-  { key: "green",   bg: "bg-green-100",   text: "text-green-700",   ring: "ring-green-400"   },
-  { key: "orange",  bg: "bg-orange-100",  text: "text-orange-700",  ring: "ring-orange-400"  },
-  { key: "rose",    bg: "bg-rose-100",    text: "text-rose-700",    ring: "ring-rose-400"    },
-  { key: "amber",   bg: "bg-amber-100",   text: "text-amber-700",   ring: "ring-amber-400"   },
-  { key: "teal",    bg: "bg-teal-100",    text: "text-teal-700",    ring: "ring-teal-400"    },
+  { key: "violet", bg: "bg-violet-100", ring: "ring-violet-400" },
+  { key: "indigo", bg: "bg-indigo-100", ring: "ring-indigo-400" },
+  { key: "blue",   bg: "bg-blue-100",   ring: "ring-blue-400"   },
+  { key: "green",  bg: "bg-green-100",  ring: "ring-green-400"  },
+  { key: "orange", bg: "bg-orange-100", ring: "ring-orange-400" },
+  { key: "rose",   bg: "bg-rose-100",   ring: "ring-rose-400"   },
+  { key: "amber",  bg: "bg-amber-100",  ring: "ring-amber-400"  },
+  { key: "teal",   bg: "bg-teal-100",   ring: "ring-teal-400"   },
 ];
 
 function colorFor(key: string) {
   return COLOR_OPTIONS.find((c) => c.key === key) ?? COLOR_OPTIONS[0]!;
 }
 
+// ─── Shared class helpers ─────────────────────────────────────────────────────
+
+const btnPrimary =
+  "flex cursor-pointer items-center gap-1.5 rounded-full bg-indigo-500 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-indigo-600 active:scale-95 disabled:opacity-60";
+const btnGhost =
+  "cursor-pointer rounded-full border border-green-200 px-3 py-1.5 text-sm text-green-600 transition hover:bg-green-50 active:scale-95";
+const cycleBtnActive = "cursor-pointer bg-indigo-500 px-3 py-2 font-medium text-white transition";
+const cycleBtnInactive = "cursor-pointer px-3 py-2 text-green-600 transition hover:bg-green-100";
+
 // ─── SubscriptionRow ─────────────────────────────────────────────────────────
 
-function SubscriptionRow({ sub, onDeleted }: { sub: Subscription; onDeleted: () => void }) {
+function SubscriptionRow({ sub }: { sub: Subscription }) {
   const utils = api.useUtils();
   const { showToast } = useToast();
 
@@ -64,13 +73,30 @@ function SubscriptionRow({ sub, onDeleted }: { sub: Subscription; onDeleted: () 
 
   const [editName, setEditName] = useState(sub.name);
   const [editEmoji, setEditEmoji] = useState(sub.emoji);
-  const [editAmount, setEditAmount] = useState(sub.amount);
+  const [editAmount, setEditAmount] = useState(String(Number(sub.amount)));
   const [editCycle, setEditCycle] = useState<"monthly" | "yearly">(
     sub.billingCycle as "monthly" | "yearly",
   );
   const [editColor, setEditColor] = useState(sub.color);
 
+  const nameInputRef = useRef<HTMLInputElement>(null);
   const col = colorFor(sub.color);
+
+  // Focus name input when entering edit mode
+  useEffect(() => {
+    if (editing) nameInputRef.current?.focus();
+  }, [editing]);
+
+  // Escape to cancel
+  useEffect(() => {
+    if (!editing) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") cancelEdit();
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editing]);
 
   const updateMutation = api.subscription.update.useMutation({
     onSuccess: async () => {
@@ -83,13 +109,12 @@ function SubscriptionRow({ sub, onDeleted }: { sub: Subscription; onDeleted: () 
   const deleteMutation = api.subscription.delete.useMutation({
     onSuccess: async () => {
       await utils.subscription.list.invalidate();
-      onDeleted();
       showToast("subscription removed");
     },
   });
 
   function saveEdit() {
-    const parsed = parseFloat(editAmount.replace(/[^0-9.]/g, ""));
+    const parsed = parseFloat(editAmount);
     if (!editName.trim() || isNaN(parsed) || parsed <= 0) return;
     updateMutation.mutate({
       id: sub.id,
@@ -104,7 +129,7 @@ function SubscriptionRow({ sub, onDeleted }: { sub: Subscription; onDeleted: () 
   function cancelEdit() {
     setEditName(sub.name);
     setEditEmoji(sub.emoji);
-    setEditAmount(sub.amount);
+    setEditAmount(String(Number(sub.amount)));
     setEditCycle(sub.billingCycle as "monthly" | "yearly");
     setEditColor(sub.color);
     setEditing(false);
@@ -121,14 +146,14 @@ function SubscriptionRow({ sub, onDeleted }: { sub: Subscription; onDeleted: () 
         <div className="flex items-center gap-2">
           <button
             onClick={() => setDeleting(false)}
-            className="rounded-full border border-green-200 bg-white px-3 py-1 text-sm text-green-600 transition hover:bg-green-50"
+            className="cursor-pointer rounded-full border border-green-200 bg-white px-3 py-1 text-sm text-green-600 transition hover:bg-green-50 active:scale-95"
           >
             cancel
           </button>
           <button
             onClick={() => deleteMutation.mutate({ id: sub.id })}
             disabled={deleteMutation.isPending}
-            className="rounded-full bg-red-500 px-3 py-1 text-sm font-medium text-white transition hover:bg-red-600 disabled:opacity-60"
+            className="cursor-pointer rounded-full bg-red-500 px-3 py-1 text-sm font-medium text-white transition hover:bg-red-600 active:scale-95 disabled:opacity-60"
           >
             {deleteMutation.isPending ? "removing…" : "remove"}
           </button>
@@ -141,24 +166,22 @@ function SubscriptionRow({ sub, onDeleted }: { sub: Subscription; onDeleted: () 
     return (
       <div className="rounded-2xl border border-indigo-200 bg-white p-4 shadow-sm">
         <div className="flex gap-2">
-          {/* Emoji */}
           <input
             value={editEmoji}
             onChange={(e) => setEditEmoji(e.target.value)}
-            className="w-12 rounded-xl border border-green-200 bg-green-50 p-2 text-center text-lg focus:outline-none focus:ring-2 focus:ring-indigo-300"
+            className="w-12 cursor-text rounded-xl border border-green-200 bg-green-50 p-2 text-center text-lg focus:outline-none focus:ring-2 focus:ring-indigo-300"
             maxLength={4}
           />
-          {/* Name */}
           <input
+            ref={nameInputRef}
             value={editName}
             onChange={(e) => setEditName(e.target.value)}
             placeholder="subscription name"
-            className="flex-1 rounded-xl border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-950 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+            className="flex-1 cursor-text rounded-xl border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-950 focus:outline-none focus:ring-2 focus:ring-indigo-300"
           />
         </div>
 
         <div className="mt-2 flex gap-2">
-          {/* Amount */}
           <input
             type="number"
             value={editAmount}
@@ -166,19 +189,14 @@ function SubscriptionRow({ sub, onDeleted }: { sub: Subscription; onDeleted: () 
             placeholder="amount"
             min="0.01"
             step="0.01"
-            className="w-32 rounded-xl border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-950 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+            className="w-32 cursor-text rounded-xl border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-950 focus:outline-none focus:ring-2 focus:ring-indigo-300"
           />
-          {/* Billing cycle toggle */}
           <div className="flex overflow-hidden rounded-xl border border-green-200 bg-green-50 text-sm">
             {(["monthly", "yearly"] as const).map((c) => (
               <button
                 key={c}
                 onClick={() => setEditCycle(c)}
-                className={`px-3 py-2 transition ${
-                  editCycle === c
-                    ? "bg-indigo-500 font-medium text-white"
-                    : "text-green-600 hover:bg-green-100"
-                }`}
+                className={editCycle === c ? cycleBtnActive : cycleBtnInactive}
               >
                 {c}
               </button>
@@ -192,25 +210,17 @@ function SubscriptionRow({ sub, onDeleted }: { sub: Subscription; onDeleted: () 
             <button
               key={c.key}
               onClick={() => setEditColor(c.key)}
-              className={`h-5 w-5 rounded-full ${c.bg} ring-offset-1 transition ${editColor === c.key ? `ring-2 ${c.ring}` : ""}`}
+              className={`h-5 w-5 cursor-pointer rounded-full ring-offset-1 transition ${c.bg} ${editColor === c.key ? `ring-2 ${c.ring}` : ""}`}
             />
           ))}
         </div>
 
-        {/* Actions */}
         <div className="mt-3 flex items-center gap-2">
-          <button
-            onClick={saveEdit}
-            disabled={updateMutation.isPending}
-            className="flex items-center gap-1.5 rounded-full bg-indigo-500 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-indigo-600 disabled:opacity-60"
-          >
+          <button onClick={saveEdit} disabled={updateMutation.isPending} className={btnPrimary}>
             <Check size={12} />
             {updateMutation.isPending ? "saving…" : "save"}
           </button>
-          <button
-            onClick={cancelEdit}
-            className="rounded-full border border-green-200 px-3 py-1.5 text-sm text-green-600 transition hover:bg-green-50"
-          >
+          <button onClick={cancelEdit} className={btnGhost}>
             cancel
           </button>
         </div>
@@ -220,12 +230,10 @@ function SubscriptionRow({ sub, onDeleted }: { sub: Subscription; onDeleted: () 
 
   return (
     <div className="group flex items-center gap-3 rounded-2xl border border-green-100 bg-white p-4 shadow-sm shadow-green-900/5 transition hover:border-green-200">
-      {/* Emoji badge */}
       <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-lg ${col.bg}`}>
         {sub.emoji}
       </div>
 
-      {/* Name + cycle badge */}
       <div className="min-w-0 flex-1">
         <p className="truncate font-medium text-green-950">{sub.name}</p>
         <p className="text-xs text-green-400">
@@ -236,24 +244,24 @@ function SubscriptionRow({ sub, onDeleted }: { sub: Subscription; onDeleted: () 
         </p>
       </div>
 
-      {/* Monthly equivalent */}
       <div className="shrink-0 text-right">
         <p className="font-mono text-base font-semibold tabular-nums text-green-950">
-          {fmtAUD(monthly)}<span className="text-xs font-normal text-green-400">/mo</span>
+          {fmtAUD(monthly)}
+          <span className="text-xs font-normal text-green-400">/mo</span>
         </p>
       </div>
 
-      {/* Action buttons — visible on hover */}
+      {/* Action buttons — reveal on row hover */}
       <div className="flex shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
         <button
           onClick={() => setEditing(true)}
-          className="flex h-7 w-7 items-center justify-center rounded-full border border-green-200 text-green-400 transition hover:border-green-300 hover:text-green-700"
+          className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border border-green-200 text-green-400 transition hover:border-green-300 hover:text-green-700 active:scale-90"
         >
           <Pencil size={12} />
         </button>
         <button
           onClick={() => setDeleting(true)}
-          className="flex h-7 w-7 items-center justify-center rounded-full border border-red-100 text-red-300 transition hover:border-red-300 hover:text-red-500"
+          className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border border-red-100 text-red-300 transition hover:border-red-300 hover:text-red-500 active:scale-90"
         >
           <Trash2 size={12} />
         </button>
@@ -267,12 +275,27 @@ function SubscriptionRow({ sub, onDeleted }: { sub: Subscription; onDeleted: () 
 function AddSubscriptionForm({ onDone }: { onDone: () => void }) {
   const utils = api.useUtils();
   const { showToast } = useToast();
+  const nameInputRef = useRef<HTMLInputElement>(null);
 
   const [name, setName] = useState("");
   const [emoji, setEmoji] = useState("");
   const [amount, setAmount] = useState("");
   const [cycle, setCycle] = useState<"monthly" | "yearly">("monthly");
   const [color, setColor] = useState("violet");
+
+  // Auto-focus name on mount
+  useEffect(() => {
+    nameInputRef.current?.focus();
+  }, []);
+
+  // Escape to cancel
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onDone();
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [onDone]);
 
   const createMutation = api.subscription.create.useMutation({
     onSuccess: async () => {
@@ -284,7 +307,7 @@ function AddSubscriptionForm({ onDone }: { onDone: () => void }) {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const parsed = parseFloat(amount.replace(/[^0-9.]/g, ""));
+    const parsed = parseFloat(amount);
     if (!name.trim() || isNaN(parsed) || parsed <= 0) return;
     createMutation.mutate({
       name: name.trim(),
@@ -305,26 +328,24 @@ function AddSubscriptionForm({ onDone }: { onDone: () => void }) {
       </p>
 
       <div className="flex gap-2">
-        {/* Emoji */}
         <input
           value={emoji}
           onChange={(e) => setEmoji(e.target.value)}
           placeholder="💳"
-          className="w-12 rounded-xl border border-green-200 bg-green-50 p-2 text-center text-lg focus:outline-none focus:ring-2 focus:ring-indigo-300"
+          className="w-12 cursor-text rounded-xl border border-green-200 bg-green-50 p-2 text-center text-lg focus:outline-none focus:ring-2 focus:ring-indigo-300"
           maxLength={4}
         />
-        {/* Name */}
         <input
+          ref={nameInputRef}
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="e.g. Netflix, Spotify…"
-          className="flex-1 rounded-xl border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-950 placeholder:text-green-300 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+          className="flex-1 cursor-text rounded-xl border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-950 placeholder:text-green-300 focus:outline-none focus:ring-2 focus:ring-indigo-300"
           required
         />
       </div>
 
       <div className="mt-2 flex flex-wrap gap-2">
-        {/* Amount */}
         <input
           type="number"
           value={amount}
@@ -333,20 +354,15 @@ function AddSubscriptionForm({ onDone }: { onDone: () => void }) {
           min="0.01"
           step="0.01"
           required
-          className="w-32 rounded-xl border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-950 placeholder:text-green-300 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+          className="w-32 cursor-text rounded-xl border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-950 placeholder:text-green-300 focus:outline-none focus:ring-2 focus:ring-indigo-300"
         />
-        {/* Cycle toggle */}
         <div className="flex overflow-hidden rounded-xl border border-green-200 bg-green-50 text-sm">
           {(["monthly", "yearly"] as const).map((c) => (
             <button
               key={c}
               type="button"
               onClick={() => setCycle(c)}
-              className={`px-3 py-2 transition ${
-                cycle === c
-                  ? "bg-indigo-500 font-medium text-white"
-                  : "text-green-600 hover:bg-green-100"
-              }`}
+              className={cycle === c ? cycleBtnActive : cycleBtnInactive}
             >
               {c}
             </button>
@@ -361,26 +377,17 @@ function AddSubscriptionForm({ onDone }: { onDone: () => void }) {
             key={c.key}
             type="button"
             onClick={() => setColor(c.key)}
-            className={`h-5 w-5 rounded-full ${c.bg} ring-offset-1 transition ${color === c.key ? `ring-2 ${c.ring}` : ""}`}
+            className={`h-5 w-5 cursor-pointer rounded-full ring-offset-1 transition ${c.bg} ${color === c.key ? `ring-2 ${c.ring}` : ""}`}
           />
         ))}
       </div>
 
-      {/* Submit row */}
       <div className="mt-3 flex items-center gap-2">
-        <button
-          type="submit"
-          disabled={createMutation.isPending}
-          className="flex items-center gap-1.5 rounded-full bg-indigo-500 px-4 py-1.5 text-sm font-medium text-white transition hover:bg-indigo-600 disabled:opacity-60"
-        >
+        <button type="submit" disabled={createMutation.isPending} className={btnPrimary}>
           <Plus size={12} />
           {createMutation.isPending ? "adding…" : "add subscription"}
         </button>
-        <button
-          type="button"
-          onClick={onDone}
-          className="rounded-full border border-green-200 px-3 py-1.5 text-sm text-green-600 transition hover:bg-green-50"
-        >
+        <button type="button" onClick={onDone} className={btnGhost}>
           cancel
         </button>
       </div>
@@ -431,7 +438,7 @@ export function SubscriptionsPageClient() {
           {!showForm && (
             <button
               onClick={() => setShowForm(true)}
-              className="flex items-center gap-1.5 rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-sm font-medium text-indigo-600 transition hover:border-indigo-300 hover:bg-indigo-100 active:scale-95"
+              className="flex cursor-pointer items-center gap-1.5 rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-sm font-medium text-indigo-600 transition hover:border-indigo-300 hover:bg-indigo-100 active:scale-95"
             >
               <Plus size={13} />
               add
@@ -441,21 +448,15 @@ export function SubscriptionsPageClient() {
       </header>
 
       <div className="space-y-3">
-        {/* Inline add form */}
         {showForm && (
           <AddSubscriptionForm onDone={() => setShowForm(false)} />
         )}
 
-        {/* Loading skeletons */}
         {query.isLoading &&
           [1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className="h-16 animate-pulse rounded-2xl bg-indigo-50"
-            />
+            <div key={i} className="h-16 animate-pulse rounded-2xl bg-indigo-50" />
           ))}
 
-        {/* Empty state */}
         {!query.isLoading && subs.length === 0 && !showForm && (
           <EmptyState
             mascotSize={64}
@@ -466,14 +467,9 @@ export function SubscriptionsPageClient() {
           />
         )}
 
-        {/* Subscription rows */}
         {!query.isLoading &&
           subs.map((sub) => (
-            <SubscriptionRow
-              key={sub.id}
-              sub={sub}
-              onDeleted={() => void query.refetch()}
-            />
+            <SubscriptionRow key={sub.id} sub={sub} />
           ))}
       </div>
 
