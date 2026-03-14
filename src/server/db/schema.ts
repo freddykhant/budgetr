@@ -221,6 +221,28 @@ export const categoryGoals = createTable(
   ],
 );
 
+// ─── Subscriptions ────────────────────────────────────────────────────────────
+
+export const subscriptions = createTable(
+  "subscription",
+  (d) => ({
+    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
+    userId: d
+      .varchar({ length: 255 })
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    name: d.varchar({ length: 255 }).notNull(),
+    emoji: d.varchar({ length: 16 }).notNull().default("💳"),
+    amount: d.numeric({ precision: 10, scale: 2 }).notNull(),
+    // "monthly" | "yearly" — amount is always the per-cycle cost, not normalised
+    billingCycle: d.varchar({ length: 10 }).notNull().default("monthly"),
+    color: d.varchar({ length: 32 }).notNull().default("violet"),
+    isActive: d.boolean().notNull().default(true),
+    createdAt: d.timestamp({ withTimezone: true }).defaultNow().notNull(),
+  }),
+  (t) => [index("subscription_user_id_idx").on(t.userId)],
+);
+
 // ─── Credit Card Trackers ─────────────────────────────────────────────────────
 
 export const creditCardTrackers = createTable(
@@ -263,6 +285,7 @@ export const usersRelations = relations(users, ({ many, one }) => ({
   entries: many(entries),
   goals: many(categoryGoals),
   creditCardTrackers: many(creditCardTrackers),
+  subscriptions: many(subscriptions),
 }));
 
 export const accountsRelations = relations(accounts, ({ one }) => ({
@@ -336,3 +359,10 @@ export const creditCardTrackersRelations = relations(
     }),
   }),
 );
+
+export const subscriptionsRelations = relations(subscriptions, ({ one }) => ({
+  user: one(users, {
+    fields: [subscriptions.userId],
+    references: [users.id],
+  }),
+}));
