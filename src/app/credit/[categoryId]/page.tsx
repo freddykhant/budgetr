@@ -1,3 +1,4 @@
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { and, eq } from "drizzle-orm";
 
@@ -12,7 +13,7 @@ export default async function CreditCardPage({
 }: {
   params: Promise<{ categoryId: string }>;
 }) {
-  const session = await auth();
+  const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user) redirect("/");
 
   const settings = await db.query.userSettings.findFirst({

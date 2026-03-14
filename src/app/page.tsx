@@ -1,12 +1,13 @@
+import { headers } from "next/headers";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 
 import { BudgieMascot } from "~/app/_components/budgie-mascot";
-import { LandingSignInButton } from "~/app/_components/landing-signin-button";
+import { OtpSignInForm } from "~/app/_components/otp-signin-form";
 import { auth } from "~/server/auth";
 
 export default async function LandingPage() {
-  const session = await auth();
+  const session = await auth.api.getSession({ headers: await headers() });
 
   if (session?.user) redirect("/home");
 
@@ -53,15 +54,9 @@ export default async function LandingPage() {
           </div>
         </div>
 
-        {/* CTA + micro copy */}
-        <div className="flex flex-col items-center gap-4 md:items-start">
-          <LandingSignInButton />
-
-          <div className="flex flex-col items-center gap-1 text-xs md:items-start md:text-sm">
-            <p className="text-green-950/40">
-              your data stays yours. no ads, no tracking.
-            </p>
-          </div>
+        {/* CTA */}
+        <div className="w-full max-w-sm">
+          <OtpSignInForm />
         </div>
       </div>
     </main>

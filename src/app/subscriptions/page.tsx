@@ -1,3 +1,4 @@
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 
@@ -10,7 +11,7 @@ import { SubscriptionsPageClient } from "~/app/_components/subscriptions-page-cl
 export const metadata = { title: "subscriptions · budgie" };
 
 export default async function SubscriptionsPage() {
-  const session = await auth();
+  const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user) redirect("/");
 
   const settings = await db.query.userSettings.findFirst({

@@ -1,3 +1,4 @@
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 
@@ -8,7 +9,7 @@ import { Header } from "~/app/_components/header";
 import { DashboardClient } from "~/app/_components/dashboard-client";
 
 export default async function Home() {
-  const session = await auth();
+  const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user) redirect("/");
 
   const settings = await db.query.userSettings.findFirst({

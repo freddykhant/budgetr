@@ -22,13 +22,13 @@ todos:
     status: completed
   - id: page-auth-checks
     content: Update all 9 server pages to use auth.api.getSession instead of auth()
-    status: in_progress
+    status: completed
   - id: auth-client
     content: Create src/lib/auth-client.ts with createAuthClient + emailOtpClient plugin
-    status: pending
+    status: completed
   - id: otp-ui
     content: Build otp-signin-form.tsx (email step + animated 6-box OTP step) and update page.tsx
-    status: pending
+    status: in_progress
 isProject: false
 ---
 

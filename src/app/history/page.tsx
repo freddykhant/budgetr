@@ -1,3 +1,4 @@
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 
@@ -10,7 +11,7 @@ import { HistoryPageClient } from "~/app/_components/history-page-client";
 export const metadata = { title: "history · budgie" };
 
 export default async function HistoryPage() {
-  const session = await auth();
+  const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user) redirect("/");
 
   const settings = await db.query.userSettings.findFirst({
