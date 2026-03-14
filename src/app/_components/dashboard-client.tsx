@@ -12,6 +12,7 @@ import { InvestmentsCard } from "./investments-card";
 import { MonthlyBudgetCard } from "./monthly-budget-card";
 import { SavingsCard } from "./savings-card";
 import { SpendingCard } from "./spending-card";
+import { SubscriptionsCard } from "./subscriptions-card";
 
 type DashboardClientProps = {
   user: {
@@ -160,6 +161,9 @@ export function DashboardClient({ user }: DashboardClientProps) {
           <SavingsCard />
           <InvestmentsCard />
         </section>
+
+        {/* Subscriptions */}
+        <SubscriptionsCard />
 
         {/* Credit cards (only renders if user has any) */}
         <CreditCardSection />
