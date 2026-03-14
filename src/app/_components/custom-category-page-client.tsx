@@ -8,6 +8,7 @@ import { ArrowLeft, Pencil, Plus, X } from "lucide-react";
 import { api } from "~/trpc/react";
 import { useToast } from "./toast-provider";
 import { EditableEntryRow } from "./editable-entry-row";
+import { EmptyState } from "./empty-state";
 
 function fmt(n: number) {
   return new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD", maximumFractionDigits: 0 }).format(n);
@@ -297,7 +298,12 @@ export function CustomCategoryPageClient({
           )}
 
           {!showGoalForm && !goal && (
-            <p className="mt-3 text-sm text-green-400">no goal set — click &quot;set goal&quot; to track progress toward a target.</p>
+            <EmptyState
+              mascotSize={40}
+              animate="tilt"
+              headline="no goal yet"
+              body="tap 'set goal' above to give this category a target."
+            />
           )}
         </div>
 
@@ -379,10 +385,12 @@ export function CustomCategoryPageClient({
           )}
 
           {!entriesQuery.isLoading && allEntries.length === 0 && (
-            <div className="py-6 text-center">
-              <p className="text-base text-green-500">no entries yet.</p>
-              <p className="mt-1 text-sm text-green-400">log your first entry above to start tracking.</p>
-            </div>
+            <EmptyState
+              mascotSize={48}
+              animate="bob"
+              headline="nothing tracked yet"
+              body="log your first entry above to watch this grow."
+            />
           )}
 
           {!entriesQuery.isLoading && allEntries.length > 0 && (

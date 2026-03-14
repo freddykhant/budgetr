@@ -8,6 +8,7 @@ import { ArrowLeft, Pencil, Plus, X } from "lucide-react";
 import { api } from "~/trpc/react";
 import { useToast } from "./toast-provider";
 import { EditableEntryRow } from "./editable-entry-row";
+import { EmptyState } from "./empty-state";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -323,9 +324,12 @@ function InvestmentCategoryCard({
 
       {/* Empty */}
       {!entriesQuery.isLoading && allEntries.length === 0 && (
-        <div className="py-4 text-center">
-          <p className="text-sm text-blue-400">no contributions yet — start investing!</p>
-        </div>
+        <EmptyState
+          mascotSize={48}
+          animate="bob"
+          headline="no contributions yet"
+          body="add your first entry above to start building wealth."
+        />
       )}
 
       {/* History */}
@@ -440,11 +444,13 @@ export function InvestmentsPageClient() {
       )}
 
       {!isLoading && investmentCategories.length === 0 && (
-        <div className="py-16 text-center">
-          <p className="text-base text-green-600">no investment categories set up.</p>
-          <p className="mt-1 text-sm text-green-400">add an investment category during onboarding or in your settings.</p>
-          <Link href="/home" className="mt-4 inline-block text-sm text-green-500 transition hover:text-green-700">← back to dashboard</Link>
-        </div>
+        <EmptyState
+          mascotSize={64}
+          animate="float"
+          headline="no investment categories set up"
+          body="add an investment category during onboarding or in your settings."
+          action={{ label: "go to settings", href: "/home" }}
+        />
       )}
 
       {!isLoading && investmentCategories.length > 0 && (

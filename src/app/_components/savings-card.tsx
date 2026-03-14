@@ -157,9 +157,10 @@ export function SavingsCard({ className }: { className?: string }) {
           <div className="h-3 w-full animate-pulse rounded-full bg-green-100" />
         </div>
       ) : savingCategories.length === 0 ? (
-        <div className="flex flex-col items-center gap-2 py-4">
-          <BudgieMascot size={40} animate="bob" className="opacity-50" />
-          <p className="text-sm text-green-500">no savings categories set up.</p>
+        <div className="flex flex-col items-center gap-2 py-6 text-center">
+          <BudgieMascot size={40} animate="bob" className="opacity-60" />
+          <p className="text-sm font-medium text-green-600">no savings categories set up</p>
+          <p className="text-xs text-green-500">add one in settings to start tracking</p>
         </div>
       ) : (
         <>

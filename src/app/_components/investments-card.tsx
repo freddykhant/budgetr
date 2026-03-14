@@ -6,6 +6,8 @@ import { getDaysInMonth } from "date-fns";
 
 import { api } from "~/trpc/react";
 
+import { BudgieMascot } from "./budgie-mascot";
+
 function fmt(n: number) {
   return new Intl.NumberFormat("en-AU", {
     style: "currency",
@@ -158,9 +160,11 @@ export function InvestmentsCard({ className }: { className?: string }) {
           <div className="h-3 w-full animate-pulse rounded-full bg-blue-50" />
         </div>
       ) : investmentCategories.length === 0 ? (
-        <p className="text-sm text-green-500">
-          no investment categories set up.
-        </p>
+        <div className="flex flex-col items-center gap-2 py-6 text-center">
+          <BudgieMascot size={40} animate="bob" className="opacity-60" />
+          <p className="text-sm font-medium text-blue-600">no investment categories set up</p>
+          <p className="text-xs text-green-500">add one in settings to start tracking</p>
+        </div>
       ) : (
         <>
           <p className="font-mono text-4xl font-semibold tabular-nums text-green-950">

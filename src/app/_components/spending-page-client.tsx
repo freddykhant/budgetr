@@ -7,6 +7,7 @@ import { ArrowLeft, Loader2, Plus, X } from "lucide-react";
 
 import { api } from "~/trpc/react";
 import { EditableEntryRow } from "./editable-entry-row";
+import { EmptyState } from "./empty-state";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -328,10 +329,12 @@ export function SpendingPageClient() {
           )}
 
           {!isLoading && txCount === 0 && (
-            <div className="py-6 text-center">
-              <p className="text-base text-green-500">no transactions yet.</p>
-              <p className="mt-1 text-sm text-green-400">add your first one above to start tracking.</p>
-            </div>
+            <EmptyState
+              mascotSize={48}
+              animate="bob"
+              headline="nothing logged yet"
+              body="tap 'add transaction' above to start."
+            />
           )}
 
           {!isLoading && txCount > 0 && (

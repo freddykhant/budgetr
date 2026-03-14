@@ -7,6 +7,8 @@ import { ArrowLeft, CheckCircle2, Circle, Pencil, Plus, Trash2, X } from "lucide
 
 import { api } from "~/trpc/react";
 
+import { EmptyState } from "./empty-state";
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function fmt(n: number) {
@@ -398,10 +400,12 @@ export function CreditCardPageClient({
                     )}
 
                     {!entriesQuery.isLoading && windowEntries.length === 0 && (
-                      <div className="py-6 text-center">
-                        <p className="text-base text-green-500">no spend logged yet.</p>
-                        <p className="mt-1 text-sm text-green-400">log purchases you put on this card to track your bonus progress.</p>
-                      </div>
+                      <EmptyState
+                        mascotSize={48}
+                        animate="bob"
+                        headline="no spend logged yet"
+                        body="log purchases you put on this card to track your bonus progress."
+                      />
                     )}
 
                     {!entriesQuery.isLoading && windowEntries.length > 0 && (
