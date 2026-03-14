@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { X, User, Wallet, LogOut, Check } from "lucide-react";
+import { X, User, Wallet, LogOut, Check, Settings } from "lucide-react";
 import { signOut } from "next-auth/react";
 import Image from "next/image";
 
 import { api } from "~/trpc/react";
 import type { RouterOutputs } from "~/trpc/react";
 
-type Tab = "account" | "budget";
+type Tab = "account" | "budget" | "preferences";
 
 interface SettingsModalProps {
   isOpen: boolean;
