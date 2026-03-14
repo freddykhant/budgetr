@@ -95,6 +95,8 @@ export const userSettings = createTable(
       .references(() => users.id),
     monthlyIncome: d.numeric({ precision: 10, scale: 2 }).notNull(),
     onboardingCompleted: d.boolean().notNull().default(false),
+    // Day of month (1–31) the user gets paid. Null means not set.
+    paydayOfMonth: d.integer(),
     createdAt: d.timestamp({ withTimezone: true }).defaultNow().notNull(),
   }),
   (t) => [
