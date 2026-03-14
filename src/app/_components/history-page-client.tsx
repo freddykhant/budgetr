@@ -181,9 +181,9 @@ export function HistoryPageClient() {
     <main className="mx-auto max-w-4xl px-6 py-10">
 
       {/* Page header */}
-      <header className="mb-8 flex items-center gap-3">
+      <header className="mb-8">
         <BackButton href="/home" />
-        <div className="flex items-center gap-2">
+        <div className="mt-5 flex items-center gap-2">
           <History size={18} className="text-green-400" />
           <h1 className="text-2xl font-semibold tracking-tight text-green-950">history</h1>
         </div>

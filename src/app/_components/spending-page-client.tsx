@@ -153,19 +153,19 @@ export function SpendingPageClient() {
     <main className="mx-auto max-w-2xl px-6 py-10">
 
       {/* Page header */}
-      <header className="mb-8 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <BackButton href="/home" />
+      <header className="mb-8">
+        <BackButton href="/home" />
+        <div className="mt-5 flex items-end justify-between">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight text-green-950">spending</h1>
-            <p className="text-sm text-green-500">{format(today, "MMMM yyyy")}</p>
+            <p className="mt-0.5 text-sm text-green-500">{format(today, "MMMM yyyy")}</p>
           </div>
+          {spendingCategory && (
+            <p className="rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-sm text-orange-600">
+              {spendingCategory.emoji} {spendingCategory.name}
+            </p>
+          )}
         </div>
-        {spendingCategory && (
-          <p className="rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-sm text-orange-600">
-            {spendingCategory.emoji} {spendingCategory.name}
-          </p>
-        )}
       </header>
 
       <div className="space-y-4">

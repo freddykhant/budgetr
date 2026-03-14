@@ -411,13 +411,11 @@ export function SavingsPageClient() {
 
   return (
     <main className="mx-auto max-w-2xl px-6 py-10">
-      <header className="mb-8 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <BackButton href="/home" />
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-green-950">savings</h1>
-            <p className="text-sm text-green-500">{format(today, "MMMM yyyy")}</p>
-          </div>
+      <header className="mb-8">
+        <BackButton href="/home" />
+        <div className="mt-5">
+          <h1 className="text-2xl font-semibold tracking-tight text-green-950">savings</h1>
+          <p className="mt-0.5 text-sm text-green-500">{format(today, "MMMM yyyy")}</p>
         </div>
       </header>
 
