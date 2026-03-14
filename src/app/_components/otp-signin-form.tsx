@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useCallback, ClipboardEvent, KeyboardEvent } from "react";
+import { useRef, useState, useCallback, type ClipboardEvent, type KeyboardEvent } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { ArrowRight, Loader2 } from "lucide-react";

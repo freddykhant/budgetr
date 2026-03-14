@@ -1,6 +1,6 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { emailOtp } from "better-auth/plugins";
+import { emailOTP } from "better-auth/plugins";
 import { Resend } from "resend";
 
 import { env } from "~/env";
@@ -27,8 +27,8 @@ export const auth = betterAuth({
     },
   },
   plugins: [
-    emailOtp({
-      async sendVerificationOTP({ email, otp }) {
+    emailOTP({
+      async sendVerificationOTP({ email, otp }: { email: string; otp: string; type: string }) {
         await resend.emails.send({
           from: "budgie <noreply@usebudgie.app>",
           to: email,
