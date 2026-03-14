@@ -3,10 +3,8 @@ import {
   index,
   pgEnum,
   pgTableCreator,
-  primaryKey,
   unique,
 } from "drizzle-orm/pg-core";
-import { type AdapterAccount } from "next-auth/adapters";
 
 export const createTable = pgTableCreator((name) => `budgetr_${name}`);
 
@@ -20,7 +18,7 @@ export const categoryTypeEnum = pgEnum("category_type", [
   "custom",
 ]);
 
-// ─── Auth tables (NextAuth) ───────────────────────────────────────────────────
+// ─── Auth tables (Better Auth) ────────────────────────────────────────────────
 
 export const users = createTable("user", (d) => ({
   id: d
@@ -28,59 +26,65 @@ export const users = createTable("user", (d) => ({
     .notNull()
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
-  name: d.varchar({ length: 255 }),
-  email: d.varchar({ length: 255 }).notNull(),
-  emailVerified: d
-    .timestamp({ mode: "date", withTimezone: true })
-    .$defaultFn(() => new Date()),
+  name: d.varchar({ length: 255 }).notNull(),
+  email: d.varchar({ length: 255 }).notNull().unique(),
+  emailVerified: d.boolean().notNull().default(false),
   image: d.varchar({ length: 255 }),
+  createdAt: d.timestamp({ withTimezone: true }).defaultNow().notNull(),
+  updatedAt: d.timestamp({ withTimezone: true }).defaultNow().notNull(),
 }));
-
-export const accounts = createTable(
-  "account",
-  (d) => ({
-    userId: d
-      .varchar({ length: 255 })
-      .notNull()
-      .references(() => users.id),
-    type: d.varchar({ length: 255 }).$type<AdapterAccount["type"]>().notNull(),
-    provider: d.varchar({ length: 255 }).notNull(),
-    providerAccountId: d.varchar({ length: 255 }).notNull(),
-    refresh_token: d.text(),
-    access_token: d.text(),
-    expires_at: d.integer(),
-    token_type: d.varchar({ length: 255 }),
-    scope: d.varchar({ length: 255 }),
-    id_token: d.text(),
-    session_state: d.varchar({ length: 255 }),
-  }),
-  (t) => [
-    primaryKey({ columns: [t.provider, t.providerAccountId] }),
-    index("account_user_id_idx").on(t.userId),
-  ],
-);
 
 export const sessions = createTable(
   "session",
   (d) => ({
-    sessionToken: d.varchar({ length: 255 }).notNull().primaryKey(),
+    id: d.varchar({ length: 255 }).notNull().primaryKey(),
     userId: d
       .varchar({ length: 255 })
       .notNull()
-      .references(() => users.id),
-    expires: d.timestamp({ mode: "date", withTimezone: true }).notNull(),
+      .references(() => users.id, { onDelete: "cascade" }),
+    token: d.varchar({ length: 255 }).notNull().unique(),
+    expiresAt: d.timestamp({ withTimezone: true }).notNull(),
+    ipAddress: d.varchar({ length: 255 }),
+    userAgent: d.text(),
+    createdAt: d.timestamp({ withTimezone: true }).defaultNow().notNull(),
+    updatedAt: d.timestamp({ withTimezone: true }).defaultNow().notNull(),
   }),
   (t) => [index("session_user_id_idx").on(t.userId)],
 );
 
-export const verificationTokens = createTable(
-  "verification_token",
+export const accounts = createTable(
+  "account",
   (d) => ({
-    identifier: d.varchar({ length: 255 }).notNull(),
-    token: d.varchar({ length: 255 }).notNull(),
-    expires: d.timestamp({ mode: "date", withTimezone: true }).notNull(),
+    id: d.varchar({ length: 255 }).notNull().primaryKey(),
+    userId: d
+      .varchar({ length: 255 })
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    accountId: d.varchar({ length: 255 }).notNull(),
+    providerId: d.varchar({ length: 255 }).notNull(),
+    accessToken: d.text(),
+    refreshToken: d.text(),
+    accessTokenExpiresAt: d.timestamp({ withTimezone: true }),
+    refreshTokenExpiresAt: d.timestamp({ withTimezone: true }),
+    scope: d.varchar({ length: 255 }),
+    idToken: d.text(),
+    password: d.text(),
+    createdAt: d.timestamp({ withTimezone: true }).defaultNow().notNull(),
+    updatedAt: d.timestamp({ withTimezone: true }).defaultNow().notNull(),
   }),
-  (t) => [primaryKey({ columns: [t.identifier, t.token] })],
+  (t) => [index("account_user_id_idx").on(t.userId)],
+);
+
+export const verifications = createTable(
+  "verification",
+  (d) => ({
+    id: d.varchar({ length: 255 }).notNull().primaryKey(),
+    identifier: d.varchar({ length: 255 }).notNull(),
+    value: d.text().notNull(),
+    expiresAt: d.timestamp({ withTimezone: true }).notNull(),
+    createdAt: d.timestamp({ withTimezone: true }).defaultNow(),
+    updatedAt: d.timestamp({ withTimezone: true }).defaultNow(),
+  }),
 );
 
 // ─── Budget & Settings ────────────────────────────────────────────────────────
@@ -297,6 +301,8 @@ export const accountsRelations = relations(accounts, ({ one }) => ({
 export const sessionsRelations = relations(sessions, ({ one }) => ({
   user: one(users, { fields: [sessions.userId], references: [users.id] }),
 }));
+
+export const verificationsRelations = relations(verifications, () => ({}));
 
 export const userSettingsRelations = relations(userSettings, ({ one }) => ({
   user: one(users, { fields: [userSettings.userId], references: [users.id] }),

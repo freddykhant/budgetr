@@ -7,22 +7,22 @@ todos:
     status: in_progress
   - id: auth-config
     content: Write src/server/auth/config.ts with Better Auth + Google provider + emailOtp plugin + Resend sender
-    status: pending
+    status: completed
   - id: auth-index
     content: Simplify src/server/auth/index.ts to re-export auth from config
-    status: pending
+    status: completed
   - id: api-route
     content: Delete [...nextauth] route, create src/app/api/auth/[...all]/route.ts with toNextJsHandler
-    status: pending
+    status: completed
   - id: trpc-context
     content: "Update src/server/api/trpc.ts to use auth.api.getSession({ headers: await headers() })"
-    status: pending
+    status: completed
   - id: env
     content: Update src/env.js — add BETTER_AUTH_SECRET and RESEND_API_KEY, remove AUTH_SECRET
-    status: pending
+    status: completed
   - id: page-auth-checks
     content: Update all 9 server pages to use auth.api.getSession instead of auth()
-    status: pending
+    status: in_progress
   - id: auth-client
     content: Create src/lib/auth-client.ts with createAuthClient + emailOtpClient plugin
     status: pending
