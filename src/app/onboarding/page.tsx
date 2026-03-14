@@ -41,10 +41,15 @@ function cycleEmoji(current: string): string {
   return EMOJI_CYCLE[(idx + 1) % EMOJI_CYCLE.length] ?? EMOJI_CYCLE[0]!;
 }
 
+const COMMON_PAYDAYS = [1, 7, 14, 15, 21, 28];
+
 export default function OnboardingPage() {
   const router = useRouter();
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [income, setIncome] = useState<string>("4100");
+  const [payday, setPayday] = useState<number | null>(null);
+  const [customPayday, setCustomPayday] = useState<string>("");
+  const [showCustomPayday, setShowCustomPayday] = useState(false);
   const [categories, setCategories] = useState<DraftCategory[]>(DEFAULT_CATEGORIES);
 
   const completeMutation = api.onboarding.complete.useMutation({
@@ -77,12 +82,30 @@ export default function OnboardingPage() {
     setCategories((prev) => prev.filter((c) => c.id !== id));
   }
 
+  function handlePaydayChip(day: number) {
+    setPayday(day);
+    setShowCustomPayday(false);
+    setCustomPayday("");
+  }
+
+  function handleCustomPaydayChange(val: string) {
+    setCustomPayday(val.replace(/[^0-9]/g, ""));
+    const n = Number(val.replace(/[^0-9]/g, ""));
+    if (n >= 1 && n <= 31) setPayday(n);
+    else setPayday(null);
+  }
+
+  const resolvedPayday = showCustomPayday
+    ? (Number(customPayday) >= 1 && Number(customPayday) <= 31 ? Number(customPayday) : null)
+    : payday;
+
   function handleSubmit() {
     if (!hasValidIncome || totalPct !== 100) return;
     completeMutation.mutate({
       income: incomeNum,
       month,
       year,
+      paydayOfMonth: resolvedPayday ?? undefined,
       categories: categories.map((c) => ({
         name: c.name,
         emoji: c.emoji,

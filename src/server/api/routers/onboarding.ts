@@ -27,6 +27,7 @@ export const onboardingRouter = createTRPCRouter({
         income: z.number().positive(),
         month: z.number().min(1).max(12),
         year: z.number(),
+        paydayOfMonth: z.number().min(1).max(31).nullable().optional(),
         categories: z.array(
           z.object({
             name: z.string().min(1).max(255),
@@ -65,6 +66,9 @@ export const onboardingRouter = createTRPCRouter({
           .set({
             monthlyIncome: input.income.toString(),
             onboardingCompleted: true,
+            ...(input.paydayOfMonth !== undefined && {
+              paydayOfMonth: input.paydayOfMonth,
+            }),
           })
           .where(eq(userSettings.id, existingSettings.id));
       } else {
@@ -72,6 +76,9 @@ export const onboardingRouter = createTRPCRouter({
           userId,
           monthlyIncome: input.income.toString(),
           onboardingCompleted: true,
+          ...(input.paydayOfMonth !== undefined && {
+            paydayOfMonth: input.paydayOfMonth,
+          }),
         });
       }
 

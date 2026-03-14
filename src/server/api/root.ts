@@ -6,6 +6,7 @@ import { entryRouter } from "./routers/entry";
 import { goalRouter } from "./routers/goal";
 import { onboardingRouter } from "./routers/onboarding";
 import { subscriptionRouter } from "./routers/subscription";
+import { userSettingsRouter } from "./routers/userSettings";
 
 export const appRouter = createTRPCRouter({
   budget: budgetRouter,
@@ -15,6 +16,7 @@ export const appRouter = createTRPCRouter({
   creditCard: creditCardRouter,
   subscription: subscriptionRouter,
   onboarding: onboardingRouter,
+  userSettings: userSettingsRouter,
 });
 
 export type AppRouter = typeof appRouter;
