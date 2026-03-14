@@ -2,11 +2,11 @@
 
 import { useMemo, useState } from "react";
 import { differenceInCalendarDays, format, isAfter, parseISO, subDays } from "date-fns";
-import Link from "next/link";
-import { ArrowLeft, CheckCircle2, Circle, Pencil, Plus, Trash2, X } from "lucide-react";
+import { CheckCircle2, Circle, Pencil, Plus, Trash2, X } from "lucide-react";
 
 import { api } from "~/trpc/react";
 
+import { BackButton } from "./back-button";
 import { EmptyState } from "./empty-state";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -154,9 +154,7 @@ export function CreditCardPageClient({
     <main className="mx-auto max-w-2xl px-6 py-10">
       <header className="mb-8 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Link href="/home" className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-green-200 bg-green-50 text-green-600 transition hover:border-green-300 hover:text-green-800" aria-label="Back to dashboard">
-            <ArrowLeft size={15} />
-          </Link>
+          <BackButton href="/home" />
           <div>
             <h1 className="text-2xl font-semibold tracking-tight text-green-950">{displayName}</h1>
             <p className="text-sm text-green-500">{format(today, "MMMM yyyy")}</p>
