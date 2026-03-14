@@ -52,7 +52,7 @@ function EmailStep({
     setError("");
     setLoading(true);
     try {
-      const result = await authClient.emailOtp.sendOtp({
+      const result = await authClient.emailOtp.sendVerificationOtp({
         email: email.trim().toLowerCase(),
         type: "sign-in",
       });
@@ -163,10 +163,9 @@ function CodeStep({
     setError("");
     setLoading(true);
     try {
-      const result = await authClient.emailOtp.verifyOtp({
+      const result = await authClient.signIn.emailOtp({
         email,
         otp: code,
-        type: "sign-in",
       });
       if (result.error) {
         setError(result.error.message ?? "Incorrect code. Try again.");
@@ -231,7 +230,7 @@ function CodeStep({
     setError("");
     setDigits(Array(CODE_LENGTH).fill(""));
     try {
-      await authClient.emailOtp.sendOtp({ email, type: "sign-in" });
+      await authClient.emailOtp.sendVerificationOtp({ email, type: "sign-in" });
       focusAt(0);
     } catch {
       setError("Could not resend. Try again.");
