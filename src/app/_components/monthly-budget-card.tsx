@@ -89,6 +89,15 @@ export function MonthlyBudgetCard({ month, year, onBudgetChange }: Props) {
     [budgetQuery.data],
   );
 
+  const summaryQuery = api.entry.monthlySummary.useQuery({ month, year });
+
+  const totalLogged = useMemo(() => {
+    if (!summaryQuery.data) return 0;
+    return summaryQuery.data.reduce((sum, row) => sum + Number(row.total ?? 0), 0);
+  }, [summaryQuery.data]);
+
+  const remaining = Math.max(0, incomeNum - totalLogged);
+
   const allocations: Allocation[] = useMemo(() => {
     if (!budgetQuery.data || !categoriesQuery.data) return [];
     return budgetQuery.data.allocations
@@ -249,9 +258,16 @@ export function MonthlyBudgetCard({ month, year, onBudgetChange }: Props) {
               />
             </div>
           ) : (
-            <p className="mt-2 font-mono text-5xl font-semibold tabular-nums tracking-tight text-green-950">
-              {fmt(incomeNum)}
-            </p>
+            <div className="mt-2">
+              <p className="font-mono text-5xl font-semibold tabular-nums tracking-tight text-green-950">
+                {fmt(incomeNum)}
+              </p>
+              {totalLogged > 0 && (
+                <p className="mt-1.5 font-mono text-sm tabular-nums text-green-500">
+                  {fmt(remaining)} remaining
+                </p>
+              )}
+            </div>
           )}
         </div>
 
