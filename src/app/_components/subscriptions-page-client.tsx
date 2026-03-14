@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Check, Pencil, Plus, Trash2, X } from "lucide-react";
+import { Check, Pencil, Plus, Trash2 } from "lucide-react";
 
 import { api } from "~/trpc/react";
 import { BackButton } from "./back-button";
