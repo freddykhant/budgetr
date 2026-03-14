@@ -4,15 +4,22 @@ import Link from "next/link";
 
 import { BudgieMascot } from "./budgie-mascot";
 
+type ActionProp =
+  | { label: string; href: string; onClick?: never }
+  | { label: string; onClick: () => void; href?: never };
+
 type EmptyStateProps = {
   mascotSize?: number;
   animate?: "bob" | "float" | "tilt";
   headline: string;
   body?: string;
-  action?: { label: string; href: string };
+  action?: ActionProp;
 };
 
-/** Shared empty state: mascot + headline + body + optional CTA link. */
+const ctaCls =
+  "mt-4 inline-flex cursor-pointer items-center rounded-full border border-green-200 bg-green-50 px-4 py-2 text-sm font-medium text-green-600 transition hover:border-green-300 hover:bg-green-100 hover:text-green-800";
+
+/** Shared empty state: mascot + headline + body + optional CTA. */
 export function EmptyState({
   mascotSize = 48,
   animate = "bob",
@@ -34,12 +41,15 @@ export function EmptyState({
         </p>
       )}
       {action && (
-        <Link
-          href={action.href}
-          className="mt-4 inline-flex cursor-pointer items-center rounded-full border border-green-200 bg-green-50 px-4 py-2 text-sm font-medium text-green-600 transition hover:border-green-300 hover:bg-green-100 hover:text-green-800"
-        >
-          {action.label}
-        </Link>
+        action.href ? (
+          <Link href={action.href} className={ctaCls}>
+            {action.label}
+          </Link>
+        ) : (
+          <button onClick={action.onClick} className={ctaCls}>
+            {action.label}
+          </button>
+        )
       )}
     </div>
   );
