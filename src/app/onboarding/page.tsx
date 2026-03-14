@@ -149,7 +149,7 @@ export default function OnboardingPage() {
           ))}
         </div>
 
-        {/* ── Step 1: Income ─────────────────────────────────────────────── */}
+        {/* ── Step 1: Income + Payday ────────────────────────────────────── */}
         {step === 1 && (
           <section className="space-y-6">
             <div>
@@ -160,6 +160,8 @@ export default function OnboardingPage() {
                 we&apos;ll use this to auto-calculate your budget split.
               </p>
             </div>
+
+            {/* Income input */}
             <div>
               <label className="text-sm text-green-600">monthly income</label>
               <div className="mt-1 flex items-center overflow-hidden rounded-xl border border-green-200 bg-green-50 px-3 py-2.5 focus-within:border-green-400">
@@ -173,6 +175,67 @@ export default function OnboardingPage() {
                   autoFocus
                 />
               </div>
+            </div>
+
+            {/* Payday picker */}
+            <div>
+              <div className="flex items-center justify-between">
+                <label className="text-sm text-green-600">
+                  what day of the month do you get paid?
+                </label>
+                <span className="text-xs text-green-400">optional</span>
+              </div>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {COMMON_PAYDAYS.map((day) => (
+                  <button
+                    key={day}
+                    type="button"
+                    onClick={() => handlePaydayChip(day)}
+                    className={`cursor-pointer rounded-full px-3 py-1.5 text-sm font-medium transition active:scale-95 ${
+                      payday === day && !showCustomPayday
+                        ? "bg-green-500 text-white"
+                        : "border border-green-200 text-green-600 hover:bg-green-50"
+                    }`}
+                  >
+                    {day === 28 ? "28th/last" : `${day}${day === 1 ? "st" : day === 7 ? "th" : day === 14 ? "th" : day === 15 ? "th" : day === 21 ? "st" : ""}`}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowCustomPayday(true);
+                    setPayday(null);
+                  }}
+                  className={`cursor-pointer rounded-full px-3 py-1.5 text-sm font-medium transition active:scale-95 ${
+                    showCustomPayday
+                      ? "bg-green-500 text-white"
+                      : "border border-green-200 text-green-600 hover:bg-green-50"
+                  }`}
+                >
+                  other
+                </button>
+              </div>
+              {showCustomPayday && (
+                <div className="mt-2 flex items-center gap-2">
+                  <input
+                    type="number"
+                    min="1"
+                    max="31"
+                    value={customPayday}
+                    onChange={(e) => handleCustomPaydayChange(e.target.value)}
+                    placeholder="e.g. 23"
+                    autoFocus
+                    className="w-24 cursor-text rounded-xl border border-green-200 bg-green-50 px-3 py-2 text-sm font-mono tabular-nums text-green-950 outline-none focus:border-green-400"
+                    inputMode="numeric"
+                  />
+                  <span className="text-sm text-green-500">of the month</span>
+                </div>
+              )}
+              {resolvedPayday && (
+                <p className="mt-2 text-xs text-green-500">
+                  budgie will remind you around the {resolvedPayday}{resolvedPayday === 1 ? "st" : resolvedPayday === 2 ? "nd" : resolvedPayday === 3 ? "rd" : "th"} each month 🎉
+                </p>
+              )}
             </div>
           </section>
         )}
