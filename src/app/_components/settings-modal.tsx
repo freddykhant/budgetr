@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { X, User, Wallet, LogOut, Check, Settings } from "lucide-react";
 import { signOut } from "next-auth/react";
 import Image from "next/image";
@@ -502,7 +503,7 @@ export function SettingsModal({ isOpen, onClose, user }: SettingsModalProps) {
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
@@ -557,6 +558,7 @@ export function SettingsModal({ isOpen, onClose, user }: SettingsModalProps) {
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
