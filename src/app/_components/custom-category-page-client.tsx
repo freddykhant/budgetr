@@ -73,12 +73,6 @@ export function CustomCategoryPageClient({
       }
     },
   });
-  const deleteEntry = api.entry.delete.useMutation({
-    onSuccess: () => {
-      void utils.entry.listAllForCategory.invalidate({ categoryId });
-      void utils.entry.listForCategories.invalidate();
-    },
-  });
   const upsertGoal = api.goal.upsert.useMutation({
     onSuccess: (_, vars) => {
       void utils.goal.get.invalidate({ categoryId });
@@ -412,12 +406,14 @@ export function CustomCategoryPageClient({
                           description={entry.description ?? null}
                           date={entry.date}
                           accent="violet"
-                          onDelete={() => deleteEntry.mutate({ id: entry.id })}
                           onSaveSuccess={() => {
                             void utils.entry.listAllForCategory.invalidate({ categoryId });
                             void utils.entry.listForCategories.invalidate();
                           }}
-                          isDeleting={deleteEntry.isPending}
+                          onDeleteSuccess={() => {
+                            void utils.entry.listAllForCategory.invalidate({ categoryId });
+                            void utils.entry.listForCategories.invalidate();
+                          }}
                         />
                       ))}
                     </ul>

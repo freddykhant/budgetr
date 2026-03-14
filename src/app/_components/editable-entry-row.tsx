@@ -18,9 +18,8 @@ type Props = {
   accent: EntryAccent;
   /** Prefix shown before the amount in view mode, e.g. "+" */
   amountPrefix?: string;
-  onDelete: () => void;
   onSaveSuccess: () => void;
-  isDeleting?: boolean;
+  onDeleteSuccess: () => void;
 };
 
 // ─── Accent classes ───────────────────────────────────────────────────────────
@@ -87,23 +86,24 @@ export function EditableEntryRow({
   date,
   accent,
   amountPrefix = "",
-  onDelete,
   onSaveSuccess,
-  isDeleting = false,
+  onDeleteSuccess,
 }: Props) {
   const today = new Date();
   const todayStr = format(today, "yyyy-MM-dd");
   const yesterdayStr = format(subDays(today, 1), "yyyy-MM-dd");
 
   const [isEditing, setIsEditing] = useState(false);
+  const [isRemoving, setIsRemoving] = useState(false);
   const [draftAmount, setDraftAmount] = useState("");
   const [draftDesc, setDraftDesc] = useState("");
   const [dateMode, setDateMode] = useState<"today" | "yesterday" | "pick">("today");
   const [pickDate, setPickDate] = useState(todayStr);
 
   const amountRef = useRef<HTMLInputElement>(null);
-
   const c = accentClasses[accent];
+
+  // ── Mutations ──────────────────────────────────────────────────────────────
 
   const updateEntry = api.entry.update.useMutation({
     onSuccess: () => {
@@ -112,18 +112,37 @@ export function EditableEntryRow({
     },
   });
 
-  function openEdit() {
-    setDraftAmount(String(amount));
-    setDraftDesc(description ?? "");
-    const mode = inferDateMode(date);
-    setDateMode(mode);
-    setPickDate(date);
-    setIsEditing(true);
-  }
+  const deleteEntry = api.entry.delete.useMutation({
+    onSuccess: onDeleteSuccess,
+    onError: () => setIsRemoving(false),
+  });
+
+  // ── Keyboard shortcut ──────────────────────────────────────────────────────
+
+  useEffect(() => {
+    if (!isEditing) return;
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") setIsEditing(false);
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [isEditing]);
+
+  // ── Focus on open ──────────────────────────────────────────────────────────
 
   useEffect(() => {
     if (isEditing) amountRef.current?.focus();
   }, [isEditing]);
+
+  // ── Handlers ───────────────────────────────────────────────────────────────
+
+  function openEdit() {
+    setDraftAmount(String(amount));
+    setDraftDesc(description ?? "");
+    setDateMode(inferDateMode(date));
+    setPickDate(date);
+    setIsEditing(true);
+  }
 
   function handleSave(e: React.FormEvent) {
     e.preventDefault();
@@ -135,16 +154,12 @@ export function EditableEntryRow({
         : dateMode === "yesterday"
           ? yesterdayStr
           : pickDate;
-    updateEntry.mutate({
-      id,
-      amount: val,
-      date: newDate,
-      description: draftDesc.trim() || null,
-    });
+    updateEntry.mutate({ id, amount: val, date: newDate, description: draftDesc.trim() || null });
   }
 
-  function handleCancel() {
-    setIsEditing(false);
+  function handleDelete() {
+    setIsRemoving(true);
+    deleteEntry.mutate({ id });
   }
 
   // ── Edit mode ──────────────────────────────────────────────────────────────
@@ -186,7 +201,7 @@ export function EditableEntryRow({
           )}
         </div>
 
-        {/* Amount + desc + actions */}
+        {/* Inputs + actions */}
         <form onSubmit={handleSave} className="flex items-center gap-2">
           <div className={`flex items-center rounded-xl border px-3 py-2 ${c.input}`}>
             <span className={`mr-1 text-sm ${c.dollar}`}>$</span>
@@ -209,17 +224,15 @@ export function EditableEntryRow({
             type="submit"
             disabled={!draftAmount || updateEntry.isPending}
             className={`shrink-0 cursor-pointer rounded-full px-3 py-2 text-sm font-medium text-white transition disabled:cursor-not-allowed ${c.save}`}
+            aria-label="Save changes"
           >
-            {updateEntry.isPending ? (
-              "saving…"
-            ) : (
-              <Check size={14} />
-            )}
+            {updateEntry.isPending ? "saving…" : <Check size={14} />}
           </button>
           <button
             type="button"
-            onClick={handleCancel}
+            onClick={() => setIsEditing(false)}
             className="shrink-0 cursor-pointer rounded-full p-2 text-green-400 transition hover:bg-green-50 hover:text-green-600"
+            aria-label="Cancel"
           >
             <X size={14} />
           </button>
@@ -231,11 +244,13 @@ export function EditableEntryRow({
   // ── View mode ──────────────────────────────────────────────────────────────
 
   return (
-    <li className="group flex items-center justify-between py-2.5">
+    <li
+      className={`group flex items-center justify-between py-2.5 transition-all duration-300 ${
+        isRemoving ? "pointer-events-none -translate-x-1 opacity-0" : "opacity-100"
+      }`}
+    >
       <p className="text-base text-green-800">
-        {description ?? (
-          <span className="italic text-green-400">no description</span>
-        )}
+        {description ?? <span className="italic text-green-400">no description</span>}
       </p>
       <div className="flex items-center gap-2">
         <p className={`font-mono text-base tabular-nums ${c.amount}`}>
@@ -251,9 +266,9 @@ export function EditableEntryRow({
         </button>
         <button
           type="button"
-          onClick={onDelete}
-          disabled={isDeleting}
-          className="cursor-pointer opacity-0 transition-opacity group-hover:opacity-100"
+          onClick={handleDelete}
+          disabled={isRemoving}
+          className="cursor-pointer opacity-0 transition-opacity group-hover:opacity-100 disabled:pointer-events-none"
           aria-label="Delete entry"
         >
           <Trash2 size={13} className="text-green-400 transition hover:text-red-500" />

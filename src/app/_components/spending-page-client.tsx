@@ -95,8 +95,6 @@ export function SpendingPageClient() {
     },
   });
 
-  const deleteEntry = api.entry.delete.useMutation({ onSuccess: () => void utils.entry.list.invalidate() });
-
   const confirmedEntries = useMemo(
     () => entryQuery.data ?? [],
     [entryQuery.data],
@@ -374,9 +372,14 @@ export function SpendingPageClient() {
                           description={tx.description}
                           date={tx.date}
                           accent="orange"
-                          onDelete={() => deleteEntry.mutate({ id: tx.id as number })}
-                          onSaveSuccess={() => void utils.entry.list.invalidate()}
-                          isDeleting={deleteEntry.isPending}
+                          onSaveSuccess={() => {
+                            void utils.entry.list.invalidate();
+                            void utils.entry.listForCategories.invalidate();
+                          }}
+                          onDeleteSuccess={() => {
+                            void utils.entry.list.invalidate();
+                            void utils.entry.listForCategories.invalidate();
+                          }}
                         />
                       );
                     })}

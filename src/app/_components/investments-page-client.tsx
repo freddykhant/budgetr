@@ -77,12 +77,6 @@ function InvestmentCategoryCard({
       }
     },
   });
-  const deleteEntry = api.entry.delete.useMutation({
-    onSuccess: () => {
-      void utils.entry.listAllForCategory.invalidate({ categoryId: category.id });
-      void utils.entry.listForCategories.invalidate();
-    },
-  });
   const upsertGoal = api.goal.upsert.useMutation({
     onSuccess: (_, vars) => {
       onGoalChange();
@@ -359,12 +353,14 @@ function InvestmentCategoryCard({
                         date={tx.date}
                         accent="blue"
                         amountPrefix="+"
-                        onDelete={() => deleteEntry.mutate({ id: tx.id })}
                         onSaveSuccess={() => {
                           void utils.entry.listAllForCategory.invalidate({ categoryId: category.id });
                           void utils.entry.listForCategories.invalidate();
                         }}
-                        isDeleting={deleteEntry.isPending}
+                        onDeleteSuccess={() => {
+                          void utils.entry.listAllForCategory.invalidate({ categoryId: category.id });
+                          void utils.entry.listForCategories.invalidate();
+                        }}
                       />
                     ))}
                   </ul>
