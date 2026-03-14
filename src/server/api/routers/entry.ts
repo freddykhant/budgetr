@@ -1,4 +1,4 @@
-import { and, desc, eq, inArray } from "drizzle-orm";
+import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 
 import {
@@ -65,6 +65,26 @@ export const entryRouter = createTRPCRouter({
         ),
         orderBy: [desc(entries.date), desc(entries.createdAt)],
       });
+    }),
+
+  // Aggregated totals per category for a given month — used by the history page
+  monthlySummary: protectedProcedure
+    .input(z.object({ month: z.number().min(1).max(12), year: z.number() }))
+    .query(async ({ ctx, input }) => {
+      return ctx.db
+        .select({
+          categoryId: entries.categoryId,
+          total: sql<string>`sum(${entries.amount})`,
+        })
+        .from(entries)
+        .where(
+          and(
+            eq(entries.userId, ctx.session.user.id),
+            eq(entries.month, input.month),
+            eq(entries.year, input.year),
+          ),
+        )
+        .groupBy(entries.categoryId);
     }),
 
   create: protectedProcedure

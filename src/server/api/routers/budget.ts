@@ -106,6 +106,19 @@ export const budgetRouter = createTRPCRouter({
       return withAllocations!;
     }),
 
+  // Read-only list of all months the user has a budget for — used by the history page
+  listMonths: protectedProcedure.query(async ({ ctx }) => {
+    return ctx.db.query.budgets.findMany({
+      where: eq(budgets.userId, ctx.session.user.id),
+      orderBy: [desc(budgets.year), desc(budgets.month)],
+      with: {
+        allocations: {
+          with: { category: true },
+        },
+      },
+    });
+  }),
+
   update: protectedProcedure
     .input(
       z.object({
