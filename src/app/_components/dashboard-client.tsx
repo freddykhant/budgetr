@@ -133,6 +133,12 @@ export function DashboardClient({ user }: DashboardClientProps) {
                 />
               </div>
             </div>
+            <Link
+              href="/history"
+              className="inline-flex items-center gap-1.5 rounded-full border border-green-200 bg-green-50 px-3 py-1 text-sm font-medium text-green-600 transition hover:border-green-300 hover:bg-green-100"
+            >
+              <History size={13} /> view history
+            </Link>
           </div>
         </section>
 

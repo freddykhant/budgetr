@@ -118,7 +118,7 @@ export function HistoryPageClient() {
     { enabled: !!prevBudget },
   );
 
-  const categories = categoriesQuery.data ?? [];
+  const categories = useMemo(() => categoriesQuery.data ?? [], [categoriesQuery.data]);
 
   // Build a lookup: categoryId → category
   const catById = useMemo(() => {

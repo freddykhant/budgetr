@@ -119,8 +119,6 @@ function TrendChartInner({
     };
   });
 
-  const selectedKey = `${selectedYear}-${selectedMonth}`;
-
   return (
     <ResponsiveContainer width="100%" height={220}>
       <AreaChart data={data} margin={{ top: 8, right: 4, bottom: 0, left: 4 }}>
@@ -213,7 +211,7 @@ export function HistoryTrendChart({
   selectedYear: number;
 }) {
   // Take up to 6 most recent budgets for the trend
-  const trendMonths = budgets.slice(0, 6).toReversed();
+  const trendMonths = [...budgets.slice(0, 6)].reverse();
 
   // Parallel queries — one per trend month
   const q0 = api.entry.monthlySummary.useQuery(
@@ -245,7 +243,7 @@ export function HistoryTrendChart({
   const isLoading = queries.some((q) => q.isLoading && trendMonths[queries.indexOf(q)]);
 
   const summaries = new Map<string, { categoryId: number; total: string | null }[]>();
-  trendMonths.forEach((b, i) => {
+  trendMonths.forEach((b: BudgetMonth, i: number) => {
     const key = `${b.year}-${b.month}`;
     summaries.set(key, queries[i]?.data ?? []);
   });
