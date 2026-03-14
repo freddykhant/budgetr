@@ -31,6 +31,7 @@ export function DashboardClient({ user }: DashboardClientProps) {
   // Budget + categories
   const budgetQuery = api.budget.getOrCreateCurrent.useQuery({ month, year });
   const categoriesQuery = api.category.list.useQuery();
+  const settingsQuery = api.userSettings.get.useQuery();
 
   const incomeNum = useMemo(
     () => Number(budgetQuery.data?.income ?? 0),
@@ -84,6 +85,19 @@ export function DashboardClient({ user }: DashboardClientProps) {
   const greeting =
     hour < 12 ? "good morning" : hour < 18 ? "good afternoon" : "good evening";
 
+  // Payday countdown
+  const paydayOfMonth = settingsQuery.data?.paydayOfMonth ?? null;
+  const paydayPill = useMemo(() => {
+    if (!paydayOfMonth) return null;
+    const clampedDay = Math.min(paydayOfMonth, totalDaysInMonth);
+    if (clampedDay === dayOfMonth) return { label: "payday today 💰", urgent: true };
+    const diff = clampedDay - dayOfMonth;
+    if (diff > 0) return { label: `payday in ${diff} day${diff === 1 ? "" : "s"}`, urgent: diff <= 2 };
+    // Payday was earlier this month — show next month's
+    const daysUntilNext = totalDaysInMonth - dayOfMonth + clampedDay;
+    return { label: `next payday in ${daysUntilNext} day${daysUntilNext === 1 ? "" : "s"}`, urgent: false };
+  }, [paydayOfMonth, dayOfMonth, totalDaysInMonth]);
+
   const hasSpendingBudget = spendingAllocation > 0 && !!spendingCategory;
   const spendUsedPct = hasSpendingBudget
     ? Math.min(100, Math.round((totalSpent / spendingAllocation) * 100))
@@ -134,6 +148,15 @@ export function DashboardClient({ user }: DashboardClientProps) {
                 />
               </div>
             </div>
+            {paydayPill && (
+              <span className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${
+                paydayPill.urgent
+                  ? "border border-amber-200 bg-amber-50 text-amber-700"
+                  : "border border-green-200 bg-green-50 text-green-600"
+              }`}>
+                {paydayPill.label}
+              </span>
+            )}
             <Link
               href="/history"
               className="inline-flex items-center gap-1.5 rounded-full border border-green-200 bg-green-50 px-3 py-1 text-sm font-medium text-green-600 transition hover:border-green-300 hover:bg-green-100"

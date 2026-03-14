@@ -320,11 +320,172 @@ function BudgetTab() {
   );
 }
 
+// ─── Preferences tab ─────────────────────────────────────────────────────────
+
+const COMMON_PAYDAYS = [1, 7, 14, 15, 21, 28];
+
+function PreferencesTab() {
+  const utils = api.useUtils();
+  const { data: settings } = api.userSettings.get.useQuery();
+
+  const [payday, setPayday] = useState<number | null>(null);
+  const [customPayday, setCustomPayday] = useState<string>("");
+  const [showCustom, setShowCustom] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const savedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Sync from server once loaded
+  useEffect(() => {
+    if (settings?.paydayOfMonth == null) return;
+    const day = settings.paydayOfMonth;
+    if (COMMON_PAYDAYS.includes(day)) {
+      setPayday(day);
+      setShowCustom(false);
+    } else {
+      setShowCustom(true);
+      setCustomPayday(String(day));
+      setPayday(day);
+    }
+  }, [settings?.paydayOfMonth]);
+
+  useEffect(() => {
+    return () => { if (savedTimerRef.current) clearTimeout(savedTimerRef.current); };
+  }, []);
+
+  const updateMutation = api.userSettings.update.useMutation({
+    onSuccess: async () => {
+      await utils.userSettings.get.invalidate();
+      setSaved(true);
+      savedTimerRef.current = setTimeout(() => setSaved(false), 2000);
+    },
+  });
+
+  const resolvedPayday = showCustom
+    ? (Number(customPayday) >= 1 && Number(customPayday) <= 31 ? Number(customPayday) : null)
+    : payday;
+
+  function handleChip(day: number) {
+    setPayday(day);
+    setShowCustom(false);
+    setCustomPayday("");
+  }
+
+  function handleCustomChange(val: string) {
+    const clean = val.replace(/[^0-9]/g, "");
+    setCustomPayday(clean);
+    const n = Number(clean);
+    setPayday(n >= 1 && n <= 31 ? n : null);
+  }
+
+  function handleSave() {
+    updateMutation.mutate({ paydayOfMonth: resolvedPayday });
+  }
+
+  const ordinal = (n: number) =>
+    n === 1 ? "1st" : n === 2 ? "2nd" : n === 3 ? "3rd" : `${n}th`;
+
+  if (!settings) {
+    return (
+      <div className="space-y-3">
+        <div className="h-5 w-32 animate-pulse rounded bg-green-100" />
+        <div className="h-10 animate-pulse rounded-xl bg-green-50" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-base font-medium text-green-950">preferences</h3>
+        <p className="mt-0.5 text-sm text-green-600">
+          personal settings for your budgie experience.
+        </p>
+      </div>
+
+      {/* Payday */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <label className="text-sm font-medium text-green-600">payday</label>
+          {settings.paydayOfMonth && (
+            <span className="text-xs text-green-400">
+              currently {ordinal(settings.paydayOfMonth)}
+            </span>
+          )}
+        </div>
+        <p className="text-xs text-green-500">what day of the month do you get paid?</p>
+        <div className="flex flex-wrap gap-1.5">
+          {COMMON_PAYDAYS.map((day) => (
+            <button
+              key={day}
+              type="button"
+              onClick={() => handleChip(day)}
+              className={`cursor-pointer rounded-full px-3 py-1.5 text-sm font-medium transition active:scale-95 ${
+                payday === day && !showCustom
+                  ? "bg-green-500 text-white"
+                  : "border border-green-200 text-green-600 hover:bg-green-50"
+              }`}
+            >
+              {ordinal(day)}{day === 28 ? " / last" : ""}
+            </button>
+          ))}
+          <button
+            type="button"
+            onClick={() => { setShowCustom(true); setPayday(null); }}
+            className={`cursor-pointer rounded-full px-3 py-1.5 text-sm font-medium transition active:scale-95 ${
+              showCustom
+                ? "bg-green-500 text-white"
+                : "border border-green-200 text-green-600 hover:bg-green-50"
+            }`}
+          >
+            other
+          </button>
+        </div>
+
+        {showCustom && (
+          <div className="flex items-center gap-2">
+            <input
+              type="number"
+              min="1"
+              max="31"
+              value={customPayday}
+              onChange={(e) => handleCustomChange(e.target.value)}
+              placeholder="e.g. 23"
+              className="w-24 cursor-text rounded-xl border border-green-200 bg-green-50 px-3 py-2 text-sm font-mono tabular-nums text-green-950 outline-none focus:border-green-400"
+              inputMode="numeric"
+            />
+            <span className="text-sm text-green-500">of the month</span>
+          </div>
+        )}
+
+        {resolvedPayday && (
+          <p className="text-xs text-green-500">
+            budgie will show a countdown to the {ordinal(resolvedPayday)} each month.
+          </p>
+        )}
+      </div>
+
+      {/* Save */}
+      <div className="border-t border-green-100 pt-4 flex items-center justify-end">
+        <button
+          onClick={handleSave}
+          disabled={updateMutation.isPending}
+          className="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-green-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-600 disabled:cursor-not-allowed disabled:bg-green-200 disabled:text-green-400 active:scale-95"
+        >
+          {saved ? (
+            <><Check size={13} /> saved</>
+          ) : updateMutation.isPending ? "saving…" : "save preferences"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ─── Modal shell ──────────────────────────────────────────────────────────────
 
 const NAV: { id: Tab; label: string; icon: React.ReactNode }[] = [
   { id: "account", label: "account", icon: <User size={15} /> },
   { id: "budget", label: "budget", icon: <Wallet size={15} /> },
+  { id: "preferences", label: "preferences", icon: <Settings size={15} /> },
 ];
 
 export function SettingsModal({ isOpen, onClose, user }: SettingsModalProps) {
@@ -350,7 +511,7 @@ export function SettingsModal({ isOpen, onClose, user }: SettingsModalProps) {
       />
 
       {/* Modal */}
-      <div className="relative z-10 flex h-[540px] w-full max-w-2xl overflow-hidden rounded-2xl border border-green-100 bg-white shadow-2xl shadow-green-900/15">
+      <div className="relative z-10 flex h-[580px] w-full max-w-2xl overflow-hidden rounded-2xl border border-green-100 bg-white shadow-2xl shadow-green-900/15">
         {/* Left sidebar */}
         <aside className="flex w-48 shrink-0 flex-col border-r border-green-100 bg-green-50 p-3">
           <p className="mb-4 px-2 pt-1 text-xs font-semibold uppercase tracking-[0.18em] text-green-500">
@@ -392,6 +553,7 @@ export function SettingsModal({ isOpen, onClose, user }: SettingsModalProps) {
           <div className="flex-1 overflow-y-auto px-6 py-5">
             {tab === "account" && <AccountTab user={user} />}
             {tab === "budget" && <BudgetTab />}
+            {tab === "preferences" && <PreferencesTab />}
           </div>
         </div>
       </div>
