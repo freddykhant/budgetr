@@ -30,6 +30,17 @@ const TYPE_OPTIONS: { value: CategoryType; label: string }[] = [
   { value: "custom",     label: "custom"     },
 ];
 
+const EMOJI_CYCLE = [
+  "💸", "🐷", "📈", "🏠", "🍔", "✈️", "🎮", "🎵",
+  "💊", "👗", "🚗", "⚡", "📱", "🎓", "☕", "🎁",
+  "🛒", "💼", "🎬", "🐾", "🏋️", "🌿", "🎨", "✨",
+];
+
+function cycleEmoji(current: string): string {
+  const idx = EMOJI_CYCLE.indexOf(current);
+  return EMOJI_CYCLE[(idx + 1) % EMOJI_CYCLE.length] ?? EMOJI_CYCLE[0]!;
+}
+
 export default function OnboardingPage() {
   const router = useRouter();
   const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -160,13 +171,14 @@ export default function OnboardingPage() {
                 >
                   {/* Row 1: emoji + name + delete */}
                   <div className="flex items-center gap-2">
-                    <input
-                      value={cat.emoji}
-                      onChange={(e) => handleUpdateCategory(cat.id, { emoji: e.target.value })}
-                      className="w-10 cursor-text rounded-lg border border-green-200 bg-white p-1.5 text-center text-lg focus:outline-none focus:ring-2 focus:ring-green-300"
-                      maxLength={4}
-                      placeholder="✨"
-                    />
+                    <button
+                      type="button"
+                      title="click to cycle emoji"
+                      onClick={() => handleUpdateCategory(cat.id, { emoji: cycleEmoji(cat.emoji) })}
+                      className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-green-100 text-lg transition hover:bg-green-200 active:scale-90"
+                    >
+                      {cat.emoji}
+                    </button>
                     <input
                       value={cat.name}
                       onChange={(e) => handleUpdateCategory(cat.id, { name: e.target.value })}
