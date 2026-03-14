@@ -3,9 +3,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { format, isToday, isYesterday, parseISO, subDays } from "date-fns";
 import Link from "next/link";
-import { ArrowLeft, Loader2, Plus, Trash2, X } from "lucide-react";
+import { ArrowLeft, Loader2, Plus, X } from "lucide-react";
 
 import { api } from "~/trpc/react";
+import { EditableEntryRow } from "./editable-entry-row";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -343,34 +344,40 @@ export function SpendingPageClient() {
                   <ul className="divide-y divide-green-100">
                     {(txs ?? []).map((tx) => {
                       const isError = tx.isPending && tx.tempId === errorTempId;
-                      return (
-                        <li
-                          key={tx.id}
-                          className={`group flex items-center justify-between py-2.5 transition-all duration-300 ${
-                            isError ? "-translate-x-2 opacity-0" : tx.isPending ? "opacity-50" : "opacity-100"
-                          }`}
-                        >
-                          <p className={`text-base ${tx.isPending ? "italic text-green-600" : "text-green-800"}`}>
-                            {tx.description ?? <span className="not-italic text-green-400">no description</span>}
-                          </p>
-                          <div className="flex items-center gap-3">
-                            <p className={`font-mono text-base tabular-nums ${tx.isPending ? "text-green-500" : "text-green-800"}`}>
-                              {fmtFull(Number(tx.amount))}
+
+                      if (tx.isPending) {
+                        return (
+                          <li
+                            key={tx.id}
+                            className={`flex items-center justify-between py-2.5 transition-all duration-300 ${
+                              isError ? "-translate-x-2 opacity-0" : "opacity-50"
+                            }`}
+                          >
+                            <p className="text-base italic text-green-600">
+                              {tx.description ?? <span className="not-italic text-green-400">no description</span>}
                             </p>
-                            {tx.isPending ? (
+                            <div className="flex items-center gap-3">
+                              <p className="font-mono text-base tabular-nums text-green-500">
+                                {fmtFull(Number(tx.amount))}
+                              </p>
                               <Loader2 size={14} className="animate-spin text-green-400" />
-                            ) : (
-                              <button
-                                type="button" onClick={() => deleteEntry.mutate({ id: tx.id as number })}
-                                disabled={deleteEntry.isPending}
-                                className="cursor-pointer opacity-0 transition-opacity group-hover:opacity-100"
-                                aria-label="Delete transaction"
-                              >
-                                <Trash2 size={14} className="text-green-400 transition hover:text-red-500" />
-                              </button>
-                            )}
-                          </div>
-                        </li>
+                            </div>
+                          </li>
+                        );
+                      }
+
+                      return (
+                        <EditableEntryRow
+                          key={tx.id}
+                          id={tx.id as number}
+                          amount={Number(tx.amount)}
+                          description={tx.description}
+                          date={tx.date}
+                          accent="orange"
+                          onDelete={() => deleteEntry.mutate({ id: tx.id as number })}
+                          onSaveSuccess={() => void utils.entry.list.invalidate()}
+                          isDeleting={deleteEntry.isPending}
+                        />
                       );
                     })}
                   </ul>

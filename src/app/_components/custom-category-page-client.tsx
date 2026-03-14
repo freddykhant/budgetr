@@ -3,18 +3,16 @@
 import { useMemo, useState } from "react";
 import { format, parseISO, subDays } from "date-fns";
 import Link from "next/link";
-import { ArrowLeft, Pencil, Plus, Trash2, X } from "lucide-react";
+import { ArrowLeft, Pencil, Plus, X } from "lucide-react";
 
 import { api } from "~/trpc/react";
 import { useToast } from "./toast-provider";
+import { EditableEntryRow } from "./editable-entry-row";
 
 function fmt(n: number) {
   return new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD", maximumFractionDigits: 0 }).format(n);
 }
 
-function fmtFull(n: number) {
-  return new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
-}
 
 export function CustomCategoryPageClient({
   categoryId, categoryName, categoryEmoji,
@@ -75,7 +73,12 @@ export function CustomCategoryPageClient({
       }
     },
   });
-  const deleteEntry = api.entry.delete.useMutation({ onSuccess: () => void entriesQuery.refetch() });
+  const deleteEntry = api.entry.delete.useMutation({
+    onSuccess: () => {
+      void utils.entry.listAllForCategory.invalidate({ categoryId });
+      void utils.entry.listForCategories.invalidate();
+    },
+  });
   const upsertGoal = api.goal.upsert.useMutation({
     onSuccess: (_, vars) => {
       void utils.goal.get.invalidate({ categoryId });
@@ -402,18 +405,20 @@ export function CustomCategoryPageClient({
                     </div>
                     <ul className="divide-y divide-violet-50">
                       {(entries ?? []).map((entry) => (
-                        <li key={entry.id} className="group flex items-center justify-between py-2.5">
-                          <p className="text-base text-green-800">{entry.description ?? <span className="text-green-400">entry</span>}</p>
-                          <div className="flex items-center gap-3">
-                            <p className="font-mono text-base tabular-nums text-violet-500">{fmtFull(Number(entry.amount))}</p>
-                            <button
-                              type="button" onClick={() => deleteEntry.mutate({ id: entry.id })} disabled={deleteEntry.isPending}
-                              className="cursor-pointer opacity-0 transition-opacity group-hover:opacity-100" aria-label="Delete entry"
-                            >
-                              <Trash2 size={14} className="text-green-400 transition hover:text-red-500" />
-                            </button>
-                          </div>
-                        </li>
+                        <EditableEntryRow
+                          key={entry.id}
+                          id={entry.id}
+                          amount={Number(entry.amount)}
+                          description={entry.description ?? null}
+                          date={entry.date}
+                          accent="violet"
+                          onDelete={() => deleteEntry.mutate({ id: entry.id })}
+                          onSaveSuccess={() => {
+                            void utils.entry.listAllForCategory.invalidate({ categoryId });
+                            void utils.entry.listForCategories.invalidate();
+                          }}
+                          isDeleting={deleteEntry.isPending}
+                        />
                       ))}
                     </ul>
                   </div>

@@ -3,10 +3,11 @@
 import { useMemo, useState } from "react";
 import { format, parseISO, subDays } from "date-fns";
 import Link from "next/link";
-import { ArrowLeft, Pencil, Plus, Trash2, X } from "lucide-react";
+import { ArrowLeft, Pencil, Plus, X } from "lucide-react";
 
 import { api } from "~/trpc/react";
 import { useToast } from "./toast-provider";
+import { EditableEntryRow } from "./editable-entry-row";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -14,9 +15,6 @@ function fmt(n: number) {
   return new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD", maximumFractionDigits: 0 }).format(n);
 }
 
-function fmtFull(n: number) {
-  return new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
-}
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -343,20 +341,21 @@ function SavingCategoryCard({
                   </div>
                   <ul className="divide-y divide-green-50">
                     {(txs ?? []).map((tx) => (
-                      <li key={tx.id} className="group flex items-center justify-between py-2.5">
-                        <p className="text-base text-green-800">
-                          {tx.description ?? <span className="text-green-400">contribution</span>}
-                        </p>
-                        <div className="flex items-center gap-3">
-                          <p className="font-mono text-base tabular-nums text-green-600">+{fmtFull(Number(tx.amount))}</p>
-                          <button
-                            type="button" onClick={() => deleteEntry.mutate({ id: tx.id })} disabled={deleteEntry.isPending}
-                            className="cursor-pointer opacity-0 transition-opacity group-hover:opacity-100" aria-label="Delete contribution"
-                          >
-                            <Trash2 size={14} className="text-green-400 transition hover:text-red-500" />
-                          </button>
-                        </div>
-                      </li>
+                      <EditableEntryRow
+                        key={tx.id}
+                        id={tx.id}
+                        amount={Number(tx.amount)}
+                        description={tx.description ?? null}
+                        date={tx.date}
+                        accent="green"
+                        amountPrefix="+"
+                        onDelete={() => deleteEntry.mutate({ id: tx.id })}
+                        onSaveSuccess={() => {
+                          void utils.entry.listAllForCategory.invalidate({ categoryId: category.id });
+                          void utils.entry.listForCategories.invalidate();
+                        }}
+                        isDeleting={deleteEntry.isPending}
+                      />
                     ))}
                   </ul>
                 </div>
