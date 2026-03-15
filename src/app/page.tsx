@@ -89,11 +89,11 @@ export default async function LandingPage() {
             {/* Section heading */}
             <div className="mb-14 text-center">
               <p className="mb-3 text-sm font-medium uppercase tracking-widest text-green-500">
-                what's inside
+                what&apos;s inside
               </p>
               <h2 className="text-3xl font-semibold tracking-tight text-green-950 md:text-4xl">
                 everything your budget needs,{" "}
-                <span className="text-green-400">nothing it doesn't</span>
+                <span className="text-green-400">nothing it doesn&apos;t</span>
               </h2>
             </div>
 
