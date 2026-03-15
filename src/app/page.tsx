@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { auth } from "~/server/auth";
 import { BudgieMascot } from "~/app/_components/budgie-mascot";
 import { FloatingNavbar } from "~/app/_components/floating-navbar";
+import { MockDashboard } from "~/app/_components/mock-dashboard";
 import { OtpSignInForm } from "~/app/_components/otp-signin-form";
 
 export default async function LandingPage() {
