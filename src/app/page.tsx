@@ -101,7 +101,7 @@ export default async function LandingPage() {
           </div>
 
           {/* Mock dashboard — exact 1:1 replica of the real app */}
-          <div className="relative mx-auto max-w-3xl px-6 pb-20">
+          <div className="relative mx-auto max-w-6xl px-6 pb-20">
             <MockDashboard />
             {/* Shadow reflection */}
             <div className="mx-auto mt-[-2px] h-8 w-[85%] rounded-b-2xl bg-gradient-to-b from-green-200/30 to-transparent blur-sm" />
