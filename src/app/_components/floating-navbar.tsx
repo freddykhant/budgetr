@@ -24,7 +24,7 @@ export function FloatingNavbar() {
         className={`flex items-center gap-5 rounded-2xl border px-5 py-3 backdrop-blur-xl transition-all duration-500 ${
           scrolled
             ? "border-green-200/90 bg-white/95 shadow-lg shadow-green-900/8"
-            : "border-white/10 bg-white/5 shadow-md shadow-black/10"
+            : "border-green-200/50 bg-white/60 shadow-md shadow-green-900/5"
         }`}
       >
         <a href="#" className="flex items-center gap-2.5">
@@ -35,20 +35,12 @@ export function FloatingNavbar() {
             height={26}
             className="rounded-lg"
           />
-          <span
-            className={`text-sm font-semibold tracking-tight transition-colors duration-500 ${
-              scrolled ? "text-green-950" : "text-white"
-            }`}
-          >
+          <span className="text-sm font-semibold tracking-tight text-green-950">
             budgie
           </span>
         </a>
 
-        <div
-          className={`h-4 w-px transition-colors duration-500 ${
-            scrolled ? "bg-green-200" : "bg-white/15"
-          }`}
-        />
+        <div className="h-4 w-px bg-green-200" />
 
         <div className="hidden items-center gap-4 sm:flex">
           {[
@@ -58,26 +50,18 @@ export function FloatingNavbar() {
             <a
               key={href}
               href={href}
-              className={`text-sm transition-colors ${
-                scrolled
-                  ? "text-green-700 hover:text-green-950"
-                  : "text-white/60 hover:text-white"
-              }`}
+              className="text-sm text-green-700 transition-colors hover:text-green-950"
             >
               {label}
             </a>
           ))}
         </div>
 
-        <div
-          className={`hidden h-4 w-px sm:block transition-colors duration-500 ${
-            scrolled ? "bg-green-200" : "bg-white/15"
-          }`}
-        />
+        <div className="hidden h-4 w-px bg-green-200 sm:block" />
 
         <a
           href="#signin"
-          className="rounded-xl bg-green-500 px-4 py-1.5 text-sm font-medium text-white transition-all hover:bg-green-400 hover:shadow-md hover:shadow-green-500/25"
+          className="rounded-xl bg-green-600 px-4 py-1.5 text-sm font-medium text-white transition-all hover:bg-green-500 hover:shadow-md hover:shadow-green-500/25"
         >
           sign in
         </a>

@@ -25,6 +25,40 @@
   }
 }
 
+/* ─── Landing page gradient text ───────────────────────────────────────────── */
+
+.landing-gradient-text {
+  background: linear-gradient(135deg, #22c55e 0%, #10b981 40%, #059669 70%, #34d399 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.landing-shimmer-text {
+  background: linear-gradient(
+    90deg,
+    #16a34a 0%,
+    #22c55e 25%,
+    #10b981 50%,
+    #059669 75%,
+    #16a34a 100%
+  );
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer-slide 4s linear infinite;
+}
+
+@keyframes shimmer-slide {
+  0% {
+    background-position: 200% center;
+  }
+  100% {
+    background-position: -200% center;
+  }
+}
+
 @keyframes budgie-bob {
   0%, 100% {
     transform: translateY(0);
