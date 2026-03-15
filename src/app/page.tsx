@@ -78,9 +78,7 @@ export default async function LandingPage() {
 
             {/* Right: sign-in card */}
             <div id="signin" className="w-full max-w-sm shrink-0">
-              <div className="rounded-2xl border border-green-100 bg-white p-7 shadow-xl shadow-green-900/6">
-                <OtpSignInForm />
-              </div>
+              <OtpSignInForm />
             </div>
           </div>
         </section>
