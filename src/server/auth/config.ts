@@ -46,7 +46,9 @@ export const auth = betterAuth({
 
         if (error) {
           console.error("[auth] Resend error:", error);
-          throw new Error("Failed to send verification email. Please try again.");
+          throw new Error(
+            "Failed to send verification email. Please try again.",
+          );
         }
       },
       expiresIn: 600,
