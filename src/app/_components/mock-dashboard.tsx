@@ -216,16 +216,16 @@ function MockBudgetCard() {
       <div className="flex items-start justify-between">
         <div>
           <div className="flex items-center gap-1.5">
-            <p className="text-xs font-semibold uppercase tracking-widest text-green-400">monthly income</p>
-            <span className="rounded-full border border-green-200 bg-green-50 px-1.5 py-0.5 text-xs text-green-600 tabular-nums">
+            <p className="text-sm font-semibold uppercase tracking-widest text-green-400">monthly income</p>
+            <span className="rounded-full border border-green-200 bg-green-50 px-1.5 py-0.5 text-sm text-green-600 tabular-nums">
               day {DAY} of {TOTAL_DAYS}
             </span>
           </div>
           <div className="mt-1.5">
-            <p className="font-mono text-3xl font-semibold tabular-nums tracking-tight text-green-950">
+            <p className="font-mono text-4xl font-semibold tabular-nums tracking-tight text-green-950">
               {fmt(INCOME)}
             </p>
-            <p className="mt-1 font-mono text-xs tabular-nums text-green-500">
+            <p className="mt-1 font-mono text-sm tabular-nums text-green-500">
               {fmt(remaining)} remaining
             </p>
           </div>
@@ -233,7 +233,7 @@ function MockBudgetCard() {
 
         <button
           type="button"
-          className="flex h-7 cursor-default items-center gap-1 rounded-full border border-green-200 bg-green-50 px-3 text-xs text-green-600"
+          className="flex h-7 cursor-default items-center gap-1 rounded-full border border-green-200 bg-green-50 px-3 text-sm text-green-600"
         >
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
@@ -247,7 +247,7 @@ function MockBudgetCard() {
 
       {/* Budget split */}
       <div className="space-y-3">
-        <div className="flex items-center justify-between text-xs text-green-600">
+        <div className="flex items-center justify-between text-sm text-green-600">
           <span>budget split</span>
           <span className="tabular-nums">{fmt(INCOME)} allocated · {fmt(0)} free</span>
         </div>
@@ -265,10 +265,10 @@ function MockBudgetCard() {
             <div key={a.name} className="rounded-lg bg-green-50 p-2.5">
               <div className={`mb-1.5 h-0.5 w-4 rounded-full ${a.color}`} />
               <p className="font-mono text-base font-semibold tabular-nums text-green-950">{a.pct}%</p>
-              <p className="mt-0.5 truncate text-xs text-green-600">
+              <p className="mt-0.5 truncate text-sm text-green-600">
                 <span className="mr-0.5">{a.emoji}</span>{a.name}
               </p>
-              <p className="mt-0.5 font-mono text-xs tabular-nums text-green-500">{fmt(a.amount)}</p>
+              <p className="mt-0.5 font-mono text-sm tabular-nums text-green-500">{fmt(a.amount)}</p>
             </div>
           ))}
         </div>
@@ -285,15 +285,15 @@ function MockSavingsCard() {
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-1.5">
           <span className="h-1.5 w-1.5 rounded-full bg-green-400" />
-          <span className="text-xs font-semibold uppercase tracking-widest text-green-500">
-            <span className="mr-0.5 text-xs">💰</span>savings
+          <span className="text-sm font-semibold uppercase tracking-widest text-green-500">
+            <span className="mr-0.5 text-sm">💰</span>savings
           </span>
         </div>
-        <span className="text-xs font-medium text-green-400">view →</span>
+        <span className="text-sm font-medium text-green-400">view →</span>
       </div>
 
-      <p className="font-mono text-2xl font-semibold tabular-nums text-green-950">{fmt(SAVINGS_TOTAL)}</p>
-      <p className="mt-0.5 text-xs text-green-600">
+      <p className="font-mono text-3xl font-semibold tabular-nums text-green-950">{fmt(SAVINGS_TOTAL)}</p>
+      <p className="mt-0.5 text-sm text-green-600">
         {fmt(SAVINGS_THIS_MONTH)} this month · of {fmt(SAVINGS_MONTHLY_ALLOC)} allocated
       </p>
 
@@ -303,12 +303,12 @@ function MockSavingsCard() {
 
       <div className="flex items-center justify-between">
         <div className="flex flex-col gap-0.5">
-          <span className="text-xs text-green-600">{Math.round(SAVINGS_MONTHLY_PCT)}% of monthly target</span>
-          <span className="text-xs text-green-400">
+          <span className="text-sm text-green-600">{Math.round(SAVINGS_MONTHLY_PCT)}% of monthly target</span>
+          <span className="text-sm text-green-400">
             Emergency Fund <span className="font-mono tabular-nums text-green-600">68%</span>
           </span>
         </div>
-        <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+        <span className="rounded-full bg-green-100 px-2 py-0.5 text-sm font-medium text-green-700">
           ahead of pace
         </span>
       </div>
@@ -324,15 +324,15 @@ function MockInvestmentsCard() {
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-1.5">
           <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
-          <span className="text-xs font-semibold uppercase tracking-widest text-blue-500">
-            <span className="mr-0.5 text-xs">📈</span>investments
+          <span className="text-sm font-semibold uppercase tracking-widest text-blue-500">
+            <span className="mr-0.5 text-sm">📈</span>investments
           </span>
         </div>
-        <span className="text-xs font-medium text-blue-400">view →</span>
+        <span className="text-sm font-medium text-blue-400">view →</span>
       </div>
 
-      <p className="font-mono text-2xl font-semibold tabular-nums text-green-950">{fmt(INVEST_TOTAL)}</p>
-      <p className="mt-0.5 text-xs text-green-600">
+      <p className="font-mono text-3xl font-semibold tabular-nums text-green-950">{fmt(INVEST_TOTAL)}</p>
+      <p className="mt-0.5 text-sm text-green-600">
         {fmt(INVEST_THIS_MONTH)} this month · of {fmt(INVEST_MONTHLY_ALLOC)} allocated
       </p>
 
@@ -342,12 +342,12 @@ function MockInvestmentsCard() {
 
       <div className="flex items-center justify-between">
         <div className="flex flex-col gap-0.5">
-          <span className="text-xs text-green-600">{Math.round(INVEST_MONTHLY_PCT)}% of monthly target</span>
-          <span className="text-xs text-blue-400">
+          <span className="text-sm text-green-600">{Math.round(INVEST_MONTHLY_PCT)}% of monthly target</span>
+          <span className="text-sm text-blue-400">
             VDHG Portfolio <span className="font-mono tabular-nums text-blue-600">72%</span>
           </span>
         </div>
-        <span className="rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600">
+        <span className="rounded-full bg-blue-50 px-2 py-0.5 text-sm font-medium text-blue-600">
           on track
         </span>
       </div>
@@ -361,27 +361,27 @@ function MockSubscriptionsCard() {
   return (
     <div className="rounded-xl border border-indigo-100 bg-white p-4 shadow-sm shadow-indigo-900/5">
       <div className="mb-3 flex items-center justify-between">
-        <p className="text-xs font-semibold uppercase tracking-widest text-indigo-400">🔁 subscriptions</p>
+        <p className="text-sm font-semibold uppercase tracking-widest text-indigo-400">🔁 subscriptions</p>
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-indigo-300">
           <path d="M5 12h14M12 5l7 7-7 7" />
         </svg>
       </div>
 
-      <p className="font-mono text-xl font-semibold tabular-nums text-green-950">
+      <p className="font-mono text-2xl font-semibold tabular-nums text-green-950">
         {fmt(SUBS_TOTAL)}
-        <span className="ml-0.5 text-xs font-normal text-green-400">/mo</span>
+        <span className="ml-0.5 text-sm font-normal text-green-400">/mo</span>
       </p>
 
       <div className="mt-2 flex items-center justify-between">
         <div className="flex items-center gap-0.5">
           {SUBS.slice(0, 4).map((s) => (
-            <span key={s.name} className="flex h-5 w-5 items-center justify-center rounded-full bg-indigo-50 text-xs">
+            <span key={s.name} className="flex h-5 w-5 items-center justify-center rounded-full bg-indigo-50 text-sm">
               {s.emoji}
             </span>
           ))}
-          <span className="ml-0.5 text-xs text-indigo-400">+1</span>
+          <span className="ml-0.5 text-sm text-indigo-400">+1</span>
         </div>
-        <p className="text-xs text-green-500">{SUBS.length} subscriptions</p>
+        <p className="text-sm text-green-500">{SUBS.length} subscriptions</p>
       </div>
     </div>
   );
@@ -397,11 +397,11 @@ export function MockDashboard() {
         <div className="flex items-center justify-between px-4 py-2.5">
           <div className="flex items-center gap-2">
             <Image src="/budgie_1.png" alt="budgie" width={24} height={24} className="rounded-md shadow-sm shadow-green-900/10" />
-            <span className="text-sm font-semibold tracking-tight text-green-950">budgie</span>
+            <span className="text-base font-semibold tracking-tight text-green-950">budgie</span>
           </div>
           {/* Mock user avatar */}
           <div className="flex size-7 items-center justify-center overflow-hidden rounded-full bg-green-200 ring-2 ring-green-300/50">
-            <span className="text-xs font-semibold text-green-700">AC</span>
+            <span className="text-sm font-semibold text-green-700">AC</span>
           </div>
         </div>
       </header>
@@ -413,26 +413,26 @@ export function MockDashboard() {
           {/* Greeting */}
           <section className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-green-400">good morning</p>
-              <h1 className="mt-0.5 text-lg font-semibold tracking-tight text-green-950">
+              <p className="text-sm font-semibold uppercase tracking-widest text-green-400">good morning</p>
+              <h1 className="mt-0.5 text-xl font-semibold tracking-tight text-green-950">
                 Alex, here&apos;s your month
               </h1>
-              <p className="mt-0.5 text-xs text-green-600">
+              <p className="mt-0.5 text-sm text-green-600">
                 You&apos;re {Math.round(MONTH_ELAPSED_PCT)}% through March and {Math.round(SPENDING_USED_PCT)}% through your spending budget — right on pace.
               </p>
             </div>
             <div className="flex items-end gap-2 md:flex-col md:items-end">
-              <p className="text-xs text-green-600">March 2026</p>
+              <p className="text-sm text-green-600">March 2026</p>
               <div className="flex flex-col items-end gap-0.5">
-                <p className="text-xs text-green-400 tabular-nums">day {DAY} of {TOTAL_DAYS}</p>
+                <p className="text-sm text-green-400 tabular-nums">day {DAY} of {TOTAL_DAYS}</p>
                 <div className="h-1 w-24 overflow-hidden rounded-full bg-green-200">
                   <div className="h-full rounded-full bg-green-500" style={{ width: `${MONTH_ELAPSED_PCT}%` }} />
                 </div>
               </div>
-              <span className="inline-flex items-center rounded-full border border-green-200 bg-green-50 px-2 py-0.5 text-xs font-medium text-green-600">
+              <span className="inline-flex items-center rounded-full border border-green-200 bg-green-50 px-2 py-0.5 text-sm font-medium text-green-600">
                 payday in 5 days
               </span>
-              <span className="inline-flex items-center gap-1 rounded-full border border-green-200 bg-green-50 px-2 py-0.5 text-xs font-medium text-green-600">
+              <span className="inline-flex items-center gap-1 rounded-full border border-green-200 bg-green-50 px-2 py-0.5 text-sm font-medium text-green-600">
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
                 view history
               </span>
