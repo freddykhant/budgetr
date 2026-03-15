@@ -215,7 +215,7 @@ function CodeStep({ email, onBack }: { email: string; onBack: () => void }) {
     setError("");
     if (char && idx < CODE_LENGTH - 1) focusAt(idx + 1);
     const code = next.join("");
-    if (code.length === CODE_LENGTH && !code.includes("")) void verify(code);
+    if (!next.includes("")) void verify(code);
   }
 
   function handleKeyDown(idx: number, e: KeyboardEvent<HTMLInputElement>) {
@@ -246,7 +246,7 @@ function CodeStep({ email, onBack }: { email: string; onBack: () => void }) {
     setDigits(next);
     setError("");
     focusAt(Math.min(pasted.length, CODE_LENGTH - 1));
-    if (pasted.length === CODE_LENGTH) void verify(pasted);
+    if (pasted.length === CODE_LENGTH) void verify(next.join(""));
   }
 
   async function handleResend() {
