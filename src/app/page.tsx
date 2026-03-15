@@ -17,169 +17,380 @@ export default async function LandingPage() {
 
       <main className="bg-white text-green-950">
         {/* ── Hero ─────────────────────────────────────────────────────────── */}
-        <section className="relative min-h-screen overflow-hidden bg-linear-to-br from-green-50 via-white to-white">
+        <section className="relative min-h-screen overflow-hidden bg-green-950">
           {/* Glow orbs */}
           <div className="pointer-events-none absolute inset-0">
-            <div className="absolute top-1/4 left-1/3 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-green-200/40 blur-[120px]" />
-            <div className="absolute right-1/4 bottom-1/3 h-[400px] w-[400px] rounded-full bg-lime-200/30 blur-[100px]" />
+            <div className="absolute top-0 left-1/2 h-[800px] w-[800px] -translate-x-1/2 -translate-y-1/3 rounded-full bg-green-500/20 blur-[160px]" />
+            <div className="absolute right-0 bottom-0 h-[500px] w-[500px] rounded-full bg-emerald-500/10 blur-[120px]" />
+            <div className="absolute bottom-1/4 left-0 h-[400px] w-[400px] rounded-full bg-lime-500/8 blur-[100px]" />
           </div>
 
-          {/* Decorative mascots */}
+          {/* Grid pattern overlay */}
+          <div
+            className="pointer-events-none absolute inset-0 opacity-[0.03]"
+            style={{
+              backgroundImage:
+                "linear-gradient(rgba(255,255,255,.3) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.3) 1px, transparent 1px)",
+              backgroundSize: "64px 64px",
+            }}
+          />
+
+          {/* Floating mascots */}
           <div className="pointer-events-none absolute inset-0 overflow-hidden">
-            <div className="absolute right-[6%] top-[22%] opacity-15">
-              <BudgieMascot size={72} animate="float" />
+            <div className="absolute right-[8%] top-[15%] opacity-20">
+              <BudgieMascot size={80} animate="float" />
             </div>
-            <div className="absolute bottom-[18%] left-[4%] opacity-10">
-              <BudgieMascot size={48} animate="bob" />
+            <div className="absolute bottom-[12%] left-[5%] opacity-15">
+              <BudgieMascot size={52} animate="bob" />
             </div>
-            <div className="absolute top-[60%] right-[18%] opacity-10">
+            <div className="absolute top-[55%] right-[15%] opacity-10">
               <BudgieMascot size={36} animate="tilt" />
             </div>
           </div>
 
-          {/* Hero content */}
-          <div className="relative mx-auto flex min-h-screen max-w-6xl flex-col items-center justify-center gap-16 px-6 py-32 md:flex-row md:gap-12 md:py-0">
-            {/* Left: copy */}
-            <div className="flex flex-1 flex-col items-center gap-6 text-center md:items-start md:text-left">
-              {/* Mascot + badge */}
-              <div className="flex items-center gap-3">
-                <BudgieMascot size={52} animate="float" />
-                <span className="rounded-full border border-green-200 bg-green-100/60 px-3 py-1 text-xs font-medium tracking-wide text-green-700">
-                  stupidly simple budgeting
-                </span>
-              </div>
-
-              {/* Headline */}
-              <h1 className="text-[clamp(2.5rem,6vw,4rem)] font-semibold leading-[1.05] tracking-tight text-green-950">
-                your money,{" "}
-                <span className="text-green-500">finally</span>{" "}
-                making sense
-              </h1>
-
-              {/* Sub-copy */}
-              <p className="max-w-md text-lg leading-relaxed text-green-700/80">
-                set your income, log what you spend, watch the magic happen.
-                no formulas, no guilt, no spreadsheets.
-              </p>
-
-              {/* Trust pills */}
-              <div className="flex flex-wrap items-center justify-center gap-2 md:justify-start">
-                {["free forever", "no ads", "your data stays yours"].map((t) => (
-                  <span
-                    key={t}
-                    className="flex items-center gap-1.5 rounded-full border border-green-100 bg-green-50 px-3 py-1 text-xs text-green-600"
-                  >
-                    <span className="h-1.5 w-1.5 rounded-full bg-green-400" />
-                    {t}
-                  </span>
-                ))}
-              </div>
+          {/* Content */}
+          <div className="relative mx-auto flex min-h-screen max-w-4xl flex-col items-center justify-center px-6 py-32 text-center">
+            {/* Badge */}
+            <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-green-500/20 bg-green-500/10 px-4 py-1.5 backdrop-blur-sm">
+              <BudgieMascot size={20} animate="bob" />
+              <span className="text-xs font-medium tracking-wide text-green-300">
+                stupidly simple budgeting
+              </span>
             </div>
 
-            {/* Right: sign-in card */}
-            <div id="signin" className="w-full max-w-sm shrink-0">
+            {/* Headline */}
+            <h1 className="mb-6 text-[clamp(2.5rem,7vw,4.5rem)] leading-[1.05] font-bold tracking-tight text-white">
+              your money,{" "}
+              <span className="bg-gradient-to-r from-green-400 to-emerald-300 bg-clip-text text-transparent">
+                finally
+              </span>{" "}
+              making sense.
+            </h1>
+
+            {/* Sub-copy */}
+            <p className="mx-auto mb-10 max-w-xl text-lg leading-relaxed text-green-200/70">
+              set your income. split it across categories. log what you spend.
+              watch everything update in real time. no formulas, no guilt, no
+              spreadsheets ever again.
+            </p>
+
+            {/* CTA */}
+            <div className="mb-12 flex flex-col items-center gap-4 sm:flex-row">
+              <a
+                href="#signin"
+                className="group flex h-12 items-center gap-2 rounded-xl bg-green-500 px-8 text-sm font-semibold text-white shadow-lg shadow-green-500/25 transition-all hover:bg-green-400 hover:shadow-xl hover:shadow-green-400/30 active:scale-[0.97]"
+              >
+                get started free
+                <span className="transition-transform group-hover:translate-x-0.5">
+                  &rarr;
+                </span>
+              </a>
+              <span className="text-sm text-green-400/60">
+                2 min setup &middot; no card needed
+              </span>
+            </div>
+
+            {/* Trust pills */}
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              {["free forever", "no ads", "your data stays yours"].map((t) => (
+                <span
+                  key={t}
+                  className="flex items-center gap-2 rounded-full border border-green-500/15 bg-green-500/5 px-3.5 py-1.5 text-xs text-green-300/80 backdrop-blur-sm"
+                >
+                  <span className="h-1.5 w-1.5 rounded-full bg-green-400" />
+                  {t}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Bottom fade */}
+          <div className="absolute right-0 bottom-0 left-0 h-24 bg-gradient-to-t from-green-950 to-transparent" />
+        </section>
+
+        {/* ── How it works ────────────────────────────────────────────────── */}
+        <section id="how" className="relative overflow-hidden bg-green-950 pb-24 pt-8">
+          <div className="mx-auto max-w-5xl px-6">
+            <div className="mb-16 text-center">
+              <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-green-400">
+                how it works
+              </p>
+              <h2 className="text-3xl font-bold tracking-tight text-white md:text-4xl">
+                three steps. two minutes.{" "}
+                <span className="text-green-400">zero stress.</span>
+              </h2>
+            </div>
+
+            <div className="grid gap-6 md:grid-cols-3">
+              {[
+                {
+                  step: "01",
+                  emoji: "💰",
+                  title: "set your income",
+                  body: "tell budgie how much you earn each month. that&apos;s your starting point.",
+                },
+                {
+                  step: "02",
+                  emoji: "🎯",
+                  title: "split it up",
+                  body: "drag sliders to divvy your income across spending, savings, investments, and custom goals.",
+                },
+                {
+                  step: "03",
+                  emoji: "✨",
+                  title: "log & watch",
+                  body: "add transactions as they happen. your remaining balances update instantly. magic.",
+                },
+              ].map(({ step, emoji, title, body }) => (
+                <div
+                  key={step}
+                  className="group relative rounded-2xl border border-green-800/50 bg-green-900/30 p-6 backdrop-blur-sm transition-all hover:border-green-700/50 hover:bg-green-900/50"
+                >
+                  <div className="mb-4 flex items-center gap-3">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-green-500/10 text-xl">
+                      {emoji}
+                    </span>
+                    <span className="font-mono text-xs tracking-wider text-green-500">
+                      {step}
+                    </span>
+                  </div>
+                  <h3 className="mb-2 text-lg font-semibold text-white">{title}</h3>
+                  <p
+                    className="text-sm leading-relaxed text-green-300/60"
+                    dangerouslySetInnerHTML={{ __html: body }}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── Dashboard showcase ──────────────────────────────────────────── */}
+        <section className="relative overflow-hidden border-t border-green-100 bg-gradient-to-b from-green-50 to-white py-24">
+          <div className="pointer-events-none absolute inset-0">
+            <div className="absolute top-0 left-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-green-200/40 blur-[120px]" />
+          </div>
+
+          <div className="relative mx-auto max-w-5xl px-6">
+            <div className="mb-16 text-center">
+              <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-green-500">
+                the dashboard
+              </p>
+              <h2 className="text-3xl font-bold tracking-tight text-green-950 md:text-4xl">
+                everything at a glance.{" "}
+                <span className="text-green-400">nothing buried.</span>
+              </h2>
+              <p className="mx-auto mt-4 max-w-xl text-green-700/60">
+                your spending, savings, investments, subscriptions, and goals —
+                all on one screen. instant clarity.
+              </p>
+            </div>
+
+            {/* Mock dashboard cards */}
+            <div className="mx-auto max-w-3xl">
+              <div className="rounded-2xl border border-green-200/80 bg-white p-4 shadow-2xl shadow-green-900/8 md:p-6">
+                {/* Mock header bar */}
+                <div className="mb-5 flex items-center justify-between rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 px-5 py-3.5">
+                  <div className="flex items-center gap-2.5">
+                    <Image
+                      src="/budgie_1.png"
+                      alt="budgie"
+                      width={22}
+                      height={22}
+                      className="rounded-md"
+                    />
+                    <span className="text-sm font-semibold text-white">budgie</span>
+                  </div>
+                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/20">
+                    <div className="h-4 w-4 rounded-full bg-white/50" />
+                  </div>
+                </div>
+
+                {/* Mock greeting */}
+                <div className="mb-5 px-1">
+                  <p className="text-sm text-green-700/50">good morning</p>
+                  <p className="text-xl font-bold text-green-950">welcome back, you!</p>
+                </div>
+
+                {/* Mock cards grid */}
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {/* Spending card */}
+                  <div className="rounded-xl border border-green-100 bg-green-50/50 p-4">
+                    <div className="mb-3 flex items-center justify-between">
+                      <span className="text-xs font-medium text-green-600">spending</span>
+                      <span className="text-xs text-green-400">💸</span>
+                    </div>
+                    <p className="mb-1 text-2xl font-bold text-green-950">$847</p>
+                    <p className="mb-3 text-xs text-green-600/60">of $1,200 budget</p>
+                    <div className="h-2 overflow-hidden rounded-full bg-green-100">
+                      <div className="h-full w-[70%] rounded-full bg-gradient-to-r from-green-400 to-green-500" />
+                    </div>
+                  </div>
+
+                  {/* Savings card */}
+                  <div className="rounded-xl border border-green-100 bg-green-50/50 p-4">
+                    <div className="mb-3 flex items-center justify-between">
+                      <span className="text-xs font-medium text-green-600">savings</span>
+                      <span className="text-xs text-green-400">🐷</span>
+                    </div>
+                    <p className="mb-1 text-2xl font-bold text-green-950">$340</p>
+                    <p className="mb-3 text-xs text-green-600/60">of $500 goal</p>
+                    <div className="h-2 overflow-hidden rounded-full bg-green-100">
+                      <div className="h-full w-[68%] rounded-full bg-gradient-to-r from-emerald-400 to-green-500" />
+                    </div>
+                  </div>
+
+                  {/* Investments card */}
+                  <div className="rounded-xl border border-green-100 bg-green-50/50 p-4">
+                    <div className="mb-3 flex items-center justify-between">
+                      <span className="text-xs font-medium text-green-600">investments</span>
+                      <span className="text-xs text-green-400">📈</span>
+                    </div>
+                    <p className="mb-1 text-2xl font-bold text-green-950">$200</p>
+                    <p className="mb-3 text-xs text-green-600/60">of $300 target</p>
+                    <div className="h-2 overflow-hidden rounded-full bg-green-100">
+                      <div className="h-full w-[67%] rounded-full bg-gradient-to-r from-lime-400 to-green-500" />
+                    </div>
+                  </div>
+
+                  {/* Subscriptions card */}
+                  <div className="rounded-xl border border-green-100 bg-green-50/50 p-4">
+                    <div className="mb-3 flex items-center justify-between">
+                      <span className="text-xs font-medium text-green-600">subscriptions</span>
+                      <span className="text-xs text-green-400">🔄</span>
+                    </div>
+                    <p className="mb-1 text-2xl font-bold text-green-950">$67</p>
+                    <p className="mb-3 text-xs text-green-600/60">4 active subscriptions</p>
+                    <div className="flex gap-1.5">
+                      {["🎵", "📺", "☁️", "🎮"].map((e) => (
+                        <span
+                          key={e}
+                          className="flex h-7 w-7 items-center justify-center rounded-lg bg-green-100 text-xs"
+                        >
+                          {e}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── Features grid ───────────────────────────────────────────────── */}
+        <section id="features" className="border-t border-green-100 bg-white py-24">
+          <div className="mx-auto max-w-5xl px-6">
+            <div className="mb-14 text-center">
+              <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-green-500">
+                features
+              </p>
+              <h2 className="text-3xl font-bold tracking-tight text-green-950 md:text-4xl">
+                everything you need,{" "}
+                <span className="text-green-400">nothing you don&apos;t.</span>
+              </h2>
+            </div>
+
+            {/* Dense grid — readme.com style */}
+            <div className="grid gap-px overflow-hidden rounded-2xl border border-green-100 bg-green-100 sm:grid-cols-2 lg:grid-cols-3">
+              {[
+                { emoji: "💸", title: "smart budget split", body: "divide your income across categories with percentage sliders." },
+                { emoji: "✏️", title: "two-tap logging", body: "add a transaction in seconds. balances update instantly." },
+                { emoji: "🎯", title: "savings goals", body: "set targets and track progress with visual milestones." },
+                { emoji: "📈", title: "investment tracking", body: "monitor investment contributions alongside everything else." },
+                { emoji: "💳", title: "credit card chaser", body: "track intro spend targets and bonus points deadlines." },
+                { emoji: "🔄", title: "subscription counter", body: "keep tabs on recurring costs. see the real monthly total." },
+                { emoji: "📊", title: "monthly history", body: "rewind to past months. see trends, charts, and patterns." },
+                { emoji: "✨", title: "custom categories", body: "travel fund, wedding, side hustle — create anything." },
+                { emoji: "🔒", title: "private & secure", body: "your data stays yours. no tracking, no ads, no selling." },
+              ].map(({ emoji, title, body }) => (
+                <div
+                  key={title}
+                  className="group bg-white p-6 transition-colors hover:bg-green-50/50"
+                >
+                  <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-green-100 text-lg transition-transform group-hover:scale-105">
+                    {emoji}
+                  </div>
+                  <h3 className="mb-1.5 text-sm font-semibold text-green-950">{title}</h3>
+                  <p className="text-xs leading-relaxed text-green-700/60">{body}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── Personality / Mascot section ─────────────────────────────────── */}
+        <section className="relative overflow-hidden bg-green-950 py-24">
+          <div className="pointer-events-none absolute inset-0">
+            <div className="absolute top-1/2 left-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-green-500/10 blur-[150px]" />
+          </div>
+
+          <div className="relative mx-auto flex max-w-3xl flex-col items-center gap-8 px-6 text-center">
+            <div className="flex items-center gap-4">
+              <BudgieMascot size={64} animate="float" />
+              <BudgieMascot size={44} animate="bob" />
+              <BudgieMascot size={28} animate="tilt" />
+            </div>
+
+            <h2 className="text-3xl font-bold tracking-tight text-white md:text-4xl">
+              built by someone who{" "}
+              <span className="bg-gradient-to-r from-green-400 to-emerald-300 bg-clip-text text-transparent">
+                hated spreadsheets
+              </span>
+            </h2>
+
+            <p className="max-w-lg text-lg leading-relaxed text-green-300/60">
+              budgie isn&apos;t a finance app for finance people. it&apos;s a
+              budget tool for normal humans who just want to know where their
+              money went without a 47-column spreadsheet.
+            </p>
+
+            <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
+              {[
+                { value: "2 min", label: "to set up" },
+                { value: "0", label: "spreadsheets" },
+                { value: "100%", label: "free" },
+                { value: "∞", label: "peace of mind" },
+              ].map(({ value, label }) => (
+                <div
+                  key={label}
+                  className="flex flex-col items-center gap-1 rounded-xl border border-green-800/40 bg-green-900/30 px-5 py-3 backdrop-blur-sm"
+                >
+                  <span className="text-xl font-bold text-green-400">{value}</span>
+                  <span className="text-xs text-green-400/60">{label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── Sign in ─────────────────────────────────────────────────────── */}
+        <section id="signin" className="relative overflow-hidden border-t border-green-100 bg-gradient-to-b from-green-50 to-white py-24">
+          <div className="pointer-events-none absolute inset-0">
+            <div className="absolute top-0 left-1/2 h-[400px] w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-green-200/30 blur-[100px]" />
+          </div>
+
+          <div className="relative mx-auto flex max-w-lg flex-col items-center gap-8 px-6 text-center">
+            <BudgieMascot size={48} animate="bob" />
+
+            <div>
+              <h2 className="mb-2 text-2xl font-bold tracking-tight text-green-950 md:text-3xl">
+                ready to take control?
+              </h2>
+              <p className="text-green-700/60">
+                takes about 2 minutes. no card required, no catch.
+              </p>
+            </div>
+
+            <div className="w-full max-w-sm">
               <OtpSignInForm />
             </div>
           </div>
         </section>
 
-        {/* ── Features ─────────────────────────────────────────────────────── */}
-        <section id="features" className="border-t border-green-100 bg-white py-24">
-          <div className="mx-auto max-w-5xl px-6">
-            {/* Section heading */}
-            <div className="mb-14 text-center">
-              <p className="mb-3 text-sm font-medium uppercase tracking-widest text-green-500">
-                what&apos;s inside
-              </p>
-              <h2 className="text-3xl font-semibold tracking-tight text-green-950 md:text-4xl">
-                everything your budget needs,{" "}
-                <span className="text-green-400">nothing it doesn&apos;t</span>
-              </h2>
-            </div>
-
-            {/* Tiles */}
-            <div className="grid gap-5 md:grid-cols-3">
-              {[
-                {
-                  emoji: "💸",
-                  title: "split it your way",
-                  body: "set your income and allocate it across spending, savings, and investments in seconds.",
-                },
-                {
-                  emoji: "✏️",
-                  title: "log in two taps",
-                  body: "add a transaction and watch your remaining balance update instantly. that's it.",
-                },
-                {
-                  emoji: "🎯",
-                  title: "goals that show up",
-                  body: "savings goals, investment milestones, subscription tracking — all in one place.",
-                },
-              ].map(({ emoji, title, body }) => (
-                <div
-                  key={title}
-                  className="rounded-2xl border border-green-100 bg-green-50/50 p-6"
-                >
-                  <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-green-100 text-xl">
-                    {emoji}
-                  </div>
-                  <h3 className="mb-2 font-semibold text-green-950">{title}</h3>
-                  <p className="text-sm leading-relaxed text-green-700/75">{body}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* Secondary row — extra details */}
-            <div className="mt-5 grid gap-5 md:grid-cols-2">
-              {[
-                {
-                  emoji: "📊",
-                  title: "see the full picture",
-                  body: "history view shows how your spending has shifted month to month. patterns become obvious.",
-                },
-                {
-                  emoji: "💳",
-                  title: "credit card chaser",
-                  body: "track intro spend targets, bonus points progress, and whether you've paid it in full.",
-                },
-              ].map(({ emoji, title, body }) => (
-                <div
-                  key={title}
-                  className="rounded-2xl border border-green-100 bg-green-50/50 p-6"
-                >
-                  <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-green-100 text-xl">
-                    {emoji}
-                  </div>
-                  <h3 className="mb-2 font-semibold text-green-950">{title}</h3>
-                  <p className="text-sm leading-relaxed text-green-700/75">{body}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── CTA strip ────────────────────────────────────────────────────── */}
-        <section className="border-t border-green-100 bg-green-50 py-20">
-          <div className="mx-auto flex max-w-2xl flex-col items-center gap-6 px-6 text-center">
-            <BudgieMascot size={48} animate="bob" />
-            <h2 className="text-2xl font-semibold tracking-tight text-green-950 md:text-3xl">
-              ready to ditch the spreadsheet?
-            </h2>
-            <p className="text-green-700/70">
-              takes about 2 minutes to set up. no card required, no catch.
-            </p>
-            <a
-              href="#signin"
-              className="rounded-xl bg-green-500 px-8 py-3 text-sm font-semibold text-white shadow-md shadow-green-500/25 transition hover:bg-green-600 hover:shadow-lg hover:shadow-green-500/30"
-            >
-              get started free
-            </a>
-          </div>
-        </section>
-
-        {/* ── Footer ───────────────────────────────────────────────────────── */}
-        <footer className="border-t border-green-900/20 bg-green-950 px-6 py-6">
-          <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-3 sm:flex-row">
+        {/* ── Footer ──────────────────────────────────────────────────────── */}
+        <footer className="border-t border-green-900/20 bg-green-950 px-6 py-8">
+          <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-4 sm:flex-row">
             <div className="flex items-center gap-2.5">
               <Image
                 src="/budgie_1.png"
@@ -188,9 +399,14 @@ export default async function LandingPage() {
                 height={22}
                 className="rounded-md opacity-80"
               />
-              <span className="text-sm font-medium text-green-400/70">budgie</span>
+              <span className="text-sm font-semibold text-green-400/70">budgie</span>
             </div>
-            <p className="text-xs text-green-600/60">
+            <div className="flex items-center gap-6 text-xs text-green-600/50">
+              <a href="#how" className="transition hover:text-green-400">how it works</a>
+              <a href="#features" className="transition hover:text-green-400">features</a>
+              <a href="#signin" className="transition hover:text-green-400">sign in</a>
+            </div>
+            <p className="text-xs text-green-600/40">
               made with ☕ and way too many spreadsheets
             </p>
           </div>
