@@ -100,98 +100,10 @@ export default async function LandingPage() {
             </div>
           </div>
 
-          {/* Mock dashboard — floats inside hero like readme.com */}
+          {/* Mock dashboard — exact 1:1 replica of the real app */}
           <div className="relative mx-auto max-w-3xl px-6 pb-20">
-            <div className="rounded-2xl border border-green-200/70 bg-white/80 p-4 shadow-2xl shadow-green-900/10 backdrop-blur-xl md:p-6">
-              {/* Mock header bar */}
-              <div className="mb-5 flex items-center justify-between rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 px-5 py-3.5">
-                <div className="flex items-center gap-2.5">
-                  <Image
-                    src="/budgie_1.png"
-                    alt="budgie"
-                    width={22}
-                    height={22}
-                    className="rounded-md"
-                  />
-                  <span className="text-sm font-semibold text-white">budgie</span>
-                </div>
-                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/20">
-                  <div className="h-4 w-4 rounded-full bg-white/50" />
-                </div>
-              </div>
-
-              {/* Mock greeting */}
-              <div className="mb-5 px-1">
-                <p className="text-sm text-green-700/50">good morning</p>
-                <p className="text-xl font-bold text-green-950">
-                  welcome back, you!
-                </p>
-              </div>
-
-              {/* Mock cards grid */}
-              <div className="grid gap-3 sm:grid-cols-2">
-                {/* Spending */}
-                <div className="rounded-xl border border-green-100 bg-green-50/50 p-4">
-                  <div className="mb-3 flex items-center justify-between">
-                    <span className="text-xs font-medium text-green-600">spending</span>
-                    <span className="text-xs">💸</span>
-                  </div>
-                  <p className="mb-1 text-2xl font-bold text-green-950">$847</p>
-                  <p className="mb-3 text-xs text-green-600/60">of $1,200 budget</p>
-                  <div className="h-2 overflow-hidden rounded-full bg-green-100">
-                    <div className="h-full w-[70%] rounded-full bg-gradient-to-r from-green-400 to-green-500" />
-                  </div>
-                </div>
-
-                {/* Savings */}
-                <div className="rounded-xl border border-green-100 bg-green-50/50 p-4">
-                  <div className="mb-3 flex items-center justify-between">
-                    <span className="text-xs font-medium text-green-600">savings</span>
-                    <span className="text-xs">🐷</span>
-                  </div>
-                  <p className="mb-1 text-2xl font-bold text-green-950">$340</p>
-                  <p className="mb-3 text-xs text-green-600/60">of $500 goal</p>
-                  <div className="h-2 overflow-hidden rounded-full bg-green-100">
-                    <div className="h-full w-[68%] rounded-full bg-gradient-to-r from-emerald-400 to-green-500" />
-                  </div>
-                </div>
-
-                {/* Investments */}
-                <div className="rounded-xl border border-green-100 bg-green-50/50 p-4">
-                  <div className="mb-3 flex items-center justify-between">
-                    <span className="text-xs font-medium text-green-600">investments</span>
-                    <span className="text-xs">📈</span>
-                  </div>
-                  <p className="mb-1 text-2xl font-bold text-green-950">$200</p>
-                  <p className="mb-3 text-xs text-green-600/60">of $300 target</p>
-                  <div className="h-2 overflow-hidden rounded-full bg-green-100">
-                    <div className="h-full w-[67%] rounded-full bg-gradient-to-r from-lime-400 to-green-500" />
-                  </div>
-                </div>
-
-                {/* Subscriptions */}
-                <div className="rounded-xl border border-green-100 bg-green-50/50 p-4">
-                  <div className="mb-3 flex items-center justify-between">
-                    <span className="text-xs font-medium text-green-600">subscriptions</span>
-                    <span className="text-xs">🔄</span>
-                  </div>
-                  <p className="mb-1 text-2xl font-bold text-green-950">$67</p>
-                  <p className="mb-3 text-xs text-green-600/60">4 active</p>
-                  <div className="flex gap-1.5">
-                    {["🎵", "📺", "☁️", "🎮"].map((e) => (
-                      <span
-                        key={e}
-                        className="flex h-7 w-7 items-center justify-center rounded-lg bg-green-100 text-xs"
-                      >
-                        {e}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Shadow reflection under card */}
+            <MockDashboard />
+            {/* Shadow reflection */}
             <div className="mx-auto mt-[-2px] h-8 w-[85%] rounded-b-2xl bg-gradient-to-b from-green-200/30 to-transparent blur-sm" />
           </div>
         </section>
